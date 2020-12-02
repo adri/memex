@@ -20,6 +20,19 @@ function renderItem(item, lastDate) {
       </div>
     </a>
     `
+    : item.provider === 'GitHub' || item.provider === 'Github' ?
+      `
+    <a href="${item.repo_homepage}" target="_blank">
+      ${instantsearch.highlight({attribute: 'repo_name', hit: item})}
+      <p class="text-xs text-gray-300 dark:text-gray-500 overflow-ellipsis whitespace-nowrap overflow-hidden">
+        ${instantsearch.highlight({attribute: 'repo_description', hit: item})}  
+      </p>
+      <p class="text-xs text-gray-300 dark:text-gray-500 overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <span class="capitalize">${item.repo_license}</span> 
+        ${item.repo_language} ${item.repo_stars_count} 
+      </p>
+    </a>
+    `
     :
     `
     <div class="text-xs text-gray-300 dark:text-gray-500 overflow-ellipsis whitespace-nowrap overflow-hidden">
@@ -40,6 +53,8 @@ function renderItem(item, lastDate) {
     `<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="./assets/images/safari-small.png" />`
     : item.provider === 'iMessage' ?
     `<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="./assets/images/iMessage-small.png" />`
+    : item.provider === 'GitHub' || item.provider === 'Github' ?
+    `<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="./assets/images/GitHub-small.png" />`
     :
     `<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>`;
 
@@ -147,40 +162,40 @@ search.addWidgets([
       `
     }
   }),
-  instantsearch.widgets.menu({
-    container: '#provider-facet',
-    attribute: 'provider',
-    sortBy: ['name:asc'],
-    cssClasses: {
-      'root': 'inline-block',
-      'item': 'inline-block'
-    },
-    templates: {
-      item: `
-        <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
-          <span class="">{{label}}</span>
-          <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
-        </a>
-    `,
-    },
-  }),
-  instantsearch.widgets.menu({
-    container: '#verb-facet',
-    attribute: 'verb',
-    sortBy: ['name:asc'],
-    cssClasses: {
-      'root': 'inline-block',
-      'item': 'inline-block'
-    },
-    templates: {
-      item: `
-        <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
-          <span class="">{{label}}</span>
-          <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
-        </a>
-    `,
-    },
-  }),
+  // instantsearch.widgets.menu({
+  //   container: '#provider-facet',
+  //   attribute: 'provider',
+  //   sortBy: ['name:asc'],
+  //   cssClasses: {
+  //     'root': 'inline-block',
+  //     'item': 'inline-block'
+  //   },
+  //   templates: {
+  //     item: `
+  //       <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
+  //         <span class="">{{label}}</span>
+  //         <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
+  //       </a>
+  //   `,
+  //   },
+  // }),
+  // instantsearch.widgets.menu({
+  //   container: '#verb-facet',
+  //   attribute: 'verb',
+  //   sortBy: ['name:asc'],
+  //   cssClasses: {
+  //     'root': 'inline-block',
+  //     'item': 'inline-block'
+  //   },
+  //   templates: {
+  //     item: `
+  //       <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
+  //         <span class="">{{label}}</span>
+  //         <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
+  //       </a>
+  //   `,
+  //   },
+  // }),
 ]);
 
 search.start();
