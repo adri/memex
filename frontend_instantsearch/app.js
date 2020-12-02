@@ -3,10 +3,19 @@ const search = instantsearch({
   searchClient: instantMeiliSearch("http://localhost:7700", "", {
     paginationTotalHits: 20, // default: 200.
     placeholderSearch: true, // default: true.
-    attributesToHighlight: []
+    attributesToHighlight: [],
   }),
   routing: true,
-  stalledSearchDelay: 0
+  stalledSearchDelay: 2,
+  searchFunction(helper) {
+    var methods = [];
+    for (var key in helper) {
+        methods.push(key);
+    }
+    console.log({helper, query: helper.state.query, funs: methods})
+
+    helper.search();
+  }
 });
 
 function renderItem(item, lastDate) {
@@ -23,12 +32,12 @@ function renderItem(item, lastDate) {
       `
     <a href="${item.repo_homepage}" target="_blank">
       ${instantsearch.highlight({attribute: 'repo_name', hit: item})}
-      <p class="text-xs text-gray-300 dark:text-gray-500 overflow-ellipsis whitespace-nowrap overflow-hidden">
+      <p class="text-sm text-gray-300 dark:text-gray-400 overflow-ellipsis whitespace-nowrap overflow-hidden">
         ${instantsearch.highlight({attribute: 'repo_description', hit: item})}  
       </p>
       <p class="text-xs text-gray-300 dark:text-gray-500 overflow-ellipsis whitespace-nowrap overflow-hidden">
-        <span class="capitalize">${item.repo_license}</span> 
-        ${item.repo_language} ${item.repo_stars_count} 
+        <span class="capitalize">${item.repo_license}</span>, 
+        ${item.repo_language}, ${item.repo_stars_count} stars 
       </p>
     </a>
     `
@@ -118,18 +127,24 @@ const customInfiniteHits = instantsearch.connectors.connectInfiniteHits(
 );
 
 search.addWidgets([
+  instantsearch.widgets.configure({
+    hitsPerPage: 20,
+    typoTolerance: false,
+  }),
   instantsearch.widgets.searchBox({
     container: "#searchbox",
     autofocus: true,
     showSubmit: false,
     showReset: false,
     showLoadingIndicator: false,
+    placeholder: 'Search...',
     cssClasses: {
       input: [
         'focus:ring-blue-900', 'focus:ring-2', 'w-full', 'text-black', 'dark:text-white',
         'dark:bg-black', 'px-10', 'py-4', 'rounded-xl'
       ],
     },
+
   }),
   customInfiniteHits({
     container: '#hits',
@@ -157,6 +172,15 @@ search.addWidgets([
             style="width: ${Math.max(1, percentage * 250)}px;" >
         </a>
       `
+    }
+  }),
+  instantsearch.widgets.currentRefinements({
+    container: '#current-refinements',
+    cssClasses: {
+      list: ['p-2', 'text-sm'],
+      label: ['rounded-full', 'bg-gray-700', 'p-2', 'pr-2'],
+      categoryLabel: [ 'p-2', 'pr-0', 'whitespace-nowrap'],
+      delete: [ 'p-2', 'pl-1' ]
     }
   }),
 ]);
