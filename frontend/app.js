@@ -6,7 +6,6 @@ const search = instantsearch({
     attributesToHighlight: []
   }),
   routing: true,
-  // attributesForFaceting: ['provider', 'verb'],
   stalledSearchDelay: 0
 });
 
@@ -59,10 +58,12 @@ function renderItem(item, lastDate) {
     `<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>`;
 
   return `
-    <div class="border-l border-gray-500 ml-32">
+    <div class="border-l border-gray-500 ml-12 md:ml-32">
       ${dateLine}
       <div class="flex w-auto items-start">
-        <div class="flex-none self-center text-right text-gray-900 dark:text-gray-500 -ml-32 w-32 pr-5">${date.toLocaleTimeString('nl-NL')}</div>
+        <div class="flex-none self-center text-right text-gray-900 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
+            ${date.toLocaleTimeString('nl-NL').substr(0, 5)}
+        </div>
         ${dot}
         <div class="flex-grow rounded-md bg-gray-200 dark:bg-gray-900 p-4 my-2 ml-4 shadow-md overflow-hidden dark:text-white">
             ${content}
@@ -116,10 +117,6 @@ const customInfiniteHits = instantsearch.connectors.connectInfiniteHits(
   renderInfiniteHits
 );
 
-// const virtualRefinementList = instantsearch.connectors.connectRefinementList(
-//   () => null
-// );
-
 search.addWidgets([
   instantsearch.widgets.searchBox({
     container: "#searchbox",
@@ -162,40 +159,6 @@ search.addWidgets([
       `
     }
   }),
-  // instantsearch.widgets.menu({
-  //   container: '#provider-facet',
-  //   attribute: 'provider',
-  //   sortBy: ['name:asc'],
-  //   cssClasses: {
-  //     'root': 'inline-block',
-  //     'item': 'inline-block'
-  //   },
-  //   templates: {
-  //     item: `
-  //       <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
-  //         <span class="">{{label}}</span>
-  //         <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
-  //       </a>
-  //   `,
-  //   },
-  // }),
-  // instantsearch.widgets.menu({
-  //   container: '#verb-facet',
-  //   attribute: 'verb',
-  //   sortBy: ['name:asc'],
-  //   cssClasses: {
-  //     'root': 'inline-block',
-  //     'item': 'inline-block'
-  //   },
-  //   templates: {
-  //     item: `
-  //       <a href="{{url}}" class="inline p-2 px-3 rounded-full {{#isRefined}} bg-gray-700{{/isRefined}}">
-  //         <span class="">{{label}}</span>
-  //         <span class="text-gray-500">({{#helpers.formatNumber}}{{count}}{{/helpers.formatNumber}})</span>
-  //       </a>
-  //   `,
-  //   },
-  // }),
 ]);
 
 search.start();
