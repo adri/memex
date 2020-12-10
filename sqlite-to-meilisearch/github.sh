@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+USER=adri
 sqlite3 "github-to-sqlite/github.db" -readonly "
 SELECT
     json_object(
@@ -17,6 +19,6 @@ SELECT
 FROM users
 LEFT JOIN stars on stars.user = users.id
 LEFT JOIN repos on stars.repo = repos.id
-WHERE login='adri'
+WHERE login='${USER}'
 ORDER BY stars.starred_at ASC
 "

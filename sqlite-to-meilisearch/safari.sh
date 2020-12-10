@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 sqlite3 ~/Library/Safari/History.db -readonly "
 SELECT
     json_object(

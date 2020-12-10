@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 sqlite3 -readonly ~/Library/Messages/chat.db "
 -- Contact information from Contacts.app
 ATTACH DATABASE '/Users/adrimbp/Library/Application Support/AddressBook/Sources/14628275-DA9B-4559-8D40-8E98D59B14CD/AddressBook-v22.abcddb' as contacts;
@@ -24,7 +25,7 @@ SELECT
         'message_service', chat.service_name,
         'message_text', message.text,
         'person_name', contact.first_name || ' ' || contact.last_name
-	) AS json
+    ) AS json
 FROM
     main.chat chat
     JOIN chat_message_join ON chat.ROWID = chat_message_join.chat_id
