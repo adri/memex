@@ -159,13 +159,17 @@
             <div id="date-facet" class="cursor-pointer">
                     <% max_count = try do Enum.max(Map.values(@dates)) rescue Enum.EmptyError -> 0 end %>
                     <%= for {date, count} <- Enum.sort(@dates, &(&1 > &2)) do %>
-                        <button
-                           id="<%= date %>"
-                           phx-click="filter-date"
-                           phx-value-date="<%= date %>"
-                           title="<%= date %> (<%= count %>)"
-                           class="bg-gray-700 hover:bg-gray-500 ml-auto block mb-px h-2 transition-all"
-                           style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * 0.01 * count * 250)) else 1 end %>px;"></button>
+                        <div class="group hover:bg-gray-600 text-xs"
+                             phx-click="filter-date"
+                             phx-value-date="<%= date %>">
+                            <span class="fixed opacity-0 group-hover:opacity-100 text-gray-100 leading-3"
+                                  style="font-size: 8px; margin-top: -2px"><%= date %> (<%= count %>)</span>
+                            <button
+                                    id="<%= date %>"
+                                    title="<%= date %> (<%= count %>)"
+                                    class="bg-gray-700 group-hover:bg-gray-500 ml-auto block mb-px h-2"
+                                    style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * 0.01 * count * 250)) else 1 end %>px;"></button>
+                        </div>
                     <% end %>
             </div>
         </div>
