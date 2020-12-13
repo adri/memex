@@ -3,10 +3,10 @@ defmodule Memex.Search.Meilisearch do
 
   def search(query = %Query{}, page, client \\ new()) do
     params = query_to_params(query, page)
-    #     IO.inspect(params, label: :search)
+    index_name = System.get_env("INDEX_NAME")
 
     client
-    |> Tesla.post("/indexes/memex/search", params)
+    |> Tesla.post("/indexes/#{index_name}/search", params)
     |> case do
       {:ok, %{status: 200} = response} -> {:ok, response.body}
       _ -> {:error, %{}}
@@ -38,8 +38,6 @@ defmodule Memex.Search.Meilisearch do
 
   defp new() do
     url = System.get_env("MEILISEARCH_HOST")
-
-    IO.inspect(url, label: :test)
 
     middleware = [
       {Tesla.Middleware.BaseUrl, url},
