@@ -23,9 +23,9 @@ Source: [Wikipedia](https://en.wikipedia.org/wiki/Memex)
 ### Installation
 ```
 # Setup environment (once)
+brew bundle
 cp .envrc.dist .envrc
 direnv allow
-brew bundle
 
 # Start services
 ./bin-dev/start.sh
