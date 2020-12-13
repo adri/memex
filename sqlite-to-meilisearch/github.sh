@@ -7,7 +7,7 @@ USER=${GITHUB_USER_NAME:=adri}
 sqlite3 "github-to-sqlite/github.db" -readonly "
 SELECT
     json_object(
-        'provider', 'Github',
+        'provider', 'GitHub',
         'verb', 'liked',
         'id', 'github_' || repos.id,
         'date_month', strftime('%Y-%m', stars.starred_at),
