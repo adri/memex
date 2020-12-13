@@ -4,7 +4,7 @@ INDEX_URL=${INDEX_URL:="${MEILISEARCH_HOST}/indexes/${INDEX_NAME}"}
 
 # Always sort by time to create a timeline
 curl -X POST "${INDEX_URL}/settings/ranking-rules" \
-  --data '[ "desc(timestamp_utc)" ]'
+  --data '[ "desc(timestamp_unix)" ]'
 
 # Configure distinct attributes
 curl -X POST "${INDEX_URL}/settings/distinct-attribute" \
