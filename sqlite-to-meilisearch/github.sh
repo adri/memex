@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-USER=adri
+
+USER=${GITHUB_USER_NAME:=adri}
+
 sqlite3 "github-to-sqlite/github.db" -readonly "
 SELECT
     json_object(

@@ -1,4 +1,5 @@
 #!/usr/bin/env fish
+# Imports commands run from the fish shell
 
 history --show-time='<-SNIP->%s;%F %T;%Y-%m;' \
   | jq --slurp --raw-input --raw-output \

@@ -1,0 +1,4 @@
+export MEILISEARCH_HOST=http://127.0.0.1:7700
+export INDEX_NAME=memex
+
+export GITHUB_USER_NAME=adri

@@ -21,8 +21,10 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("filter-date", %{"date" => date}, %{assigns: %{query: string}} = socket) do
-    query = Query.from_string(string)
-    |> Query.add_filter("date_month", date)
+    query =
+      Query.from_string(string)
+      |> Query.add_filter("date_month", date)
+
     {:noreply, socket |> assign(query: Query.to_string(query), page: 1) |> search()}
   end
 

@@ -11,6 +11,7 @@ defmodule MemexWeb.PhotoController do
         conn
         |> put_resp_content_type("image/jpeg", "utf-8")
         |> send_resp(200, contents)
+
       {:error, _} ->
         conn
         |> send_resp(404, "Not found")

@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-sqlite3 -readonly ~/Pictures/Photos\ Library.photoslibrary/database/Photos.sqlite "
+# Imports photos and videos from Apple Photos
+# including labels.
+
+PHOTOS_DB_PATH=${PHOTOS_DB_PATH:=$(whoami)/Pictures/Photos\ Library.photoslibrary/database/Photos.sqlite}
+PSI_DB_PATH=${PSI_DB_PATH:=$(whoami)/Pictures/Photos\ Library.photoslibrary/database/search/psi.sqlite}
+
+sqlite3 -readonly "$PHOTOS_DB_PATH" "
 -- Machine learning metadata information from psi.sqlite
-ATTACH DATABASE '/Users/adrimbp/Pictures/Photos Library.photoslibrary/database/search/psi.sqlite' as psi;
+-- The set UUID is split into two integers (uuid_0, uuid_1) and needs to be converted manually.
+ATTACH DATABASE '$PSI_DB_PATH' as psi;
 WITH metadata AS (
     SELECT
         substr(printf('%p', assets.uuid_0), 15, 2)
@@ -52,6 +59,7 @@ SELECT
         'timezone_name', ZADDITIONALASSETATTRIBUTES.ZTIMEZONENAME,
         'photo_file_path', ZASSET.ZDIRECTORY || '/' || ZASSET.ZFILENAME,
         'photo_file_name', ZADDITIONALASSETATTRIBUTES.ZORIGINALFILENAME,
+        'photo_kind', CASE ZASSET.ZKIND WHEN 0 THEN 'photo' ELSE 'movie' END,
         'photo_labels', json_extract(metadata.labels, '$'),
         'location_latitude', CASE WHEN ZASSET.ZLATITUDE == -180.0 AND ZASSET.ZLONGITUDE == -180.0 THEN NULL ELSE ZASSET.ZLATITUDE END,
         'location_longitude', CASE WHEN ZASSET.ZLATITUDE == -180.0 AND ZASSET.ZLONGITUDE == -180.0 THEN NULL ELSE ZASSET.ZLONGITUDE END,
@@ -62,6 +70,3 @@ LEFT JOIN ZADDITIONALASSETATTRIBUTES ON ZASSET.ZADDITIONALATTRIBUTES=ZADDITIONAL
 LEFT JOIN ZEXTENDEDATTRIBUTES ON ZEXTENDEDATTRIBUTES.ZASSET = ZASSET.Z_PK
 JOIN metadata ON ZASSET.ZUUID=metadata.uuid
 "
-
-
-

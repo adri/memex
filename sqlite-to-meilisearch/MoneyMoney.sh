@@ -1,6 +1,14 @@
-KEY=$(security find-generic-password -a adrimbp -s moneymoney -w)
+#!/usr/bin/env bash
+# Imports financial transactions from Money Money
+# The database is encrypted using sqlcipher cipher version 3.
+# The encryption key is stored in Apple Keychain.
+
+USER=$(whoami)
+MONEY_MONEY_KEYCHAIN_KEY=${MONEY_MONEY_KEYCHAIN_KEY:=moneymoney}
+PRAGMA_KEY=$(security find-generic-password -a "$USER" -s $MONEY_MONEY_KEYCHAIN_KEY -w)
+
 sqlcipher -readonly ~/Library/Containers/com.moneymoney-app.retail/Data/Library/Application\ Support/MoneyMoney/Database/MoneyMoney.sqlite "
-PRAGMA key = "${KEY}";
+PRAGMA key = '${PRAGMA_KEY}';
 PRAGMA cipher_compatibility = 3;
 SELECT
     json_object(
@@ -21,6 +29,6 @@ FROM transactions
 LEFT JOIN accounts ON transactions.local_account_key=accounts.rowid
 LEFT JOIN categories ON transactions.category_key=categories.rowid
 " | awk '!/^ok$/'
-# needed ot filter out "ok" response from PRAGMA
+# needed to filter out "ok" response from PRAGMA
 
 

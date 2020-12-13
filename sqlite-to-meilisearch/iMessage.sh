@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+CONTACTS_DB_PATH=${CONTACTS_DB_PATH:="14628275-DA9B-4559-8D40-8E98D59B14CD/AddressBook-v22.abcddb"}
 sqlite3 -readonly ~/Library/Messages/chat.db "
 -- Contact information from Contacts.app
-ATTACH DATABASE '/Users/adrimbp/Library/Application Support/AddressBook/Sources/14628275-DA9B-4559-8D40-8E98D59B14CD/AddressBook-v22.abcddb' as contacts;
+ATTACH DATABASE '${HOME}/Library/Application Support/AddressBook/Sources/${CONTACTS_DB_PATH}' as contacts;
 WITH contact AS (
     SELECT
         record.ZFIRSTNAME AS first_name,

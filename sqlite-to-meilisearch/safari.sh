@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-sqlite3 ~/Library/Safari/History.db -readonly "
+# Imports browser history from Safari
+
+HISTORY_DB_PATH=${HISTORY_DB_PATH:=~/Library/Safari/History.db}
+
+sqlite3 $HISTORY_DB_PATH -readonly "
 SELECT
     json_object(
         'provider', 'Safari',
         'verb', 'browsed',
-        'id', history_visits.id,
+        'id', 'safari-' || history_visits.id,
         'date_month', strftime('%Y-%m', history_visits.visit_time + 978307200, 'unixepoch', 'utc'),
         'timestamp_utc', datetime(history_visits.visit_time + 978307200, 'unixepoch', 'utc'),
         'timestamp_unix', strftime('%s', datetime(history_visits.visit_time + 978307200, 'unixepoch', 'utc')),

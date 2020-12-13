@@ -1,18 +1,12 @@
 defmodule Memex.Search.Meilisearch do
-  use Tesla
-
-  plug Tesla.Middleware.BaseUrl, "http://localhost:7700"
-  #  plug Tesla.Middleware.Headers, [{"authorization", "token xyz"}]
-#    plug Tesla.Middleware.Logger
-  plug Tesla.Middleware.JSON
-
   alias Memex.Search.Query
 
-  def search(query = %Query{}, page) do
+  def search(query = %Query{}, page, client \\ new()) do
     params = query_to_params(query, page)
-    IO.inspect(params, label: :search)
+    #     IO.inspect(params, label: :search)
 
-    post("/indexes/memex/search", params)
+    client
+    |> Tesla.post("/indexes/memex/search", params)
     |> case do
       {:ok, %{status: 200} = response} -> {:ok, response.body}
       _ -> {:error, %{}}
@@ -20,22 +14,41 @@ defmodule Memex.Search.Meilisearch do
   end
 
   defp query_to_params(query, page) do
-    params = %{
-      "q" => query.query,
-      "limit" => 20,
-      "offset" => (page - 1) * 20,
-      "facetsDistribution" => ["date_month"],
-      "attributesToHighlight" => ["*"]
-    }
+    params =
+      %{
+        "q" => query.query,
+        "limit" => 20,
+        "offset" => (page - 1) * 20,
+        "facetsDistribution" => ["date_month"],
+        "attributesToHighlight" => ["*"]
+      }
+      |> add_filters_to_params(query.filters)
+  end
 
-    if Query.has_filters(query) do
-      Map.merge(params, %{
-        "filters" => query.filters
-         |> Enum.map(fn {key, value} -> "#{key}=#{value}" end)
-         |> Enum.join(" AND ")
-      })
-    else
-      params
-    end
+  defp add_filters_to_params(params, filters) when filters == %{}, do: params
+
+  defp add_filters_to_params(params, filters) do
+    Map.merge(params, %{
+      "filters" =>
+        filters
+        |> Enum.map(fn {key, value} -> "#{key}=#{value}" end)
+        |> Enum.join(" AND ")
+    })
+  end
+
+  defp new() do
+    url = System.get_env("MEILISEARCH_HOST")
+
+    IO.inspect(url, label: :test)
+
+    middleware = [
+      {Tesla.Middleware.BaseUrl, url},
+      Tesla.Middleware.JSON
+      #     , Tesla.Middleware.Logger
+    ]
+
+    # {Tesla.Middleware.Headers [{"authorization", "token xyz"}]}
+
+    Tesla.client(middleware)
   end
 end
