@@ -1,19 +1,20 @@
 <div class="mx-auto">
     <div class="p-5 font-san items-center justify-center">
-        <header class="flex block fixed md:ml-20 text-black dark:text-white shadow-lg dark:bg-black rounded-xl">
-            <div class="flex justify-center items-center flex-grow w-full relative">
+        <header class="flex block fixed md:ml-20 text-black w-1/2 dark:text-white shadow-lg dark:bg-black width-autos rounded-xl">
+            <div class="flex justify-center items-center flex-grow block relative">
                 <button class="flex items-center justify-center absolute left-0 top-5 rounded-l-xl px-4 text-black dark:text-white">
                     <svg class="h-4 w-4 text-grey-dark" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                          viewBox="0 0 24 24">
                         <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
                     </svg>
                 </button>
-                <form phx-change="search" phx-submit="search" role="search" novalidate="">
+                <form class="w-full" phx-change="search" phx-submit="search" role="search" novalidate="">
                     <input
                         autocapitalize="off"
                         autocomplete="off" autofocus="true"
                         name="query"
-                        class="transition-colors focus:ring-blue-900 focus:ring-2 w-full text-black dark:text-white dark:bg-black px-10 py-4 rounded-xl" maxlength="512"
+                        class="transition-colors focus:ring-blue-900 focus:ring-2 w-full text-black dark:text-white dark:bg-black px-10 py-4 rounded-xl"
+                        maxlength="512"
                         placeholder="Search..."
                         spellcheck="false"
                         value="<%= @query %>"
@@ -78,7 +79,7 @@
                           "Safari" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/safari-small.png")}" />)
                           "MoneyMoney" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/MoneyMoney-small.png")}" />)
                           "iMessage" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/iMessage-small.png")}" />)
-                          "Github" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
+                          "GitHub" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
                           "Photos" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
                           "terminal" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
                           _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
@@ -94,7 +95,7 @@
                                 </a>
                             <% end %>
 
-                            <%= if hit["provider"] === "Github" do %>
+                            <%= if hit["provider"] === "GitHub" do %>
                                 <a href="<%= hit["repo_homepage"] %>" target="_blank">
                                     <%= raw hit["_formatted"]["repo_name"] %>
                                     <p class="text-sm text-gray-300 dark:text-gray-400 truncate">
