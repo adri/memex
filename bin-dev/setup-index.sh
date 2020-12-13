@@ -2,6 +2,13 @@
 
 INDEX_URL=${INDEX_URL:="${MEILISEARCH_HOST}/indexes/${INDEX_NAME}"}
 
+# Create index
+curl -X POST "${MEILISEARCH_HOST}/indexes" \
+  --data '{
+    "uid": "'"${INDEX_NAME}"'",
+    "primaryKey": "id"
+  }'
+
 # Always sort by time to create a timeline
 curl -X POST "${INDEX_URL}/settings/ranking-rules" \
   --data '[ "desc(timestamp_unix)" ]'
