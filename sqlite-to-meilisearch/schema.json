@@ -1,0 +1,102 @@
+{
+  "$id": "https://example.com/arrays.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/memex"
+  },
+  "definitions": {
+    "memex": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "object",
+      "required": [
+        "provider",
+        "verb",
+        "id",
+        "date_month",
+        "timestamp_utc",
+        "timestamp_unix"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "verb": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "date_month": {
+          "type": "string"
+        },
+        "timestamp_utc": {
+          "type": "string"
+        },
+        "timestamp_unix": {
+          "type": "number"
+        },
+        "message_direction": {
+          "type": "string"
+        },
+        "message_service": {
+          "type": "string"
+        },
+        "message_text": {
+          "type": "string"
+        },
+        "person_name": {
+          "type": "string"
+        },
+        "photo_file_path": {
+          "type": "string"
+        },
+        "photo_file_name": {
+          "type": "string"
+        },
+        "photo_kind": {
+          "type": "string"
+        },
+        "photo_labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "location_latitude": {
+          "type": ["number", "null"]
+        },
+        "location_longitude": {
+          "type": ["number", "null"]
+        },
+        "device_name": {
+          "type": ["string", "null"]
+        },
+        "command": {
+          "type": "string"
+        },
+        "website_title": {
+          "type": ["string", "null"]
+        },
+        "repo_name": {
+          "type": "string"
+        },
+        "repo_description": {
+          "type": ["string", "null"]
+        },
+        "repo_homepage": {
+          "type": ["string", "null"]
+        },
+        "repo_license": {
+          "type": ["string", "null"]
+        },
+        "repo_language": {
+          "type": ["string", "null"]
+        },
+        "repo_stars_count": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

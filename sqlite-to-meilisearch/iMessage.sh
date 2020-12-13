@@ -18,20 +18,22 @@ SELECT
     json_object(
         'provider', 'iMessage',
         'verb', 'messaged',
-        'id', message.guid,
+        'id', 'imessage-' || message.guid,
         'date_month', strftime('%Y-%m', message.date / 1000000000 + strftime ('%s', '2001-01-01'), 'unixepoch', 'utc'),
         'timestamp_utc', datetime(message.date / 1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'utc'),
-        'timestamp_unix', strftime('%s', datetime(message.date / 1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'utc')),
+        'timestamp_unix', CAST(strftime('%s', datetime(message.date / 1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'utc')) as INT),
         'message_direction', (CASE WHEN message.is_from_me THEN 'sent' ELSE 'received' END),
         'message_service', chat.service_name,
         'message_text', message.text,
-        'person_name', contact.first_name || ' ' || contact.last_name
+        'person_name', CASE WHEN contact.first_name IS NULL AND contact.last_name IS NULL THEN chat.chat_identifier ELSE contact.first_name || ' ' || contact.last_name END
     ) AS json
 FROM
     main.chat chat
     JOIN chat_message_join ON chat.ROWID = chat_message_join.chat_id
     JOIN message ON chat_message_join.message_id = message.ROWID
     LEFT JOIN contact ON contact.phone_number = chat.chat_identifier OR contact.email_address = chat.chat_identifier
+WHERE
+    message.text IS NOT NULL
 ORDER BY
     message_date ASC
 "

@@ -109,6 +109,10 @@
 
                             <%= if hit["provider"] === "iMessage" do %>
                                 <div class="text-xs text-gray-300 dark:text-gray-500 truncate">
+                                    <%= case hit["message_direction"] do
+                                        "sent" -> "Sent to "
+                                        "received" -> "Received from "
+                                     end%>
                                     <%= raw hit["_formatted"]["person_name"] %>
                                 </div>
                                 <%= raw hit["_formatted"]["message_text"] %>

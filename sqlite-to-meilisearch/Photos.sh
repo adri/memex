@@ -2,8 +2,8 @@
 # Imports photos and videos from Apple Photos
 # including labels.
 
-PHOTOS_DB_PATH=${PHOTOS_DB_PATH:=$(whoami)/Pictures/Photos\ Library.photoslibrary/database/Photos.sqlite}
-PSI_DB_PATH=${PSI_DB_PATH:=$(whoami)/Pictures/Photos\ Library.photoslibrary/database/search/psi.sqlite}
+PHOTOS_DB_PATH=${PHOTOS_DB_PATH:=/Users/$(whoami)/Pictures/Photos\ Library.photoslibrary/database/Photos.sqlite}
+PSI_DB_PATH=${PSI_DB_PATH:=/Users/$(whoami)/Pictures/Photos\ Library.photoslibrary/database/search/psi.sqlite}
 
 sqlite3 -readonly "$PHOTOS_DB_PATH" "
 -- Machine learning metadata information from psi.sqlite
