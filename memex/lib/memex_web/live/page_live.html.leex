@@ -24,12 +24,8 @@
         </header>
     </div>
     <div class="flex items-start md:mx-5">
-        <div class="w-4/5 mt-8"
-             id="hits-<%= Base.encode16(@query) %>"
-             phx-update="append"
-             phx-hook="InfiniteScroll"
-             data-page="<%= @page %>"
-        >
+        <div class="w-4/5 mt-8">
+            <div id="hits-<%= Base.encode16(@query) %>" phx-update="append">
             <%= for {hit, index} <- Enum.with_index(@results) do %>
                 <div id="hit-<%= hit["id"] %>" class="border-l border-gray-500 ml-12 md:ml-32">
                     <%= if index === 0 || String.slice(hit["timestamp_utc"], 0..10) != String.slice(Enum.at(@results, index - 1)["timestamp_utc"], 0..10) do %>
@@ -149,6 +145,8 @@
                     </div>
                 </div>
             <% end %>
+            </div>
+        <div id="loader" phx-hook="InfiniteScroll" data-page="<%= @page %>"></div>
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
             <div id="date-facet" class="cursor-pointer relative">
