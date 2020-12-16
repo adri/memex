@@ -126,7 +126,7 @@
                                     <span class="float-right rounded-full dark:bg-gray-700 p-2 text-xs"><%= raw hit["_formatted"]["transaction_category"] %></span>
                                 <% end %>
                                 <div class="text-xs text-gray-300 dark:text-gray-500 truncate">
-                                    <%= hit["_formatted"]["transaction_account_name"] %> - <%= raw hit["_formatted"]["transaction_purpose"] %>
+                                    <%= raw hit["_formatted"]["transaction_account_name"] %> - <%= raw hit["_formatted"]["transaction_purpose"] %>
                                 </div>
                             <% end %>
 
@@ -161,7 +161,7 @@
                                     id="<%= date %>"
                                     title="<%= date %> (<%= count %>)"
                                     class="bg-gray-700 group-hover:bg-gray-500 ml-auto block mb-px h-2"
-                                    style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * 0.01 * count * 250)) else 1 end %>px;"></button>
+                                    style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
                         </div>
                     <% end %>
             </div>
