@@ -2,8 +2,6 @@
 # Imports stars from Github
 # Needs github-to-sqlite database.
 
-USER=${GITHUB_USER_NAME:=adri}
-
 sqlite3 "github-to-sqlite/github.db" -readonly "
 SELECT
     json_object(
@@ -23,6 +21,6 @@ SELECT
 FROM users
 LEFT JOIN stars on stars.user = users.id
 LEFT JOIN repos on stars.repo = repos.id
-WHERE login='${USER}'
+WHERE login='${GITHUB_USER_NAME}'
 ORDER BY stars.starred_at ASC
 "

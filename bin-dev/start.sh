@@ -6,4 +6,5 @@
 # Start Elixir frontend
 cd memex
 mix deps.get
+cd assets && yarn && cd ..
 MEILISEARCH_HOST=$MEILISEARCH_HOST iex -S mix phx.server
