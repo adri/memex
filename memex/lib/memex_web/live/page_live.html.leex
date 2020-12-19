@@ -160,9 +160,11 @@
 
                                 <a href="https://twitter.com/<%= hit["tweet_user_screen_name"] %>" class="block text-xs text-gray-300 dark:text-gray-500 truncate" target="_blank">
                                     <img class="rounded-full float-left mr-2 mb-1" src="<%= hit["tweet_user_avatar_url"] %>" width="20" height="20" />
-                                    <%= raw hit["_formatted"]["tweet_user_screen_name"] %><%= if hit["_formatted"]["tweet_user_location"] do %>, <%= raw hit["_formatted"]["tweet_user_location"] %><%= end %>
+                                    <%= raw hit["_formatted"]["tweet_user_screen_name"] %><%= if hit["_formatted"]["tweet_user_location"] != "" do %>, <%= raw hit["_formatted"]["tweet_user_location"] %><%= end %>
                                 </a>
-                                <%= raw MemexWeb.TimelineView.auto_link(hit["_formatted"]["tweet_full_text"]) %>
+                                <a href="<%= hit["tweet_url"] %>" target="_blank">
+                                    <%= raw MemexWeb.TimelineView.auto_link(hit["_formatted"]["tweet_full_text"]) %>
+                                </a>
                                 <%= for media <- hit["tweet_media"] do %>
                                     <%# <%= media["type"] %>
                                     <a href="<%= media["url"] %>" target="_blank">

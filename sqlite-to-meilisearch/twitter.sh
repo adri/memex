@@ -8,6 +8,7 @@ SHARED_FIELDS="
     'timestamp_utc', datetime(tweets.created_at),
     'timestamp_unix', CAST(strftime('%s', tweets.created_at) AS INT),
     'tweet_full_text', substr(tweets.full_text, json_extract(tweets.display_text_range, '\$[0]'), json_extract(tweets.display_text_range, '\$[1]')),
+    'tweet_url', 'https://twitter.com/' || users.screen_name || '/status/' || tweets.id,
     'tweet_liked', tweets.favorited,
     'tweet_retweeted', tweets.retweeted,
     'tweet_liked_count', tweets.favorite_count,
