@@ -146,6 +146,7 @@
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
             <div id="date-facet" class="cursor-pointer relative">
+                <%= if @dates do %>
                     <% max_count = try do Enum.max(Map.values(@dates)) rescue Enum.EmptyError -> 0 end %>
                     <%= for {date, count} <- Enum.sort(@dates, &(&1 > &2)) do %>
                         <div class="group hover:bg-gray-600 text-xs"
@@ -160,6 +161,7 @@
                                     style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
                         </div>
                     <% end %>
+                <%= end %>
             </div>
         </div>
     </div>
