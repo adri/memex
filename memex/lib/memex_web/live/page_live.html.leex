@@ -79,8 +79,14 @@
 
                         <div class="flex-grow rounded-md bg-gray-200 dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 ml-4 shadow-md overflow-hidden dark:text-white">
                             <%= if hit["provider"] === "Safari" do %>
+                                <%= if MemexWeb.TimelineView.is_youtube_url(hit["website_url"]) do %>
+                                    <img class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src="http://i3.ytimg.com/vi/<%= MemexWeb.TimelineView.parse_youtube_id(hit["website_url"]) %>/mqdefault.jpg" />
+                                <% end %>
+
                                 <a href="<%= hit["website_url"] %>" target="_blank">
-                                    <%= raw hit["_formatted"]["website_title"] %>
+                                    <p class="truncate">
+                                        <%= raw hit["_formatted"]["website_title"] %>
+                                    </p>
                                     <div class="text-xs text-gray-300 dark:text-gray-500 truncate">
                                         <%= hit["device_name"] %>: <%= raw hit["_formatted"]["website_url"] %>
                                     </div>
