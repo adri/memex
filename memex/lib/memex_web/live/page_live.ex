@@ -6,7 +6,7 @@ defmodule MemexWeb.PageLive do
   @impl true
   def mount(_params, _session, socket) do
     socket = assign(socket, query: "", page: 1)
-    {:ok, socket, temporary_assigns: [results: %{}, dates: %{}]}
+    {:ok, socket, temporary_assigns: [results: %{}, dates: %{}, metadata: nil]}
   end
 
   @impl true
@@ -37,12 +37,16 @@ defmodule MemexWeb.PageLive do
         |> assign(
           query: string,
           results: response["hits"],
+          metadata: %{
+            "totalHits" => response["nbHits"],
+            "processingTimeMs" => response["processingTimeMs"]
+          },
           dates: response["facetsDistribution"]["date_month"]
         )
 
       _ ->
         socket
-        |> assign(query: string, page: 1, results: %{}, dates: %{})
+        |> assign(query: string, page: 1, results: %{}, dates: %{}, metadata: nil)
     end
   end
 end
