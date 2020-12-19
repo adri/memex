@@ -28,13 +28,14 @@
             <div id="hits-<%= Base.encode16(@query) %>" phx-update="append">
             <%= for {hit, index} <- Enum.with_index(@results) do %>
                 <div id="hit-<%= hit["id"] %>" class="border-l border-gray-500 ml-12 md:ml-32">
+                    <% date = DateTime.from_unix!(cond do
+                        is_integer(hit["timestamp_unix"]) -> hit["timestamp_unix"]
+                        is_float(hit["timestamp_unix"]) -> round(hit["timestamp_unix"])
+                        is_nil(hit["timestamp_unix"]) -> :os.system_time(:seconds)
+                        true -> String.to_integer(hit["timestamp_unix"])
+                    end) %>
+
                     <%= if index === 0 || String.slice(hit["timestamp_utc"], 0..10) != String.slice(Enum.at(@results, index - 1)["timestamp_utc"], 0..10) do %>
-                        <% date = DateTime.from_unix!(cond do
-                            is_integer(hit["timestamp_unix"]) -> hit["timestamp_unix"]
-                            is_float(hit["timestamp_unix"]) -> round(hit["timestamp_unix"])
-                            is_nil(hit["timestamp_unix"]) -> :os.system_time(:seconds)
-                            true -> String.to_integer(hit["timestamp_unix"])
-                         end) %>
                         <% days_between = case index do
                           0 -> nil
                           _ -> Date.diff(DateTime.from_unix!(cond do
@@ -64,12 +65,7 @@
 
                     <div class="flex w-auto items-start">
                         <div class="flex-none self-center text-right text-gray-900 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
-                            <%= cond do
-                                is_integer(hit["timestamp_utc"]) -> String.slice(to_string(hit["timestamp_utc"]), 10..15)
-                                hit["timestamp_utc"] -> String.slice(hit["timestamp_utc"], 10..15)
-                                true -> ""
-                            end
-                            %>
+                            <%= Calendar.strftime(date, "%H:%m") %>
                         </div>
                         <%= case hit["provider"] do
                           "Safari" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/safari-small.png")}" />)
