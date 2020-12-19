@@ -2,4 +2,7 @@ data.ms/
 data/
 backup/
 node_modules/
+auth.json
 .envrc
+twitter.db
+github.db

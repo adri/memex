@@ -74,6 +74,7 @@
                           "GitHub" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
                           "Photos" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
                           "terminal" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
+                          "Twitter" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/Twitter-small.png")}" />)
                           _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
                         end %>
 
@@ -142,6 +143,27 @@
                                 <p class="text-xs text-gray-300 dark:text-gray-500">
                                     <%= hit["_formatted"]["photo_file_name"] %> - <%= raw hit["_formatted"]["device_name"] %>
                                 </p>
+                            <% end %>
+
+                             <%= if hit["provider"] === "Twitter" do %>
+                                <%= if hit["tweet_liked"] != 0 do %>
+                                    <span class="float-right rounded-full dark:bg-gray-700 ml-2 p-2 text-xs">Liked</span>
+                                <% end %>
+                                <%= if hit["tweet_retweeted"] != 0 do %>
+                                    <span class="float-right rounded-full dark:bg-gray-700 p-2 text-xs">Retweeted</span>
+                                <% end %>
+
+                                <a href="https://twitter.com/<%= hit["tweet_user_screen_name"] %>" class="block text-xs text-gray-300 dark:text-gray-500 truncate" target="_blank">
+                                    <img class="rounded-full float-left mr-2 mb-1" src="<%= hit["tweet_user_avatar_url"] %>" width="20" height="20" />
+                                    <%= raw hit["_formatted"]["tweet_user_screen_name"] %><%= if hit["_formatted"]["tweet_user_location"] do %>, <%= raw hit["_formatted"]["tweet_user_location"] %><%= end %>
+                                </a>
+                                <%= raw MemexWeb.TimelineView.auto_link(hit["_formatted"]["tweet_full_text"]) %>
+                                <%= for media <- hit["tweet_media"] do %>
+                                    <%# <%= media["type"] %>
+                                    <a href="<%= media["url"] %>" target="_blank">
+                                        <img class="object-cover h-20 w-20 rounded-md mr-4 mt-4" width="60" height="60" src="<%= media["url"] %>" />
+                                    </a>
+                                <% end %>
                             <% end %>
                         </div>
                     </div>
