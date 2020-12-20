@@ -38,7 +38,7 @@
                     Found <%= Number.Delimit.number_to_delimited(@metadata["totalHits"], precision: 0) %> results in <%= @metadata["processingTimeMs"] %> ms
                 <% end %>
             </div>
-            <div id="hits-<%= Base.encode16(@query) %>" phx-update="append">
+            <div id="hits-<%= Base.encode16(@query) %>" phx-update="replace">
             <%= for {hit, index} <- Enum.with_index(@results) do %>
                 <div id="hit-<%= hit["id"] %>" class="border-l border-gray-500 ml-12 md:ml-32">
                     <% date = DateTime.from_unix!(cond do

@@ -22,8 +22,7 @@ defmodule Memex.Search.Meilisearch do
     params =
       %{
         "q" => query.query,
-        "limit" => 20,
-        "offset" => (page - 1) * 20,
+        "limit" => @results_per_page * page,
         "facetsDistribution" => ["date_month"],
         "attributesToHighlight" => ["*"]
       }
