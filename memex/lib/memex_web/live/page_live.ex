@@ -40,6 +40,7 @@ defmodule MemexWeb.PageLive do
     {:noreply,
      socket
      |> assign(query: query <> suggestion, suggestion: nil, page: 1)
+     |> search()
      |> push_event("force-input-value", %{value: query <> suggestion})}
   end
 
