@@ -78,7 +78,7 @@
 
                     <div class="flex w-auto items-start">
                         <div class="flex-none self-center text-right text-gray-900 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
-                            <%= Calendar.strftime(date, "%H:%m") %>
+                            <%= Calendar.strftime(date, "%H:%M") %>
                         </div>
 
                         <a href="#" class="flex-none self-center inline-block w-6 h-6 -ml-3" phx-click="show-surrounding" phx-value-timestamp="<%= hit["timestamp_unix"] %>">
