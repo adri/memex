@@ -55,7 +55,7 @@ SELECT
         'uuid', metadata.uuid,
         'date_month', strftime('%Y-%m', ZASSET.ZDATECREATED + strftime('%s', '2001-01-01'), 'unixepoch'),
         'timestamp_utc', datetime(ZASSET.ZDATECREATED + strftime('%s', '2001-01-01'), 'unixepoch'),
-        'timestamp_unix', ZASSET.ZDATECREATED + strftime('%s', '2001-01-01'),
+        'timestamp_unix', CAST(ZASSET.ZDATECREATED + strftime('%s', '2001-01-01') AS INT),
         'timezone_name', ZADDITIONALASSETATTRIBUTES.ZTIMEZONENAME,
         'photo_file_path', ZASSET.ZDIRECTORY || '/' || ZASSET.ZFILENAME,
         'photo_file_name', ZADDITIONALASSETATTRIBUTES.ZORIGINALFILENAME,
