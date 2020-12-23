@@ -80,16 +80,19 @@
                         <div class="flex-none self-center text-right text-gray-900 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
                             <%= Calendar.strftime(date, "%H:%m") %>
                         </div>
-                        <%= case hit["provider"] do
-                          "Safari" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/safari-small.png")}" />)
-                          "MoneyMoney" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/MoneyMoney-small.png")}" />)
-                          "iMessage" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/iMessage-small.png")}" />)
-                          "GitHub" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
-                          "Photos" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
-                          "terminal" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
-                          "Twitter" -> raw ~s(<img class="flex-none self-center inline-block w-6 h-6 -ml-3" src="#{Routes.static_path(@socket, "/images/Twitter-small.png")}" />)
-                          _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
-                        end %>
+
+                        <a href="#" class="flex-none self-center inline-block w-6 h-6 -ml-3" phx-click="show-surrounding" phx-value-timestamp="<%= hit["timestamp_unix"] %>">
+                            <%= case hit["provider"] do
+                            "Safari" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/safari-small.png")}" />)
+                            "MoneyMoney" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/MoneyMoney-small.png")}" />)
+                            "iMessage" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/iMessage-small.png")}" />)
+                            "GitHub" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
+                            "Photos" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
+                            "terminal" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
+                            "Twitter" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Twitter-small.png")}" />)
+                            _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
+                            end %>
+                        </a>
 
                         <div class="flex-grow rounded-md bg-gray-200 dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 ml-4 shadow-md overflow-hidden dark:text-white">
                             <%= if hit["provider"] === "Safari" do %>

@@ -3,18 +3,19 @@ defmodule MemexWeb.PageLive do
 
   alias Memex.Search.Query
 
-  @default_assigns [results: %{}, dates: %{}, metadata: nil, suggestion: nil]
+  @default_assigns [results: %{}, dates: %{}, metadata: nil, suggestion: nil, surroundings: nil]
   @highlight_regex ~r/<em>.*<\/em>(\w*)\W/u
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign(socket, query: "", page: 1, suggestion: nil)
+    socket = assign(socket, query: "", page: 1, suggestion: nil, surroundings: nil)
     {:ok, socket, temporary_assigns: [results: %{}, dates: %{}, metadata: nil]}
   end
 
   @impl true
   def handle_event("search", %{"query" => query}, socket) do
-    {:noreply, socket |> assign(query: query, page: 1) |> search()}
+    {:noreply,
+     socket |> assign(query: query, page: 1, surroundings: nil, suggestion: nil) |> search()}
   end
 
   @impl true
@@ -28,7 +29,13 @@ defmodule MemexWeb.PageLive do
       Query.from_string(string)
       |> Query.add_filter("date_month", date)
 
-    {:noreply, socket |> assign(query: Query.to_string(query), page: 1) |> search()}
+    {:noreply,
+     socket |> assign(query: Query.to_string(query), page: 1, surroundings: nil) |> search()}
+  end
+
+  @impl true
+  def handle_event("show-surrounding", %{"timestamp" => timestamp}, socket) do
+    {:noreply, socket |> assign(surroundings: String.to_integer(timestamp)) |> search()}
   end
 
   @impl true
@@ -44,14 +51,15 @@ defmodule MemexWeb.PageLive do
      |> push_event("force-input-value", %{value: query <> suggestion})}
   end
 
+  @impl true
   def handle_event("accept-suggestion", _key, socket) do
     {:noreply, socket}
   end
 
-  defp search(%{assigns: %{page: page, query: string}} = socket) do
+  defp search(%{assigns: %{page: page, query: string, surroundings: surroundings}} = socket) do
     query = Query.from_string(string)
 
-    case Memex.Search.Meilisearch.search(query, page) do
+    case Memex.Search.Meilisearch.search(query, page, surroundings) do
       {:ok, response} ->
         socket
         |> assign(
