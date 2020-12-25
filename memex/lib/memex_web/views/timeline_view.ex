@@ -9,4 +9,23 @@ defmodule MemexWeb.TimelineView do
   def auto_link(text) do
     Regex.replace(@url_regex, text, "<a href=\"\\0\" target=\"_blank\">\\0</a>")
   end
+
+  def days_between(timestamp1, timestamp2) do
+    Date.diff(date_from_timestamp(timestamp2), date_from_timestamp(timestamp1))
+    |> max(0)
+  end
+
+  def date_from_timestamp(timestamp) do
+    cond do
+      is_integer(timestamp) ->
+        timestamp
+
+      is_float(timestamp) ->
+        round(timestamp)
+
+      true ->
+        String.to_integer(timestamp)
+    end
+    |> DateTime.from_unix!()
+  end
 end
