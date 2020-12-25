@@ -35,7 +35,7 @@ LEFT JOIN categories ON transactions.category_key=categories.rowid
   'map(
      . +
      (.transaction_purpose
-       | capture("Pasvolgnr: \\d{3} (?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})")
+       | capture("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})")
        | .year + "-" + .month + "-" + .day + "T" + .hours + ":" + .minutes + ":00" + "Z"
        | {"timestamp_unix": . | fromdate} ) )' \
    | jq -r '.[]'
