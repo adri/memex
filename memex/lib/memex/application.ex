@@ -9,6 +9,7 @@ defmodule Memex.Application do
     children = [
       # Start the Telemetry supervisor
       MemexWeb.Telemetry,
+      {Finch, name: MyFinch},
       {ConCache, [name: :search, ttl_check_interval: false]},
       # Start the PubSub system
       {Phoenix.PubSub, name: Memex.PubSub},

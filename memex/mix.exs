@@ -34,9 +34,11 @@ defmodule Memex.MixProject do
   defp deps do
     [
       {:con_cache, "~> 0.13"},
+      {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
       {:phoenix, "~> 1.5.7"},
       {:phoenix_live_view, "~> 0.15.0"},
       {:floki, ">= 0.27.0", only: :test},
+      {:finch, "~> 0.5"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_dashboard, "~> 0.4"},
