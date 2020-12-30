@@ -43,7 +43,8 @@ defmodule MemexWeb.PageLive do
         "accept-suggestion",
         %{"key" => "ArrowRight"},
         %{assigns: %{query: query, suggestion: suggestion}} = socket
-      ) do
+      )
+      when not is_nil(suggestion) do
     {:noreply,
      socket
      |> assign(query: query <> suggestion, suggestion: nil, page: 1)
