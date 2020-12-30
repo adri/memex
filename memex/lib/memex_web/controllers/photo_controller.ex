@@ -5,7 +5,8 @@ defmodule MemexWeb.PhotoController do
 
   def image(conn, %{"path" => path} = params) do
     new_path =
-      @photos_path <> String.replace(params["path"], [".jpeg", ".heic", ".mov"], "_4_5005_c.jpeg")
+      @photos_path <>
+        String.replace(params["path"], [".jpeg", ".heic", ".mov", ".png"], "_4_5005_c.jpeg")
 
     case File.read(new_path) do
       {:ok, contents} ->
