@@ -33,11 +33,20 @@ LEFT JOIN categories ON transactions.category_key=categories.rowid
   | jq -s '.' \
   | jq  \
   'map(
-     . +
-     (.transaction_purpose
-       | capture("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})")
-       | .year + "-" + .month + "-" + .day + "T" + .hours + ":" + .minutes + ":00" + "Z"
-       | {"timestamp_unix": . | fromdate} ) )' \
-   | jq -r '.[]'
+    . +
+    (
+      if .transaction_purpose | test("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})") then
+        .transaction_purpose
+          | capture("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})")
+          | {
+            timestamp_unix: (.year + "-" + .month + "-" + .day + "T" + .hours + ":" + .minutes + ":00" + "Z") | fromdate,
+            timestamp_utc: (.year + "-" + .month + "-" + .day + " " + .hours + ":" + .minutes)
+          }
+      else
+        {}
+      end
+    )
+  )' \
+  | jq -r '.[]'
 # awk => needed to filter out "ok" response from PRAGMA
 # jq  => Fix timestamp with actual date if possible
