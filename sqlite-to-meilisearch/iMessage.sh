@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+CHAT_DB_PATH=${CHAT_DB_PATH:="~/Library/Messages/chat.db"}
 CONTACTS_DB_PATH=${CONTACTS_DB_PATH:="14628275-DA9B-4559-8D40-8E98D59B14CD/AddressBook-v22.abcddb"}
-sqlite3 -readonly ~/Library/Messages/chat.db "
+sqlite3 -readonly ${CHAT_DB_PATH} "
 -- Contact information from Contacts.app
 ATTACH DATABASE '${HOME}/Library/Application Support/AddressBook/Sources/${CONTACTS_DB_PATH}' as contacts;
 WITH contact AS (
@@ -34,6 +35,6 @@ FROM
     LEFT JOIN contact ON contact.phone_number = chat.chat_identifier OR contact.email_address = chat.chat_identifier
 WHERE
     message.text IS NOT NULL
-ORDER BY
-    message_date ASC
+GROUP BY
+    message.guid
 "
