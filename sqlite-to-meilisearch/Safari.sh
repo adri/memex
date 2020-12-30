@@ -19,8 +19,6 @@ SELECT
 FROM
     history_visits
     INNER JOIN history_items ON history_items.id = history_visits.history_item
-    LEFT JOIN history_items_to_tags ON history_items.id = history_items_to_tags.history_item
-    LEFT JOIN history_tags ON history_tags.id = history_items_to_tags.tag_id
 GROUP BY
     history_visits.id
 "
