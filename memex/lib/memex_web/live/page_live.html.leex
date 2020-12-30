@@ -23,7 +23,7 @@
                         type="search"
                         value="<%= @query %>" />
                     <%= if @suggestion do %>
-                        <div class="absolute top-4 left-10 z-0">
+                        <div class="absolute top-4 left-10 z-0 select-none pointer-events-none">
                             <span class="text-transparent"><%= @query %></span><span class="text-gray-500"><%= @suggestion %></span>
                         </div>
                     <% end %>
