@@ -49,7 +49,7 @@
                             <figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>
                             <div class="text-base font-medium text-gray-900 p-3 dark:text-gray-500">
                                 <%= Calendar.strftime(date, "%A, %d %B %Y") %>
-                                <span class="text-xs transition-opacity opacity-0 group-hover:opacity-100">
+                                <span class="hidden md:inline-block text-xs transition-opacity opacity-0 group-hover:opacity-100">
                                     <%= case days_between do
                                       0 -> ""
                                       1 -> "1 day later"
@@ -157,7 +157,7 @@
 
                                 <a href="https://twitter.com/<%= hit["tweet_user_screen_name"] %>" class="block text-xs text-gray-300 dark:text-gray-500 truncate" target="_blank">
                                     <img class="rounded-full float-left mr-2 mb-1" src="<%= hit["tweet_user_avatar_url"] %>" width="20" height="20" />
-                                    <%= raw hit["_formatted"]["tweet_user_screen_name"] %><%= if hit["_formatted"]["tweet_user_location"] != "" do %>, <%= raw hit["_formatted"]["tweet_user_location"] %><%= end %>
+                                    <%= raw hit["_formatted"]["tweet_user_screen_name"] %><%= if hit["_formatted"]["tweet_user_location"] != "" do %>, <%= raw hit["_formatted"]["tweet_user_location"] %><% end %>
                                 </a>
                                 <a href="<%= hit["tweet_url"] %>" target="_blank">
                                     <%= raw MemexWeb.TimelineView.auto_link(hit["_formatted"]["tweet_full_text"]) %>
@@ -193,7 +193,7 @@
                                     style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
                         </div>
                     <% end %>
-                <%= end %>
+                <% end %>
             </div>
         </div>
     </div>
