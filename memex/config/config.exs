@@ -10,6 +10,7 @@ use Mix.Config
 # Configures the endpoint
 config :memex, MemexWeb.Endpoint,
   url: [host: "localhost"],
+  http: [ip: {0, 0, 0, 0}],
   secret_key_base: "BP29B2R/vGyAzIXMvxN0W8Qs/Ok1UjxP7/mDqoAL872Ima1bZMKhZ09ZYQqlTn96",
   render_errors: [view: MemexWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Memex.PubSub,
