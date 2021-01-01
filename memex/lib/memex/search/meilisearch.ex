@@ -108,7 +108,8 @@ defmodule Memex.Search.Meilisearch do
 
     middleware = [
       {Tesla.Middleware.BaseUrl, url},
-      Tesla.Middleware.JSON
+      Tesla.Middleware.JSON,
+      Tesla.Middleware.Telemetry
       # , Tesla.Middleware.Logger
     ]
 
