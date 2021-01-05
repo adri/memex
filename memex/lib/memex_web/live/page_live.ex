@@ -3,12 +3,21 @@ defmodule MemexWeb.PageLive do
 
   alias Memex.Search.Query
 
-  @default_assigns [results: %{}, dates: %{}, metadata: nil, suggestion: nil, surroundings: nil]
+  @default_assigns [
+    results: %{},
+    dates: %{},
+    metadata: nil,
+    suggestion: nil,
+    surroundings: nil,
+    search_ref: nil
+  ]
   @highlight_regex ~r/<em>.*<\/em>(\w*)\W/u
 
   @impl true
   def mount(_params, _session, socket) do
-    socket = assign(socket, query: "", page: 1, suggestion: nil, surroundings: nil)
+    socket =
+      assign(socket, query: "", page: 1, suggestion: nil, surroundings: nil, search_ref: nil)
+
     {:ok, socket, temporary_assigns: [results: %{}, dates: %{}, metadata: nil]}
   end
 
@@ -58,26 +67,51 @@ defmodule MemexWeb.PageLive do
   end
 
   defp search(%{assigns: %{page: page, query: string, surroundings: surroundings}} = socket) do
-    query = Query.from_string(string)
+    pid = self()
 
-    case Memex.Search.Meilisearch.search(query, page, surroundings) do
-      {:ok, response} ->
-        socket
-        |> assign(
-          query: string,
-          results: response["hits"],
-          metadata: %{
-            "totalHits" => response["nbHits"],
-            "processingTimeMs" => response["processingTimeMs"]
-          },
-          dates: response["facetsDistribution"]["date_month"],
-          suggestion: get_suggestion(response["hits"])
-        )
+    socket
+    |> cancel_current_search()
+    |> assign(query: string)
+    |> assign(
+      search_ref:
+        spawn(fn ->
+          query = Query.from_string(string)
+          result = Memex.Search.Meilisearch.search(query, page, surroundings)
+          send(pid, {:search_result, string, result})
+        end)
+    )
+  end
 
-      _ ->
-        socket
-        |> assign(@default_assigns ++ [query: string, page: 1])
-    end
+  defp cancel_current_search(socket) do
+    socket.assigns.search_ref && Process.exit(socket.assigns.search_ref, :kill)
+
+    socket
+  end
+
+  @impl true
+  def handle_info({:search_result, string, result}, socket) do
+    socket =
+      case result do
+        {:ok, response} ->
+          socket
+          |> assign(
+            query: string,
+            results: response["hits"],
+            metadata: %{
+              "totalHits" => response["nbHits"],
+              "processingTimeMs" => response["processingTimeMs"]
+            },
+            dates: response["facetsDistribution"]["date_month"],
+            suggestion: get_suggestion(response["hits"]),
+            search_ref: nil
+          )
+
+        _ ->
+          socket
+          |> assign(@default_assigns ++ [query: string, page: 1])
+      end
+
+    {:noreply, socket}
   end
 
   defp get_suggestion(results) do
