@@ -21,10 +21,11 @@ defmodule MemexWeb.Telemetry do
 
   def metrics do
     [
+      # Tesla Metrics
       summary("tesla.request.stop.duration",
-        descripion: "Request duration",
         unit: {:native, :millisecond}
       ),
+      counter("tesla.request.stop.duration"),
 
       # Phoenix Metrics
       summary("phoenix.endpoint.stop.duration",
