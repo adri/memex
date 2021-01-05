@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Imports stars from Github
 # Needs github-to-sqlite database.
-
+# Import liked repositories
 sqlite3 "github-to-sqlite/github.db" -readonly "
 SELECT
     json_object(

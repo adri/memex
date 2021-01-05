@@ -3,7 +3,7 @@
 # and indexes it in Meilisearch.
 #
 # Usage: import.sh [importer file]
-# Example: import.sh sqlite-to-meilisearch/iMessage.sh
+# Example: import.sh sqlite-to-json/iMessage.sh
 
 exec $1 \
   | jq -s '.' \
