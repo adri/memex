@@ -39,6 +39,7 @@ defmodule Memex.MixProject do
       {:phoenix_live_view, "~> 0.15.0"},
       {:floki, ">= 0.27.0", only: :test},
       {:finch, "~> 0.5"},
+      {:git_diff, "~> 0.6.2"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_dashboard, "~> 0.4"},
