@@ -20,6 +20,15 @@ Andrew has written many interesting [blog posts](https://hyfen.net/memex/) while
 
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Memex)
 
+### How does it look like?
+<img width="876" alt="memex" src="https://user-images.githubusercontent.com/133832/112340685-142cf700-8cc1-11eb-8679-1473a7793170.png">
+
+What it can do:
+
+* Search with auto-suggest and search result highlights 🔍
+* Timeline with clickable filters ⏲️
+* Super fast ⚡
+
 ### Installation
 
 ```
