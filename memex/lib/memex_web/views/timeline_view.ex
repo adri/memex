@@ -53,21 +53,12 @@ defmodule MemexWeb.TimelineView do
     end
   end
 
+  def nl2br(nil), do: ""
+
   def nl2br(text) do
     text
     |> String.trim()
     |> String.replace("\n", "<br />")
-  end
-
-  def line_number(ln) when is_nil(ln), do: ""
-  def line_number(ln), do: to_string(ln)
-
-  def line_id(patch, line) do
-    hash = :erlang.phash2({patch.from, patch.to})
-
-    ln = "-#{line.from_line_number}-#{line.to_line_number}"
-
-    [to_string(hash), ln]
   end
 
   def line_type(line), do: to_string(line.type)
