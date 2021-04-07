@@ -77,6 +77,7 @@
                             "Photos" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
                             "terminal" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
                             "Twitter" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Twitter-small.png")}" />)
+                            "git-notes" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
                             _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
                             end %>
                         </a>
@@ -175,15 +176,15 @@
                                 <% {:ok, parsed_diff} = GitDiff.parse_patch(hit["commit_diff"]) %>
                                 <%= for patch <- parsed_diff do %>
                                     <a href="obsidian://open?<%= URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)}) %>" target="_blank">
-                                        <%= MemexWeb.TimelineView.nl2br(patch.from) %>
-                                    </a>
-                                    <%= for chunk <- patch.chunks do %>
-                                        <%= for line <- chunk.lines do %>
-                                            <pre class="text-sm overflow-scroll <%= case MemexWeb.TimelineView.line_type(line) do
-                                            "remove" -> "line-through text-gray-600"
-                                            _ -> "" end %>"><code><%= raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"]) %></code></pre>
+                                        <%= String.trim(MemexWeb.TimelineView.nl2br(patch.from), ".md") %>
+                                        <%= for chunk <- patch.chunks do %>
+                                            <%= for line <- chunk.lines do %>
+                                                <pre class="text-sm overflow-scroll <%= case MemexWeb.TimelineView.line_type(line) do
+                                                "remove" -> "line-through text-gray-600"
+                                                _ -> "" end %>"><%= raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"]) %></pre>
+                                            <% end %>
                                         <% end %>
-                                    <% end %>
+                                    </a>
                                 <% end %>
                             <% end %>
                         </div>

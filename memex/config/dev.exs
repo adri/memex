@@ -5,7 +5,7 @@ use Mix.Config
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
-# with webpack to recompile .js and .css sources.
+# with snowpack to recompile .js and .css sources.
 config :memex, MemexWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
@@ -13,10 +13,9 @@ config :memex, MemexWeb.Endpoint,
   check_origin: false,
   watchers: [
     node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
+      "node_modules/snowpack/index.bin.js",
+      "build",
+      "--watch",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]
