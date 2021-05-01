@@ -169,15 +169,15 @@
                                 <% {:ok, parsed_diff} = GitDiff.parse_patch(hit["commit_diff"]) %>
                                 <%= for patch <- parsed_diff do %>
                                     <a href="obsidian://open?<%= URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)}) %>" target="_blank">
-                                        <%= String.trim(MemexWeb.TimelineView.nl2br(patch.from), ".md") %>
-                                        <%= for chunk <- patch.chunks do %>
-                                            <%= for line <- chunk.lines do %>
-                                                <pre class="text-sm overflow-scroll <%= case MemexWeb.TimelineView.line_type(line) do
-                                                "remove" -> "line-through text-gray-600"
-                                                _ -> "" end %>"><%= raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"]) %></pre>
-                                            <% end %>
-                                        <% end %>
+                                        <%= MemexWeb.TimelineView.nl2br(patch.from) %>
                                     </a>
+                                    <%= for chunk <- patch.chunks do %>
+                                        <%= for line <- chunk.lines do %>
+                                            <pre class="text-sm overflow-scroll <%= case MemexWeb.TimelineView.line_type(line) do
+                                            "remove" -> "line-through text-gray-600"
+                                            _ -> "" end %>"><code><%= raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"]) %></code></pre>
+                                        <% end %>
+                                    <% end %>
                                 <% end %>
                             <% end %>
                         </div>
