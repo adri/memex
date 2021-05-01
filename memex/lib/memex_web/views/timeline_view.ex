@@ -1,6 +1,7 @@
 defmodule MemexWeb.TimelineView do
   @youtube_url_regex ~r/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
   @url_regex ~r/https\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/i
+  alias MemexWeb.Router.Helpers, as: Routes
 
   def is_youtube_url(url), do: Regex.match?(@youtube_url_regex, url)
 
@@ -13,6 +14,37 @@ defmodule MemexWeb.TimelineView do
   def days_between(timestamp1, timestamp2) do
     Date.diff(date_from_timestamp(timestamp2), date_from_timestamp(timestamp1))
     |> max(0)
+  end
+
+  def icon_by_provider(provider) do
+    case provider do
+      "Safari" ->
+        "/images/safari-small.png"
+
+      "MoneyMoney" ->
+        "/images/MoneyMoney-small.png"
+
+      "iMessage" ->
+        "/images/iMessage-small.png"
+
+      "GitHub" ->
+        "/images/GitHub-small.png"
+
+      "Photos" ->
+        "/images/Photos-small.png"
+
+      "terminal" ->
+        "/images/terminal-small.png"
+
+      "Twitter" ->
+        "/images/Twitter-small.png"
+
+      "git-notes" ->
+        "/images/GitHub-small.png"
+
+      _ ->
+        nil
+    end
   end
 
   def date_from_timestamp(timestamp) do

@@ -1,9 +1,11 @@
 defmodule Memex.Search.Query do
-  defstruct query: "", filters: %{}, page: 1
+  defstruct query: "", filters: %{}, page: 1, highlights: [""]
 
   def add_filter(query, key, value), do: put_in(query.filters[key], value)
 
   def has_filters(query), do: query.filters !== %{}
+
+  def disable_highlights(query), do: %{query | highlights: []}
 
   def to_string(query) do
     []

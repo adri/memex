@@ -19,6 +19,7 @@ defmodule MemexWeb.Router do
 
     live "/", PageLive, :index
     get "/photos/:path", PhotoController, :image
+    get "/alfred/search", AlfredController, :search
   end
 
   # Other scopes may use custom stacks.

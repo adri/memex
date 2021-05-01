@@ -69,16 +69,9 @@
                         </div>
 
                         <a href="#" class="flex-none self-center inline-block w-6 h-6 -ml-3" phx-click="show-surrounding" phx-value-timestamp="<%= hit["timestamp_unix"] %>">
-                            <%= case hit["provider"] do
-                            "Safari" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/safari-small.png")}" />)
-                            "MoneyMoney" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/MoneyMoney-small.png")}" />)
-                            "iMessage" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/iMessage-small.png")}" />)
-                            "GitHub" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
-                            "Photos" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Photos-small.png")}" />)
-                            "terminal" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/terminal-small.png")}" />)
-                            "Twitter" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/Twitter-small.png")}" />)
-                            "git-notes" -> raw ~s(<img src="#{Routes.static_path(@socket, "/images/GitHub-small.png")}" />)
-                            _ -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
+                            <%= case MemexWeb.TimelineView.icon_by_provider(hit["provider"]) do
+                                nil -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
+                                provider -> raw ~s(<img src="#{provider}" />)
                             end %>
                         </a>
 
@@ -149,7 +142,7 @@
                                 </p>
                             <% end %>
 
-                             <%= if hit["provider"] === "Twitter" do %>
+                            <%= if hit["provider"] === "Twitter" do %>
                                 <%= if hit["tweet_liked"] != 0 do %>
                                     <span class="float-right rounded-full dark:bg-gray-700 ml-2 p-2 text-xs">Liked</span>
                                 <% end %>
@@ -172,7 +165,7 @@
                                 <% end %>
                             <% end %>
 
-                             <%= if hit["provider"] === "git-notes" do %>
+                            <%= if hit["provider"] === "git-notes" do %>
                                 <% {:ok, parsed_diff} = GitDiff.parse_patch(hit["commit_diff"]) %>
                                 <%= for patch <- parsed_diff do %>
                                     <a href="obsidian://open?<%= URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)}) %>" target="_blank">
@@ -192,7 +185,10 @@
                 </div>
             <% end %>
             </div>
-        <div id="loader" phx-hook="InfiniteScroll" data-page="<%= @page %>"></div>
+
+        <%= if @results != %{} do %>
+            <div id="loader" phx-hook="InfiniteScroll" data-page="<%= @page %>"></div>
+        <% end %>
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
             <div id="date-facet" class="cursor-pointer relative">
@@ -203,15 +199,26 @@
                              phx-click="filter-date"
                              phx-value-date="<%= date %>">
                             <span class="absolute opacity-0 group-hover:opacity-100 text-gray-100 leading-3"
-                                  style="font-size: 8px; margin-top: -2px"><%= date %> (<%= count %>)</span>
+                                style="font-size: 8px; margin-top: -2px"><%= date %> (<%= count %>)</span>
                             <button
-                                    id="<%= date %>"
-                                    title="<%= date %> (<%= count %>)"
-                                    class="bg-gray-700 group-hover:bg-gray-500 ml-auto block mb-px h-2"
-                                    style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
+                                id="<%= date %>"
+                                title="<%= date %> (<%= count %>)"
+                                class="bg-gray-700 group-hover:bg-gray-500 ml-auto block mb-px h-2"
+                                style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
                         </div>
                     <% end %>
                 <% end %>
+            </div>
+        </div>
+        <div class="fixed inset-0 backdrop-filter backdrop-blur-md">
+            <div class="fixed bg-gray-700 w-8/12 p-4 inset-y-0 right-0 shadow-2xl overflow-hidden overflow-y-auto">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg dark:text-blue-400 leading-7">Details</h2>
+                    <button aria-label="Close" class="dark:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>

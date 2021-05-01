@@ -7,8 +7,8 @@ import.sh sqlite-to-json/Photos.sh
 import.sh sqlite-to-json/Safari.sh
 import.sh sqlite-to-json/terminal.sh
 
-./github-to-sqlite/import-database.sh
-import.sh sqlite-to-json/github.sh
+#./github-to-sqlite/import-database.sh
+#import.sh sqlite-to-json/github.sh
 
-./twitter-to-sqlite/import-database.sh
-import.sh sqlite-to-json/twitter.sh
+#./twitter-to-sqlite/import-database.sh
+#import.sh sqlite-to-json/twitter.sh
