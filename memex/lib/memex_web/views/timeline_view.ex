@@ -16,6 +16,33 @@ defmodule MemexWeb.TimelineView do
     |> max(0)
   end
 
+  def time_between(timestamp1, timestamp2) do
+    DateTime.diff(date_from_timestamp(timestamp2), date_from_timestamp(timestamp1))
+  end
+
+  def human_time_between(timestamp1, timestamp2) do
+    diff = abs(time_between(timestamp1, timestamp2))
+
+    cond do
+      diff < 60 ->
+        "less than a minute"
+
+      diff > 60 && diff < 120 ->
+        "1 minute"
+
+      diff >= 120 && diff < 3600 ->
+        "#{div(diff, 60)} minutes"
+
+      diff >= 3600 && diff < 7200 ->
+        min = rem(diff, 3600) |> div(60)
+        "a 1 hour and #{min} minutes"
+
+      diff >= 7200 ->
+        min = rem(diff, 3600) |> div(60)
+        "#{div(diff, 3600)} hours and #{min} minutes"
+    end
+  end
+
   def icon_by_provider(provider) do
     case provider do
       "Safari" ->
@@ -41,6 +68,9 @@ defmodule MemexWeb.TimelineView do
 
       "git-notes" ->
         "/images/GitHub-small.png"
+
+      "Arc" ->
+        "/images/Arc-small.png"
 
       _ ->
         nil

@@ -180,6 +180,43 @@
                                     <% end %>
                                 <% end %>
                             <% end %>
+
+                            <%= if hit["provider"] === "Arc" do %>
+                                <div class="flex">
+                                    <img class="object-cover h-24 w-24 -m-4 rounded-l mr-4" width="82" height="82" src="https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/pin-l-embassy+f74e4e(<%= hit["place_longitude"] %>,<%= hit["place_latitude"] %>)/<%= hit["place_longitude"] %>,<%= hit["place_latitude"] %>,15/100x100@2x?access_token=<%= System.get_env("MAPBOX_API_KEY") %>" />
+
+                                    <div class="flex-grow truncate">
+                                        <%= if hit["place_name"] do %>
+                                            <%= raw hit["_formatted"]["place_name"] %>
+                                        <% end %>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500">
+                                            Spent <%= MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"]) %>.
+                                            <%= if hit["place_name"] do %>
+                                            <%= raw hit["_formatted"]["place_street_address"] %>
+                                            <% end %>
+                                        </p>
+                                    </div>
+
+                                    <div class="flex items-center ml-2 text-xs space-x-2">
+                                        <%= if hit["activity_heart_rate_average"] do %>
+                                            <span class="flex p-2 space-x-1 items-center rounded-md border text-gray-500 border-gray-300 dark:border-gray-700 ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                                <%= round(hit["activity_heart_rate_average"]) %>
+                                            </span>
+                                        <% end %>
+                                        <%= if hit["activity_floors_ascended"] && hit["activity_floors_ascended"] + hit["activity_floors_descended"] != 0 do %>
+                                            <span class="flex ml-2 p-2 space-x-1 items-center rounded-md text-gray-500 border dark:border-gray-700 border-gray-300">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
+                                                </svg>
+                                                <%= round(hit["activity_floors_ascended"] + hit["activity_floors_descended"]) %>
+                                            </span>
+                                        <% end %>
+                                    </div>
+                                </div>
+                            <% end %>
                         </div>
                     </div>
                 </div>

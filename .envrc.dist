@@ -2,3 +2,11 @@ export MEILISEARCH_HOST=http://127.0.0.1:7700
 export INDEX_NAME=memex
 
 export GITHUB_USER_NAME=adri
+
+# Optional, used to resolve Foursquare categories
+# and places collected by the Arc app.
+export FOURSQUARE_CLIENT_ID=
+export FOURSQUARE_CLIENT_SECRET=
+
+# Optional, used to display a map preview of locations
+export MAPBOX_API_KEY=

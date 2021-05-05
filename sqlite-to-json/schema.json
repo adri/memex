@@ -36,6 +36,12 @@
         "timestamp_unix": {
           "type": "number"
         },
+        "timestamp_start_utc": {
+          "type": "string"
+        },
+        "timestamp_start_unix": {
+          "type": "number"
+        },
         "message_direction": {
           "type": "string"
         },
@@ -63,12 +69,6 @@
             "type": "string"
           }
         },
-        "location_latitude": {
-          "type": ["number", "null"]
-        },
-        "location_longitude": {
-          "type": ["number", "null"]
-        },
         "device_name": {
           "type": ["string", "null"]
         },
@@ -95,7 +95,22 @@
         },
         "repo_stars_count": {
           "type": "number"
-        }
+        },
+        "place_name": {
+          "type": "string"
+        },
+        "place_address": {
+          "type": "string"
+        },
+        "place_latitude": {
+          "type": ["number", "null"]
+        },
+        "place_longitude": {
+          "type": ["number", "null"]
+        },
+        "place_foursquare_venue_id": {
+          "type": "string"
+        },
       }
     }
   }
