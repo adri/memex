@@ -2,6 +2,8 @@ defmodule MemexWeb.PageLive do
   use MemexWeb, :live_view
 
   alias Memex.Search.Query
+  alias Memex.Search.Sidebars
+  alias Memex.Search.Meilisearch
 
   @default_assigns [
     results: %{},
@@ -16,7 +18,14 @@ defmodule MemexWeb.PageLive do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      assign(socket, query: "", page: 1, suggestion: nil, surroundings: nil, search_ref: nil)
+      assign(socket,
+        sidebars: Sidebars.init(),
+        query: "",
+        page: 1,
+        suggestion: nil,
+        surroundings: nil,
+        search_ref: nil
+      )
 
     {:ok, socket, temporary_assigns: [results: %{}, dates: %{}, metadata: nil]}
   end
@@ -64,6 +73,19 @@ defmodule MemexWeb.PageLive do
   @impl true
   def handle_event("accept-suggestion", _key, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
+    {:ok, data} = Meilisearch.find(data["id"])
+    data |> IO.inspect(label: "72")
+
+    {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
+  end
+
+  @impl true
+  def handle_event("close-last-sidebar", _key, %{assigns: %{sidebars: sidebars}} = socket) do
+    {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
   defp search(%{assigns: %{page: page, query: string, surroundings: surroundings}} = socket) do

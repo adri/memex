@@ -17,12 +17,13 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import { InfiniteScroll } from "./infinite_scroll";
 import { ForceInputValue } from "./force_input_value";
+import { Sidebar } from "./sidebar";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: { InfiniteScroll, ForceInputValue },
+  hooks: { InfiniteScroll, ForceInputValue, Sidebar },
   params: { _csrf_token: csrfToken },
 });
 // connect if there are any LiveViews on the page

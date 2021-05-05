@@ -232,31 +232,49 @@
                 <%= if @dates do %>
                     <% max_count = try do Enum.max(Map.values(@dates)) rescue Enum.EmptyError -> 0 end %>
                     <%= for {date, count} <- Enum.sort(@dates, &(&1 > &2)) do %>
-                        <div class="group hover:bg-gray-600 text-xs"
+                        <div class="group hover:dark:bg-gray-600 hover:bg-gray-100 text-xs"
                              phx-click="filter-date"
                              phx-value-date="<%= date %>">
-                            <span class="absolute opacity-0 group-hover:opacity-100 text-gray-100 leading-3"
+                            <span class="absolute opacity-0 group-hover:opacity-100 text-gray-500 dark:text-gray-100 leading-3"
                                 style="font-size: 8px; margin-top: -2px"><%= date %> (<%= count %>)</span>
                             <button
                                 id="<%= date %>"
                                 title="<%= date %> (<%= count %>)"
-                                class="bg-gray-700 group-hover:bg-gray-500 ml-auto block mb-px h-2"
+                                class="dark:bg-gray-700 bg-gray-300 group-hover:dark:bg-gray-500 group-hover:bg-gray-200 ml-auto block mb-px h-2"
                                 style="width: <%= unless max_count == 0 do round(max(1, (100 / max_count) * count )) else 1 end %>%;"></button>
                         </div>
                     <% end %>
                 <% end %>
             </div>
         </div>
-        <div class="fixed inset-0 backdrop-filter backdrop-blur-md">
-            <div class="fixed bg-gray-700 w-8/12 p-4 inset-y-0 right-0 shadow-2xl overflow-hidden overflow-y-auto">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg dark:text-blue-400 leading-7">Details</h2>
-                    <button aria-label="Close" class="dark:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+        <div phx-hook="Sidebar" id="sidebars" data-open="<%= length(@sidebars) > 0 %>" aria-hidden></div>
+        <%= for {sidebar, index} <- Enum.with_index(@sidebars) do %>
+            <div id="sidebar-<%= index %>"  class="fixed inset-0 transition backdrop-filter backdrop-blur-sm <%= if sidebar["closed"] do %> backdrop-filter-none pointer-events-none<% else %> bg-black bg-opacity-30 <% end %>">
+                <div phx-click="close-last-sidebar"class="fixed inset-0 text-white"></div>
+                <% width = case index do
+                    0 -> "w-10/12"
+                    1 -> "w-9/12"
+                    2 -> "w-8/12"
+                    3 -> "w-7/12"
+                    _ -> "w-6/12"
+                end %>
+                <div class="fixed border-l dark:border-gray-700 dark:bg-gray-800 bg-gray-50 p-5 inset-y-0 right-0 shadow-2xl <%= width %> overflow-hidden transform transition-transform <%= if sidebar["closed"] do %>translate-x-full<% end %>">
+                    <div class="flex items-center justify-between">
+                        <%= case MemexWeb.TimelineView.icon_by_provider(sidebar["provider"]) do
+                            nil -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
+                            provider -> raw ~s(<img class="flex-none w-7 h-7 mr-2" src="#{provider}" />)
+                        end %>
+                        <h2 class="text-lg flex-grow dark:text-white leading-7"><%= sidebar["website_title"] || sidebar["id"] %> Details</h2>
+                        <button phx-click="close-last-sidebar" aria-label="Close" class="dark:text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="overflow-y-scroll text-sm space-x-5 dark:text-white">
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsu </p>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsu </p>
+                    </div>
                 </div>
-
             </div>
-        </div>
+        <% end %>
     </div>
 </div>
