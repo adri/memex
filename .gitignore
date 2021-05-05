@@ -1,5 +1,7 @@
 data.ms/
+dumps/
 data/
+data*/
 backup/
 node_modules/
 auth.json
