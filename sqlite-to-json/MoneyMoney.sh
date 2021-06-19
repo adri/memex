@@ -23,6 +23,7 @@ SELECT
         'transaction_amount', transactions.amount,
         'transaction_currency', transactions.currency,
         'transaction_recipient', transactions.name,
+        'transaction_reference', transactions.eref,
         'transaction_purpose', transactions.unformatted_purpose
   ) AS json
 FROM transactions
@@ -31,7 +32,7 @@ LEFT JOIN categories ON transactions.category_key=categories.rowid
 " \
   | awk '!/^ok$/' \
   | jq -s '.' \
-  | jq  \
+  | TZ="Etc/UTC" jq  \
   'map(
     . +
     (
@@ -47,6 +48,21 @@ LEFT JOIN categories ON transactions.category_key=categories.rowid
       end
     )
   )' \
+  | TZ="Etc/UTC" jq  \
+  'map(
+    . +
+    (
+      if .transaction_reference | test("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})") then
+        .transaction_reference
+          | capture("(?<day>\\d{2})-(?<month>\\d{2})-(?<year>\\d{4}) (?<hours>\\d{2}):(?<minutes>\\d{2})")
+          | {
+            timestamp_unix: (.year + "-" + .month + "-" + .day + "T" + .hours + ":" + .minutes + ":00" + "Z") | fromdate,
+            timestamp_utc: (.year + "-" + .month + "-" + .day + " " + .hours + ":" + .minutes)
+          }
+      else
+        {}
+      end
+    )
+  )' \
   | jq -r '.[]'
 # awk => needed to filter out "ok" response from PRAGMA
-# jq  => Fix timestamp with actual date if possible
