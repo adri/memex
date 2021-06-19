@@ -1,0 +1,34 @@
+version: "2.2"
+services:
+  postgres:
+    image: postgres:13
+    ports:
+      - "65432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=memex
+      - POSTGRES_DB=memex
+    volumes:
+      - /dev/urandom:/dev/random # Required to get non-blocking entropy source
+      - postgres-db:/var/lib/postgresql/data
+      - ./data/postgres-share:/postgres-share:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "psql",
+          "-h",
+          "localhost",
+          "-U",
+          "postgres",
+          "-c",
+          "select 1",
+          "memex",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+
+volumes:
+  postgres-db:

@@ -14,7 +14,8 @@ defmodule Memex.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Memex.PubSub},
       # Start the Endpoint (http/https)
-      MemexWeb.Endpoint
+      MemexWeb.Endpoint,
+      {Memex.Repo, []}
       # Start a worker by calling: Memex.Worker.start_link(arg)
       # {Memex.Worker, arg}
     ]

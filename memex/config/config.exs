@@ -21,6 +21,15 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :memex, ecto_repos: [Memex.Repo]
+
+config :memex, Memex.Repo,
+  url: System.get_env("POSTGRES_DSN"),
+  pool_size: 5,
+  timeout: 60_000
+
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

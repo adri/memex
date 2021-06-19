@@ -2,6 +2,7 @@
 # Run: brew bundle
 
 brew "direnv"
+brew "dockerize"
 brew "elixir"
 brew "jq"
 brew "sqlcipher"

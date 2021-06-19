@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-# Start Meilisearch
-./meilisearch --no-analytics=no --no-sentry=no --http-payload-size-limit=104857600 &
+# Start Postgres
+docker compose up -d
+dockerize -wait-retry-interval 5s -wait tcp://127.0.0.1:65432 -timeout 5m &> /dev/null
 
 # Start Elixir frontend
 cd memex
 mix deps.get
+mix ecto.migrate
 cd assets && yarn && cd ..
-MEILISEARCH_HOST=$MEILISEARCH_HOST iex -S mix phx.server
+iex -S mix phx.server
