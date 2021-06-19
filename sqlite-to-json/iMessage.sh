@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-CHAT_DB_PATH=${CHAT_DB_PATH:="~/Library/Messages/chat.db"}
-CONTACTS_DB_PATH=${CONTACTS_DB_PATH:="14628275-DA9B-4559-8D40-8E98D59B14CD/AddressBook-v22.abcddb"}
+CHAT_DB_PATH=${CHAT_DB_PATH:="${HOME}/Library/Messages/chat.db"}
+CONTACTS_DB_PATH=${CONTACTS_DB_PATH:="AAE8D6A5-FEED-47BB-82CF-1A51C6789400/AddressBook-v22.abcddb"}
+DATE_CORRECTION="/ 1000000000 + 978307200" # strftime('%s', '2001-01-01')
+
 sqlite3 -readonly ${CHAT_DB_PATH} "
 -- Contact information from Contacts.app
 ATTACH DATABASE '${HOME}/Library/Application Support/AddressBook/Sources/${CONTACTS_DB_PATH}' as contacts;
 WITH contact AS (
     SELECT
+        record.ZUNIQUEID as id,
         record.ZFIRSTNAME AS first_name,
         record.ZLASTNAME AS last_name,
         REPLACE(phone.ZFULLNUMBER, ' ', '') AS phone_number,
@@ -20,13 +23,14 @@ SELECT
         'provider', 'iMessage',
         'verb', 'messaged',
         'id', 'imessage-' || message.guid,
-        'date_month', strftime('%Y-%m', message.date / 1000000000 + strftime ('%s', '2001-01-01'), 'unixepoch', 'utc'),
-        'timestamp_utc', datetime(message.date / 1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'utc'),
-        'timestamp_unix', CAST(strftime('%s', datetime(message.date / 1000000000 + strftime('%s', '2001-01-01'), 'unixepoch', 'utc')) as INT),
+        'date_month', strftime('%Y-%m', message.date ${DATE_CORRECTION}, 'unixepoch'),
+        'timestamp_utc', datetime(message.date ${DATE_CORRECTION}, 'unixepoch'),
+        'timestamp_unix', CAST(strftime('%s', datetime(message.date ${DATE_CORRECTION}, 'unixepoch')) as INT),
         'message_direction', (CASE WHEN message.is_from_me THEN 'sent' ELSE 'received' END),
         'message_service', chat.service_name,
         'message_text', message.text,
-        'person_name', CASE WHEN contact.first_name IS NULL AND contact.last_name IS NULL THEN chat.chat_identifier ELSE contact.first_name || ' ' || contact.last_name END
+        'person_name', CASE WHEN contact.first_name IS NULL AND contact.last_name IS NULL THEN chat.chat_identifier ELSE contact.first_name || ' ' || contact.last_name END,
+        'person_id', contact.id
     ) AS json
 FROM
     main.chat chat
