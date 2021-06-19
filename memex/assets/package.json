@@ -28,6 +28,6 @@
     "tailwindcss": "^2.1.2",
     "terser-webpack-plugin": "^2.3.2",
     "webpack": "4.41.5",
-    "webpack-cli": "^3.3.2"
+    "webpack-cli": "^4.7.2"
   }
 }
