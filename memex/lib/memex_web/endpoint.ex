@@ -44,6 +44,8 @@ defmodule MemexWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
+    # Increase to 300MB max upload
+    length: 300_000_000,
     json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride

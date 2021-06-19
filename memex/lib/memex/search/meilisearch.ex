@@ -1,7 +1,7 @@
 defmodule Memex.Search.Meilisearch do
   alias Memex.Search.Query
 
-  @date_facet "date_month"
+  @date_facet "month"
   @results_per_page 20
 
   def search(query = %Query{}, page, surroundings, client \\ new()) do
@@ -12,49 +12,48 @@ defmodule Memex.Search.Meilisearch do
 
     client
     |> Tesla.post("/indexes/#{index_name}/search", params)
-    |> maybe_load_surroundings(surroundings, index_name, client)
     |> case do
       {:ok, %{status: 200} = response} -> {:ok, response.body}
       _ -> {:error, %{}}
     end
   end
 
-  defp maybe_load_surroundings(response, nil, _index_name, _client), do: response
-  defp maybe_load_surroundings({:error, _} = response, [], _index_name, _client), do: response
+  def find(id, client \\ new()) do
+    index_name = System.get_env("INDEX_NAME")
 
-  defp maybe_load_surroundings({:ok, %{status: 200} = response}, timestamp, index_name, client) do
+    client
+    |> Tesla.get("/indexes/#{index_name}/documents/#{id}")
+    |> case do
+      {:ok, %{status: 200} = response} -> {:ok, response.body}
+      _ -> {:error, %{}}
+    end
+  end
+
+  def surroundings(timestamp, client \\ new()) do
+    index_name = System.get_env("INDEX_NAME")
+
     client
     |> Tesla.post("/indexes/#{index_name}/search", %{
       "q" => "",
-      "filters" => "timestamp_unix > #{timestamp - 3600} AND timestamp_unix < #{timestamp + 600}",
-      "limit" => 80,
+      "filters" => "timestamp_unix > #{timestamp - 600} AND timestamp_unix < #{timestamp}",
+      "limit" => 10,
       "attributesToHighlight" => ["*"]
     })
     |> case do
-      {:ok, %{status: 200} = surrounding} ->
-        {:ok,
-         update_in(response.body["hits"], fn hits ->
-           surrounding.body["hits"]
-           |> Enum.into(%{}, fn hit -> {hit["id"], hit} end)
-           |> Map.merge(Enum.into(hits, %{}, fn hit -> {hit["id"], hit} end))
-           |> Map.values()
-           |> Enum.sort_by(& &1["timestamp_unix"], :desc)
-         end)}
-
-      _ ->
-        # Ignore errors because the original query worked
-        {:ok, response}
+      {:ok, %{status: 200} = surrounding} -> {:ok, surrounding.body}
+      {:error, reason} -> {:error, reason}
     end
   end
 
   defp query_to_params(query, page, settings) do
     %{
-      "q" => query.query,
+      "q" => Query.to_string(query),
       "limit" => @results_per_page * page,
       "facetsDistribution" => ["date_month"],
       "attributesToHighlight" => ["*"]
     }
-    |> handle_filters(query.filters, settings)
+
+    # |> handle_filters(query.filters, settings)
   end
 
   defp handle_filters(params, filters, _settings) when filters == %{}, do: params
@@ -93,14 +92,15 @@ defmodule Memex.Search.Meilisearch do
   end
 
   defp get_index_settings(index_name, client \\ new()) do
-    ConCache.get_or_store(:search, "settings", fn ->
-      client
-      |> Tesla.get("/indexes/#{index_name}/settings")
-      |> case do
-        {:ok, %{status: 200} = response} -> {:ok, response.body}
-        _ -> {:error, %{}}
-      end
-    end)
+    # ConCache.get_or_store(:search, "settings", fn ->
+    #   client
+    #   |> Tesla.get("/indexes/#{index_name}/settings")
+    #   |> case do
+    #     {:ok, %{status: 200} = response} -> {:ok, response.body}
+    #     _ -> {:error, %{}}
+    #   end
+    # end)
+    {:ok, %{"attributesForFaceting" => ["date_month"]}}
   end
 
   defp new() do

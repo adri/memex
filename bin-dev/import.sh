@@ -8,5 +8,6 @@
 exec $1 \
   | jq -s '.' \
   | curl \
+  -H 'Content-Type: application/json' \
   -X POST "$MEILISEARCH_HOST/indexes/${INDEX_NAME}/documents" \
   --data @-

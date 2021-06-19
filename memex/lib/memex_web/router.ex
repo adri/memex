@@ -18,14 +18,16 @@ defmodule MemexWeb.Router do
     pipe_through :browser
 
     live "/", PageLive, :index
+    live "/person", Sidebars.PersonLive, :index
     get "/photos/:path", PhotoController, :image
     get "/alfred/search", AlfredController, :search
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", MemexWeb do
-  #   pipe_through :api
-  # end
+  scope "/", MemexWeb do
+    pipe_through :api
+    post "/indexes/:index/documents", IndexController, :upsert_documents
+  end
 
   # Enables LiveDashboard only for development
   #

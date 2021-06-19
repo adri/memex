@@ -2,19 +2,19 @@ defmodule MemexWeb.AlfredController do
   use MemexWeb, :controller
 
   alias Memex.Search.Query
-  alias MemexWeb.Router
+  alias Memex.Search.Postgres, as: Search
 
   def search(conn, params) do
     query =
       Query.from_string(params["q"] || "")
       |> Query.disable_highlights()
 
-    with {:ok, results} <- Memex.Search.Meilisearch.search(query, 1, nil) do
+    with {:ok, results} <- Search.search(query, 1, nil) do
       conn
       |> put_resp_content_type("application/json", "utf-8")
       |> send_resp(200, Jason.encode!(alfred_format_hits(results["hits"])))
     else
-      error ->
+      {:error, error} ->
         conn
         |> put_resp_content_type("application/json", "utf-8")
         |> send_resp(400, Jason.encode!(%{"error" => error}))
@@ -59,9 +59,9 @@ defmodule MemexWeb.AlfredController do
 
   defp alfred_format_title(%{"provider" => "MoneyMoney"} = hit),
     do:
-      Number.Currency.number_to_currency(abs(hit["transaction_amount"]),
-        unit: hit["transaction_currency"],
-        format: "%n %u"
+      MemexWeb.TimelineView.number_to_currency(
+        abs(hit["transaction_amount"]),
+        hit["transaction_currency"]
       ) <> ": #{hit["transaction_recipient"]} #{hit["transaction_category"]}"
 
   defp alfred_format_title(_hit), do: "unknown"
@@ -74,9 +74,7 @@ defmodule MemexWeb.AlfredController do
 
   defp alfred_format_subtitle(%{"provider" => "GitHub"} = hit),
     do:
-      "#{hit["repo_description"]} #{hit["repo_license"]} #{hit["repo_language"]} #{
-        hit["repo_stars_count"]
-      } stars"
+      "#{hit["repo_description"]} #{hit["repo_license"]} #{hit["repo_language"]} #{hit["repo_stars_count"]} stars"
 
   defp alfred_format_subtitle(%{"provider" => "iMessage"} = hit) do
     case hit["message_direction"] do
