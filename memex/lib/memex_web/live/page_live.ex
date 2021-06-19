@@ -1,19 +1,43 @@
 defmodule MemexWeb.PageLive do
+  use Surface.LiveView
   use MemexWeb, :live_view
 
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
-  alias Memex.Search.Meilisearch
+  alias Memex.Search.Postgres, as: Search
+  alias MemexWeb.Timeline
+  alias MemexWeb.SearchResultStats
+  alias MemexWeb.SearchBar
+  alias MemexWeb.DatesFacet
+  alias MemexWeb.SidebarsComponent
 
   @default_assigns [
-    results: %{},
+    results: [],
     dates: %{},
     metadata: nil,
     suggestion: nil,
     surroundings: nil,
     search_ref: nil
   ]
-  @highlight_regex ~r/<em>.*<\/em>(\w*)\W/u
+  @highlight_regex ~r/<em>(.*)<\/em>/u
+
+  def render(assigns) do
+    ~H"""
+    <div class="mx-auto">
+      <SearchBar query={{ @query }} />
+      <div class="flex items-start">
+        <div class="w-4/5 mt-8">
+          <SearchResultStats totalHits={{@metadata["totalHits"]}} processingTimeMs={{@metadata["processingTimeMs"]}} />
+          <Timeline query={{ @query }} results={{ @results }} page={{ @page }} />
+        </div>
+        <div class="w-1/5 overflow-hidden pl-5 text-white">
+           <DatesFacet dates={{ @dates }} />
+        </div>
+        <SidebarsComponent sidebars={{ @sidebars }} />
+      </div>
+    </div>
+    """
+  end
 
   @impl true
   def mount(_params, _session, socket) do
@@ -27,7 +51,23 @@ defmodule MemexWeb.PageLive do
         search_ref: nil
       )
 
-    {:ok, socket, temporary_assigns: [results: %{}, dates: %{}, metadata: nil]}
+    {:ok, socket, temporary_assigns: [results: [], dates: %{}, metadata: nil]}
+  end
+
+  @impl true
+  def handle_params(params, _url, socket) do
+    query = Map.get(params, "query", "")
+
+    cond do
+      query == "" ->
+        {:noreply, socket}
+
+      query == socket.assigns.query ->
+        {:noreply, socket}
+
+      true ->
+        handle_event("search", %{"query" => query}, socket)
+    end
   end
 
   @impl true
@@ -42,10 +82,14 @@ defmodule MemexWeb.PageLive do
   end
 
   @impl true
-  def handle_event("filter-date", %{"date" => date}, %{assigns: %{query: string}} = socket) do
+  def handle_event(
+        "filter-date",
+        %{"key" => key, "value" => value},
+        %{assigns: %{query: string}} = socket
+      ) do
     query =
       Query.from_string(string)
-      |> Query.add_filter("date_month", date)
+      |> Query.add_filter(key, value)
 
     {:noreply,
      socket |> assign(query: Query.to_string(query), page: 1, surroundings: nil) |> search()}
@@ -60,14 +104,14 @@ defmodule MemexWeb.PageLive do
   def handle_event(
         "accept-suggestion",
         %{"key" => "ArrowRight"},
-        %{assigns: %{query: query, suggestion: suggestion}} = socket
+        %{assigns: %{suggestion: suggestion}} = socket
       )
       when not is_nil(suggestion) do
     {:noreply,
      socket
-     |> assign(query: query <> suggestion, suggestion: nil, page: 1)
+     |> assign(query: suggestion, suggestion: nil, page: 1)
      |> search()
-     |> push_event("force-input-value", %{value: query <> suggestion})}
+     |> push_event("force-input-value", %{value: suggestion})}
   end
 
   @impl true
@@ -77,8 +121,7 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
-    {:ok, data} = Meilisearch.find(data["id"])
-    data |> IO.inspect(label: "72")
+    data = data |> IO.inspect(label: "detail view data")
 
     {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
   end
@@ -98,7 +141,7 @@ defmodule MemexWeb.PageLive do
       search_ref:
         spawn(fn ->
           query = Query.from_string(string)
-          result = Memex.Search.Meilisearch.search(query, page, surroundings)
+          result = Search.search(query, page, surroundings)
           send(pid, {:search_result, string, result})
         end)
     )
@@ -127,6 +170,7 @@ defmodule MemexWeb.PageLive do
             suggestion: get_suggestion(response["hits"]),
             search_ref: nil
           )
+          |> push_patch(to: Routes.page_path(socket, :index, query: string))
 
         _ ->
           socket
@@ -147,5 +191,7 @@ defmodule MemexWeb.PageLive do
         end
       end)
     end
+
+    nil
   end
 end

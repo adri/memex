@@ -36,7 +36,7 @@ defmodule Memex.MixProject do
       {:con_cache, "~> 0.13"},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
       {:phoenix, "~> 1.5.7"},
-      {:phoenix_live_view, "~> 0.15.0"},
+      {:phoenix_live_view, "~> 0.15.7"},
       {:floki, ">= 0.27.0", only: :test},
       {:finch, "~> 0.5"},
       {:git_diff, "~> 0.6.2"},
@@ -51,8 +51,10 @@ defmodule Memex.MixProject do
       {:postgrex, "~> 0.15.9"},
       {:gettext, "~> 0.11"},
       {:tesla, "~> 1.4.0"},
+      {:surface, "~> 0.3.0"},
+      {:money, "~> 1.4"},
+      {:month, "~> 2.1"},
       {:hackney, "~> 1.16.0"},
-      {:number, "~> 1.0.3"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"}
     ]

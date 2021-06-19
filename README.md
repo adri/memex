@@ -51,4 +51,4 @@ open http://localhost:4000
 
 ### Links
 
-- Icons https://macosicons.com
+- Icons https://macosicons.com, https://heroicons.com

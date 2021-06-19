@@ -8,6 +8,8 @@
     <%= live_title_tag assigns[:page_title] || "Memex" %>
     <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <link rel="shortcut icon" type="image/png" href="<%= Routes.static_path(@conn, "/images/memex.png") %>"  />
+    <link rel="shortcut icon" type="image/png" href="<%= Routes.static_path(@conn, "/images/memex.png") %>" color="darkhex" media="(prefers-color-scheme: dark)" />
   </head>
   <body class="dark:bg-gray-800 bg-gray-200">
     <%= @inner_content %>

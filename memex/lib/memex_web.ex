@@ -48,6 +48,7 @@ defmodule MemexWeb do
         layout: {MemexWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
+      unquote(liveview_helpers())
     end
   end
 
@@ -90,6 +91,28 @@ defmodule MemexWeb do
       import MemexWeb.ErrorHelpers
       import MemexWeb.Gettext
       alias MemexWeb.Router.Helpers, as: Routes
+    end
+  end
+
+  defp liveview_helpers do
+    quote do
+      defp async_query(socket, key, default, query) do
+        socket
+        |> assign(key, default)
+        |> assign_async(fn -> {key, Memex.Search.Postgres.query(query)} end)
+      end
+
+      defp assign_async(socket, callback) do
+        pid = self()
+        spawn(fn -> send(pid, {:async_assign, callback.()}) end)
+
+        socket
+      end
+
+      @impl true
+      def handle_info({:async_assign, {key, result}}, socket) do
+        {:noreply, assign(socket, Keyword.put([], key, result))}
+      end
     end
   end
 

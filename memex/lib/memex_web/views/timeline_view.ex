@@ -3,6 +3,7 @@ defmodule MemexWeb.TimelineView do
   @url_regex ~r/https\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/i
   alias MemexWeb.Router.Helpers, as: Routes
 
+  def is_youtube_url(nil), do: false
   def is_youtube_url(url), do: Regex.match?(@youtube_url_regex, url)
 
   def parse_youtube_id(url), do: Enum.at(Regex.run(@youtube_url_regex, url), 1)
@@ -18,6 +19,53 @@ defmodule MemexWeb.TimelineView do
 
   def time_between(timestamp1, timestamp2) do
     DateTime.diff(date_from_timestamp(timestamp2), date_from_timestamp(timestamp1))
+  end
+
+  def timestamp_start_between(results, time_range) do
+    results
+    |> Enum.filter(fn hit ->
+      hit["timestamp_start_unix"] && Enum.member?(time_range, hit["timestamp_start_unix"])
+    end)
+  end
+
+  def count_results_between(results, timestamp) do
+    results
+    |> Enum.filter(fn hit ->
+      hit["timestamp_start_unix"] &&
+        Enum.member?(hit["timestamp_start_unix"]..hit["timestamp_unix"], timestamp)
+    end)
+    |> Enum.count()
+  end
+
+  def timeline_classes(results, hit, index) do
+    previous_hit = Enum.at(results, index - 1)["timestamp_unix"]
+    previous_results_between = MemexWeb.TimelineView.count_results_between(results, previous_hit)
+    results_between = MemexWeb.TimelineView.count_results_between(results, hit["timestamp_unix"])
+
+    timeline_classes =
+      if results_between > previous_results_between do
+        " rounded-t"
+      else
+        ""
+      end
+
+    previous_timeline_classes =
+      case previous_results_between do
+        0 -> "bg-gray-400 dark:bg-gray-700 " <> timeline_classes
+        1 -> "bg-gray-500 dark:bg-gray-500 " <> timeline_classes
+        2 -> "bg-gray-600 dark:bg-gray-300 " <> timeline_classes
+        _ -> "bg-gray-700 dark:bg-gray-100 " <> timeline_classes
+      end
+
+    timeline_classes =
+      case results_between do
+        0 -> "bg-gray-400 dark:bg-gray-700 " <> timeline_classes
+        1 -> "bg-gray-500 dark:bg-gray-500 " <> timeline_classes
+        2 -> "bg-gray-600 dark:bg-gray-300 " <> timeline_classes
+        _ -> "bg-gray-700 dark:bg-gray-100 " <> timeline_classes
+      end
+
+    {previous_timeline_classes, timeline_classes}
   end
 
   def human_time_between(timestamp1, timestamp2) do
@@ -138,5 +186,15 @@ defmodule MemexWeb.TimelineView do
     else
       _e -> line_text(text)
     end
+  end
+
+  def number_to_currency(_number, nil), do: nil
+  def number_to_currency(nil, _options), do: nil
+
+  def number_to_currency(number, currency) do
+    {:ok, money} = Money.parse(number, currency)
+
+    money
+    |> Money.to_string(symbol: true)
   end
 end

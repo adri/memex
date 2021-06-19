@@ -25,7 +25,7 @@
                         value="<%= @query %>" />
                     <%= if @suggestion do %>
                         <div class="absolute top-4 left-10 z-0 select-none pointer-events-none">
-                            <span class="text-transparent"><%= @query %></span><span class="text-gray-500"><%= @suggestion %></span>
+                            <span class="text-transparent"><%= @query %></span><span class="text-gray-500"><%= String.replace(@suggestion, @query, "") %></span>
                         </div>
                     <% end %>
                 </form>
@@ -34,29 +34,75 @@
     </div>
     <div class="flex items-start md:mx-5">
         <div class="w-4/5 mt-8">
-            <div class="border-l border-gray-200 dark:border-gray-500 text-xs dark:text-gray-600 text-gray-400 ml-12 md:ml-32 pl-4 mt-4">
-                <%= if @metadata do %>
-                    Found <%= Number.Delimit.number_to_delimited(@metadata["totalHits"], precision: 0) %> results in <%= @metadata["processingTimeMs"] %> ms
-                <% end %>
+            <div class="text-xs dark:text-gray-600 text-gray-400 ml-12 md:ml-32 mt-1">
+                <div class="flex w-auto items-start">
+                    <div class="flex-none self-stretch border-l border-r dark:border-gray-800 border-gray-200 bg-gray-400 dark:bg-gray-700 w-2 -ml-1"></div>
+
+                    <div class="pl-3">
+                    <%= if @metadata do %>
+                        <span class="pt-4 inline-block">Found <%= @metadata["totalHits"] %> results in <%= @metadata["processingTimeMs"] %> ms</span>
+                    <% end %>
+                    </div>
+                </div>
             </div>
             <div id="hits-<%= Base.encode16(@query) %>" phx-update="replace">
             <%= for {hit, index} <- Enum.with_index(@results) do %>
-                <div id="hit-<%= hit["id"] %>" class="border-l border-gray-500 dark:border-gray-500 ml-12 md:ml-32">
-                    <% date = MemexWeb.TimelineView.date_from_timestamp(hit["timestamp_unix"]) %>
+                <% {previous_timeline_classes, timeline_classes} = MemexWeb.TimelineView.timeline_classes(@results, hit, index) %>
+
+                <div id="hit-<%= hit["id"] %>" class="ml-12 md:ml-32">
+                    <%= if index !== 0 do %>
+                        <%= for hit <- MemexWeb.TimelineView.timestamp_start_between(@results, hit["timestamp_unix"]..Enum.at(@results, index - 1)["timestamp_unix"]) do %>
+                            <div class="flex w-auto items-start group">
+                                <div class="flex-none self-stretch rounded-b border-b border-l border-r dark:border-gray-800 border-gray-200 <%= previous_timeline_classes %> bg-opacity-30 w-2 -ml-1"></div>
+
+                                <div class="flex-none self-center text-right text-gray-400 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
+                                    <% start_date = MemexWeb.TimelineView.date_from_timestamp(hit["timestamp_start_unix"]) |> DateTime.shift_zone!("Europe/Amsterdam") %>
+                                    <%= Calendar.strftime(start_date, "%H:%M") %>
+                                </div>
+
+                                <div class="flex-none self-center inline-block w-6 h-6 -ml-4">
+                                    <%= case MemexWeb.TimelineView.icon_by_provider(hit["provider"]) do
+                                        nil -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
+                                        provider -> raw ~s(<img src="#{provider}" />)
+                                    end %>
+                                </div>
+
+                                <div class="text-xs text-gray-500 p-3 dark:text-gray-500">
+                                    <%= if hit["verb"] === "visited" do %>
+                                        Arrived at <%= hit["place_name"] || hit["place_address"] %>
+                                    <% end %>
+                                    <%= if hit["verb"] === "moved" do %>
+                                        Started <%= hit["activity_type"] %>
+                                    <% end %>
+
+                                    <span class="hidden md:inline-block text-xs transition-opacity opacity-0 group-hover:opacity-100">
+                                        <%= if hit["verb"] === "visited" do %>
+                                            and stayed
+                                        <% end %>
+                                         for <%= MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"]) %>.
+                                    </span>
+                                </div>
+                            </div>
+                        <% end %>
+                    <% end %>
+
+                    <% date = MemexWeb.TimelineView.date_from_timestamp(hit["timestamp_unix"]) |> DateTime.shift_zone!("Europe/Amsterdam") %>
                     <% days_between = MemexWeb.TimelineView.days_between(hit["timestamp_unix"], Enum.at(@results, index - 1)["timestamp_unix"]) %>
 
                     <%= if index === 0 || days_between > 0 do %>
                         <div class="flex w-auto items-start group">
-                            <figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>
+                            <div class="flex-none self-stretch border-l border-r dark:border-gray-800 border-gray-200 <%= timeline_classes %> w-2 -ml-1"></div>
+
+                            <figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-2 dark:bg-gray-400"></figure>
                             <div class="text-base font-medium text-gray-500 p-3 dark:text-gray-500">
                                 <%= Calendar.strftime(date, "%A, %d %B %Y") %>
                                 <span class="hidden md:inline-block text-xs transition-opacity opacity-0 group-hover:opacity-100">
                                     <%= case days_between do
                                       0 -> ""
-                                      1 -> "1 day later"
-                                      d when d <= 31 -> "#{d} days later"
-                                      d when d <= 31*12 -> "#{round(d/31)} months later"
-                                      d -> "#{d/365} years later"
+                                      1 -> "1 day before"
+                                      d when d <= 31 -> "#{d} days before"
+                                      d when d <= 31*12 -> "#{round(d/31)} months before"
+                                      d -> "#{d/365} years before"
                                     end %>
                                 </span>
                             </div>
@@ -64,22 +110,39 @@
                     <% end %>
 
                     <div class="flex w-auto items-start">
+                        <div class="flex-none self-stretch border-l border-r dark:border-gray-800 border-gray-200 <%= timeline_classes %> w-2 -ml-1"></div>
+
                         <div class="flex-none self-center text-right text-gray-400 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
                             <%= Calendar.strftime(date, "%H:%M") %>
                         </div>
 
-                        <a phx-click="open-sidebar" phx-value-id="<%= hit["id"] %>" phx-value-provider="<%= hit["provider"] %>"  phx-value-timestamp="<%= hit["timestamp_unix"] %>" href="#" class="flex-none self-center inline-block w-6 h-6 -ml-3">
+                        <a phx-click="open-sidebar" phx-value-id="<%= hit["id"] %>" phx-value-provider="<%= hit["provider"] %>"  phx-value-timestamp="<%= hit["timestamp_unix"] %>" href="#" class="flex-none self-center inline-block w-6 h-6 -ml-4">
                             <%= case MemexWeb.TimelineView.icon_by_provider(hit["provider"]) do
                                 nil -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
                                 provider -> raw ~s(<img src="#{provider}" />)
                             end %>
                         </a>
 
-                        <div class="flex-grow rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 ml-4 shadow-md overflow-hidden dark:text-white">
+                        <div class="flex-grow rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 ml-2 shadow-md overflow-hidden dark:text-white">
                             <%= if hit["provider"] === "Safari" do %>
                                 <%= if MemexWeb.TimelineView.is_youtube_url(hit["website_url"]) do %>
                                     <img class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src="http://i3.ytimg.com/vi/<%= MemexWeb.TimelineView.parse_youtube_id(hit["website_url"]) %>/mqdefault.jpg" />
                                 <% end %>
+
+                                <div class="float-right">
+                                    <%= for related <- hit["_relations"] || [] do %>
+                                        <button
+                                            phx-click="open-sidebar"
+                                            phx-value-type="person"
+                                            phx-value-name="<%= related["related"]["person_name"] %>"
+                                            class="text-xs px-3 py-1 dark:bg-gray-800 rounded-full">
+                                            <%= case related["type"] do
+                                                "shared_by" -> "From "
+                                                "shared_to" -> "To "
+                                            end
+                                            %><b><%= related["related"]["person_name"] |> String.split(" ") |> Enum.at(0) %></b></button>
+                                     <% end %>
+                                </div>
 
                                 <a href="<%= hit["website_url"] %>" target="_blank">
                                     <p class="truncate">
@@ -110,15 +173,13 @@
                                         "sent" -> "Sent to "
                                         "received" -> "Received from "
                                      end%>
-                                    <%= raw hit["_formatted"]["person_name"] %>
+                                    <button phx-click="open-sidebar" phx-value-type="person" phx-value-name="<%= hit["person_name"] %>" class="border border-gray-200 dark:border-gray-700 px-1 rounded"><%= raw hit["_formatted"]["person_name"] %></button>
                                 </div>
                                 <%= raw hit["_formatted"]["message_text"] %>
                             <% end %>
 
                             <%= if hit["provider"] === "MoneyMoney" do %>
-                                <span class="font-mono">
-                                    <%= Number.Currency.number_to_currency(abs(hit["transaction_amount"]), unit: hit["transaction_currency"], format: "%n %u") %>
-                                </span>
+                                <span class="font-mono"><%= MemexWeb.TimelineView.number_to_currency(abs(hit["transaction_amount"]), hit["transaction_currency"]) %></span>
                                 <%= if hit["transaction_amount"] < 0 do "to " else "from " end%>
                                 <span><%= raw hit["_formatted"]["transaction_recipient"] %></span>
 
@@ -136,7 +197,12 @@
 
                             <%= if hit["provider"] === "Photos" do %>
                                 <img class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src="<%= Routes.photo_path(@socket, :image, hit["photo_file_path"]) %>" />
-                                <p class="text-xs truncate"><%= Enum.join(hit["_formatted"]["photo_labels"], ", ") %></p>
+                                <p class="text-xs truncate"><%= raw Enum.join(hit["_formatted"]["photo_labels"], ", ") %></p>
+
+                                <%= for person_name <- (hit["person_name"] || []) do %>
+                                    <button phx-click="open-sidebar" phx-value-type="person" phx-value-name="<%= person_name %>" class="text-xs border border-gray-200 dark:border-gray-700 px-1 rounded"><%= raw person_name %></button>
+                                <% end %>
+
                                 <p class="text-xs text-gray-400 dark:text-gray-500">
                                     <%= hit["_formatted"]["photo_file_name"] %> - <%= raw hit["_formatted"]["device_name"] %>
                                 </p>
@@ -158,7 +224,6 @@
                                     <%= raw MemexWeb.TimelineView.auto_link(hit["_formatted"]["tweet_full_text"]) %>
                                 </a>
                                 <%= for media <- hit["tweet_media"] do %>
-                                    <%# <%= media["type"] %>
                                     <a href="<%= media["url"] %>" target="_blank">
                                         <img class="object-cover h-20 w-20 rounded-md mr-4 mt-4" width="60" height="60" src="<%= media["url"] %>" />
                                     </a>
@@ -181,19 +246,48 @@
                                 <% end %>
                             <% end %>
 
-                            <%= if hit["provider"] === "Arc" do %>
-                                <div class="flex">
+                            <%= if hit["provider"] === "Arc" and hit["verb"] === "visited" do %>
+                                <div class="flex cursor-pointer" phx-click="open-sidebar" phx-value-id="<%= hit["id"] %>">
                                     <img class="object-cover h-24 w-24 -m-4 rounded-l mr-4" width="82" height="82" src="https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/pin-l-embassy+f74e4e(<%= hit["place_longitude"] %>,<%= hit["place_latitude"] %>)/<%= hit["place_longitude"] %>,<%= hit["place_latitude"] %>,15/100x100@2x?access_token=<%= System.get_env("MAPBOX_API_KEY") %>" />
 
                                     <div class="flex-grow truncate">
-                                        <%= if hit["place_name"] do %>
-                                            <%= raw hit["_formatted"]["place_name"] %>
-                                        <% end %>
+                                        <%= raw hit["_formatted"]["place_name"] || hit["_formatted"]["place_address"] %>
                                         <p class="text-xs text-gray-400 dark:text-gray-500">
                                             Spent <%= MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"]) %>.
-                                            <%= if hit["place_name"] do %>
-                                            <%= raw hit["_formatted"]["place_street_address"] %>
+                                            <%= if hit["place_address"] do %>
+                                                <%= raw hit["_formatted"]["place_address"] %>
                                             <% end %>
+                                        </p>
+                                    </div>
+
+                                    <div class="flex items-center ml-2 text-xs space-x-2">
+                                        <%= if hit["activity_heart_rate_average"] do %>
+                                            <span class="flex p-2 space-x-1 items-center rounded-md border text-gray-500 border-gray-300 dark:border-gray-700 ">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                                <%= round(hit["activity_heart_rate_average"]) %>
+                                            </span>
+                                        <% end %>
+                                        <%= if hit["activity_floors_ascended"] && hit["activity_floors_ascended"] + hit["activity_floors_descended"] != 0 do %>
+                                            <span class="flex ml-2 p-2 space-x-1 items-center rounded-md text-gray-500 border dark:border-gray-700 border-gray-300">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M5 12a1 1 0 102 0V6.414l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L5 6.414V12zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
+                                                </svg>
+                                                <%= round(hit["activity_floors_ascended"] + hit["activity_floors_descended"]) %>
+                                            </span>
+                                        <% end %>
+                                    </div>
+                                </div>
+                            <% end %>
+
+                            <%= if hit["provider"] === "Arc" and hit["verb"] === "moved" do %>
+                                <div class="flex cursor-pointer" phx-click="open-sidebar" phx-value-id="<%= hit["id"] %>">
+
+                                    <div class="flex-grow truncate">
+                                        Finished <%= raw hit["_formatted"]["activity_type"] %>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500">
+                                            <%= MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"]) %>.
                                         </p>
                                     </div>
 
@@ -223,9 +317,7 @@
             <% end %>
             </div>
 
-        <%= if @results != %{} do %>
             <div id="loader" phx-hook="InfiniteScroll" data-page="<%= @page %>"></div>
-        <% end %>
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
             <div id="date-facet" class="cursor-pointer relative">
@@ -234,7 +326,8 @@
                     <%= for {date, count} <- Enum.sort(@dates, &(&1 > &2)) do %>
                         <div class="group hover:dark:bg-gray-600 hover:bg-gray-100 text-xs"
                              phx-click="filter-date"
-                             phx-value-date="<%= date %>">
+                             phx-value-key="month"
+                             phx-value-value="<%= date %>">
                             <span class="absolute opacity-0 group-hover:opacity-100 text-gray-500 dark:text-gray-100 leading-3"
                                 style="font-size: 8px; margin-top: -2px"><%= date %> (<%= count %>)</span>
                             <button
@@ -247,9 +340,9 @@
                 <% end %>
             </div>
         </div>
-        <div phx-hook="Sidebar" id="sidebars" data-open="<%= length(@sidebars) > 0 %>" aria-hidden></div>
-        <%= for {sidebar, index} <- Enum.with_index(@sidebars) do %>
-            <div id="sidebar-<%= index %>"  class="fixed inset-0 transition backdrop-filter backdrop-blur-sm <%= if sidebar["closed"] do %> backdrop-filter-none pointer-events-none<% else %> bg-black bg-opacity-30 <% end %>">
+        <div phx-hook="Sidebar" id="sidebars" data-open="<%= length(@sidebars) > 1 %>" aria-hidden></div>
+        <%= for {hit, index} <- Enum.with_index(@sidebars) do %>
+            <div id="sidebar-<%= index %>"  class="fixed inset-0 transition backdrop-filter backdrop-blur-sm <%= if hit["closed"] do %> backdrop-filter-none pointer-events-none<% else %> bg-black bg-opacity-30 <% end %>">
                 <div phx-click="close-last-sidebar"class="fixed inset-0 text-white"></div>
                 <% width = case index do
                     0 -> "w-10/12"
@@ -258,21 +351,45 @@
                     3 -> "w-7/12"
                     _ -> "w-6/12"
                 end %>
-                <div class="fixed border-l dark:border-gray-700 dark:bg-gray-800 bg-gray-50 p-5 inset-y-0 right-0 shadow-2xl <%= width %> overflow-hidden transform transition-transform <%= if sidebar["closed"] do %>translate-x-full<% end %>">
-                    <div class="flex items-center justify-between">
-                        <%= case MemexWeb.TimelineView.icon_by_provider(sidebar["provider"]) do
-                            nil -> raw ~s(<figure class="flex-none self-center inline-block rounded-full w-2 h-2 -ml-1 dark:bg-gray-300"></figure>)
-                            provider -> raw ~s(<img class="flex-none w-7 h-7 mr-2" src="#{provider}" />)
-                        end %>
-                        <h2 class="text-lg flex-grow dark:text-white leading-7"><%= sidebar["website_title"] || sidebar["id"] %> Details</h2>
+                <div class="fixed border-l dark:border-gray-700 dark:bg-gray-800 bg-gray-50 p-5 inset-y-0 right-0 shadow-2xl <%= width %> overflow-scroll transform transition-transform <%= if hit["closed"] do %>translate-x-full<% end %>">
+                    <%# Sidebar start %>
+                    <div class="flex place-items-start justify-between">
+                        <span class="flex-none"></span>
+
                         <button phx-click="close-last-sidebar" aria-label="Close" class="dark:text-white">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-                    <div class="overflow-y-scroll text-sm space-x-5 dark:text-white">
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsu </p>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsu </p>
+
+                    <%= if hit["type"] === "person" do %>
+                        <%= live_render(@socket, MemexWeb.Sidebars.PersonLive, id: "1234", session: %{"hit" => hit})  %>
+                    <% end %>
+
+                    <div class="grid grid-cols-3 gap-4">
+
+                    <%= if hit["location_latitude"] && hit["location_longitude"] do %>
+                        <div class="rounded-md col-span-3" style="height: 200px" phx-hook="Map" id="map-<%= index %>" data-points='[{"lat": <%= hit["location_latitude"] %>, "lon": <%= hit["location_longitude"] %>}]'></div>
+                    <% end %>
+
+                    <%= if hit["provider"] === "Photos" do %>
+                    <%# Ideas:
+                        - show similar photos
+                        - what else happened at this place
+                     %>
+                        <div><img class="rounded-md mr-4" src="<%= Routes.photo_path(@socket, :image, hit["photo_file_path"]) %>" /></div>
+                        <div class="">
+                            <p class="text-xs text-graydate-400 dark:text-gray-200"><%= Enum.join(Enum.uniq(hit["photo_labels"]), ", ") %></p>
+                            <p class="text-xs text-gray-400 dark:text-gray-200">
+                                <%= hit["photo_file_name"] %>
+                            </p>
+                            <p class="text-xs text-gray-400 dark:text-gray-200">
+                                Shot on <%= raw hit["device_name"] %>
+                            </p>
+                        </div>
+                    <% end %>
                     </div>
+
+                    <%# Sidebar end %>
                 </div>
             </div>
         <% end %>
