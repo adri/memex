@@ -1,7 +1,6 @@
 defmodule MemexWeb.TimelineView do
   @youtube_url_regex ~r/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
   @url_regex ~r/https\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/i
-  alias MemexWeb.Router.Helpers, as: Routes
 
   def is_youtube_url(nil), do: false
   def is_youtube_url(url), do: Regex.match?(@youtube_url_regex, url)

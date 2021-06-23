@@ -3,10 +3,10 @@ defmodule MemexWeb.PhotoController do
 
   @photos_path "/Users/adrimbp/Pictures/Photos\ Library.photoslibrary/resources/derivatives/masters/"
 
-  def image(conn, %{"path" => path} = params) do
+  def image(conn, %{"path" => path} = _params) do
     new_path =
       @photos_path <>
-        String.replace(params["path"], [".jpeg", ".heic", ".mov", ".png"], "_4_5005_c.jpeg")
+        String.replace(path, [".jpeg", ".heic", ".mov", ".png"], "_4_5005_c.jpeg")
 
     case File.read(new_path) do
       {:ok, contents} ->

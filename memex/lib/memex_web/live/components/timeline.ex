@@ -22,7 +22,7 @@ defmodule MemexWeb.Timeline do
           class="flex w-auto items-start group ml-12 md:ml-20">
             <VerticalLine class="{{ previous_timeline_classes(@results, hit, index) }}" />
             <Time date={{ date(hit["timestamp_start_unix"]) }} />
-            <ProviderIcon providere={{ hit["provider"] }} />
+            <ProviderIcon provider={{ hit["provider"] }} />
             <div class="text-xs text-gray-500 p-3 dark:text-gray-500">
               <span :if={{ hit["verb"] === "visited"}}>Arrived at {{ hit["place_name"] || hit["place_address"] }}</span>
               <span :if={{ hit["verb"] === "moved"}}>Started {{ hit["activity_type"] }}</span>

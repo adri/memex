@@ -4,7 +4,7 @@ defmodule Memex.Search.Meilisearch do
   @date_facet "month"
   @results_per_page 20
 
-  def search(query = %Query{}, page, surroundings, client \\ new()) do
+  def search(query = %Query{}, page, _surroundings, client \\ new()) do
     index_name = System.get_env("INDEX_NAME")
     {:ok, settings} = get_index_settings(index_name, client)
     params = query_to_params(query, page, settings)
@@ -52,8 +52,7 @@ defmodule Memex.Search.Meilisearch do
       "facetsDistribution" => ["date_month"],
       "attributesToHighlight" => ["*"]
     }
-
-    # |> handle_filters(query.filters, settings)
+    |> handle_filters(query.filters, settings)
   end
 
   defp handle_filters(params, filters, _settings) when filters == %{}, do: params
@@ -91,7 +90,7 @@ defmodule Memex.Search.Meilisearch do
     })
   end
 
-  defp get_index_settings(index_name, client \\ new()) do
+  defp get_index_settings(_index_name, _client) do
     # ConCache.get_or_store(:search, "settings", fn ->
     #   client
     #   |> Tesla.get("/indexes/#{index_name}/settings")
