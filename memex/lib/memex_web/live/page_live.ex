@@ -1,6 +1,5 @@
 defmodule MemexWeb.PageLive do
-  use Surface.LiveView
-  use MemexWeb, :live_view
+  use MemexWeb, :surface_live_view
 
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
