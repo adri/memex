@@ -5,12 +5,12 @@ defmodule MemexWeb.Timeline.DateBorder do
   prop(days_between, :number, required: true)
 
   def render(assigns) do
-    ~H"""
+    ~F"""
     <div class="text-base font-medium text-gray-500 p-3 dark:text-gray-500">
-      <span>{{ format(@date) }}</span>
+      <span>{format(@date)}</span>
 
       <span class="hidden md:inline-block text-xs transition-opacity opacity-0 group-hover:opacity-100">
-      {{ days_between_to_text(@days_between) }}
+      {days_between_to_text(@days_between)}
       </span>
     </div>
     """

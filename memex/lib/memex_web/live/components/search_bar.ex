@@ -4,7 +4,7 @@ defmodule MemexWeb.SearchBar do
   prop(query, :string)
 
   def render(assigns) do
-    ~H"""
+    ~F"""
     <div class="p-5 font-san items-center justify-center">
         <header class="flex block fixed md:ml-4 text-black w-8/12 dark:text-white shadow-lg dark:bg-black bg-white rounded-xl">
             <div class="flex justify-center items-center flex-grow block relative">
@@ -28,7 +28,7 @@ defmodule MemexWeb.SearchBar do
                         placeholder="Search..."
                         spellcheck="false"
                         type="search"
-                        value={{ @query }} />
+                        value={@query} />
                 </form>
             </div>
         </header>

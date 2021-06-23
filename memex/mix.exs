@@ -51,7 +51,7 @@ defmodule Memex.MixProject do
       {:postgrex, "~> 0.15.9"},
       {:gettext, "~> 0.11"},
       {:tesla, "~> 1.4.0"},
-      {:surface, "~> 0.4.0"},
+      {:surface, "~> 0.5.0"},
       {:money, "~> 1.4"},
       {:month, "~> 2.1"},
       {:hackney, "~> 1.16.0"},

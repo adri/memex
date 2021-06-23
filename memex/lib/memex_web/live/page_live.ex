@@ -22,18 +22,18 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def render(assigns) do
-    ~H"""
+    ~F"""
     <div class="mx-auto">
-      <SearchBar query={{ @query }} />
+      <SearchBar query={@query} />
       <div class="flex items-start">
         <div class="w-4/5 mt-8">
-          <SearchResultStats totalHits={{@metadata["totalHits"]}} processingTimeMs={{@metadata["processingTimeMs"]}} />
-          <Timeline query={{ @query }} results={{ @results }} page={{ @page }} />
+          <SearchResultStats totalHits={@metadata["totalHits"]} processingTimeMs={@metadata["processingTimeMs"]} />
+          <Timeline query={@query} results={@results} page={@page} />
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
-           <DatesFacet dates={{ @dates }} />
+           <DatesFacet dates={@dates} />
         </div>
-        <SidebarsComponent sidebars={{ @sidebars }} />
+        <SidebarsComponent sidebars={@sidebars} />
       </div>
     </div>
     """
