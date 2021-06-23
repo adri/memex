@@ -21,6 +21,7 @@ defmodule MemexWeb.PageLive do
   ]
   @highlight_regex ~r/<em>(.*)<\/em>/u
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="mx-auto">
