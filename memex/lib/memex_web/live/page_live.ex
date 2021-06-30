@@ -8,6 +8,7 @@ defmodule MemexWeb.PageLive do
   alias MemexWeb.SearchResultStats
   alias MemexWeb.SearchBar
   alias MemexWeb.DatesFacet
+  alias MemexWeb.CloseCircles
   alias MemexWeb.SidebarsComponent
 
   @default_assigns [
@@ -23,9 +24,12 @@ defmodule MemexWeb.PageLive do
   @impl true
   def render(assigns) do
     ~F"""
-    <div class="mx-auto">
+    <div class="mx-auto mt-3">
       <SearchBar query={@query} />
-      <div class="flex items-start">
+      <div :if={@query == ""}>
+        <CloseCircles />
+      </div>
+      <div :if={@query != ""} class="flex items-start">
         <div class="w-4/5 mt-8">
           <SearchResultStats totalHits={@metadata["totalHits"]} processingTimeMs={@metadata["processingTimeMs"]} />
           <Timeline query={@query} results={@results} page={@page} />

@@ -1,4 +1,5 @@
 @import "../node_modules/nprogress/nprogress.css";
+@import "./rings.css";
 @import "./mapbox.css";
 
 @tailwind base;

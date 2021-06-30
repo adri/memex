@@ -1,0 +1,483 @@
+body {
+  background: #fff;
+}
+
+.watch {
+  background-size: 100%;
+  font-family: "San Francisco Display UltraLight", "Open Sans", Helvetica, Arial,
+    Serif;
+  font-size: 32px;
+  width: 440px;
+  height: 487px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.screen {
+  width: 59.2%;
+  height: 74%;
+  position: absolute;
+  left: 18%;
+  top: 13%;
+  /**** DIAL 1 ****/
+  /**** DIAL 2 ****/
+  /**** DIAL 3 ****/
+}
+.screen .title,
+.screen .time {
+  -webkit-animation: show-title 5s forwards ease-out;
+  animation: show-title 5s forwards ease-out;
+  color: #b1b4c2;
+  font-size: 0.9em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  letter-spacing: 0.05em;
+}
+.screen .time {
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+  right: 0;
+  left: auto;
+}
+.screen .dials {
+  -webkit-animation: show-dials 5s forwards ease-out;
+  animation: show-dials 5s forwards ease-out;
+  width: 4em;
+  height: 4em;
+  border-radius: 50%;
+  position: absolute;
+  top: 1.75em;
+  left: 0;
+}
+.screen .dial {
+  border: 1px solid #000;
+  border-radius: 50%;
+}
+.screen .dial.move {
+  position: absolute;
+  width: 8em;
+  height: 8em;
+}
+.screen .dial.move::before {
+  background-size: 50%;
+  content: "";
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: -0.29em;
+  left: calc(50% - 0.75em);
+  z-index: 10;
+}
+.screen .dial.move::after {
+  content: "";
+  background: #000;
+  border-radius: 50%;
+  width: 6em;
+  height: 6em;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+}
+.screen .dial.move .dial-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4em;
+  overflow: hidden;
+}
+.screen .dial.move .wedge {
+  width: 4em;
+  height: 8em;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.screen .dial.move .container1 {
+  left: 4em;
+}
+.screen .dial.move .container1 .wedge {
+  -webkit-animation: rotate-bg-dial-1-1 5s 0.2s linear forwards;
+  animation: rotate-bg-dial-1-1 5s 0.2s linear forwards;
+  border-radius: 8em 0 0 8em;
+  background: #fc1d20;
+  left: -4em;
+  transform-origin: 100% 50%;
+}
+.screen .dial.move .container2 {
+  left: 0;
+}
+.screen .dial.move .container2 .wedge {
+  -webkit-animation: rotate-bg-dial-1-2 5s 0.2s linear forwards;
+  animation: rotate-bg-dial-1-2 5s 0.2s linear forwards;
+  background: #fc1d20;
+  border-radius: 0 8em 8em 0;
+  transform-origin: 0 50%;
+  left: 4em;
+}
+.screen .dial.move .marker {
+  width: 1em;
+  height: 1em;
+  background: #fc1d20;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.5em);
+}
+.screen .dial.move .end {
+  -webkit-animation: rotate-marker-dial-1 5s 0.2s linear forwards;
+  animation: rotate-marker-dial-1 5s 0.2s linear forwards;
+  transform-origin: 50% 4em;
+}
+.screen .dial.exercise {
+  position: absolute;
+  width: 6em;
+  height: 6em;
+  top: 1em;
+  left: 1em;
+}
+.screen .dial.exercise::before {
+  background-size: 50%;
+  content: "";
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: -0.29em;
+  left: calc(50% - 0.75em);
+  z-index: 10;
+}
+.screen .dial.exercise::after {
+  content: "";
+  background: #000;
+  border-radius: 50%;
+  width: 4em;
+  height: 4em;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+}
+.screen .dial.exercise .dial-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3em;
+  overflow: hidden;
+}
+.screen .dial.exercise .wedge {
+  border-radius: 50%;
+  width: 3em;
+  height: 6em;
+  position: absolute;
+}
+.screen .dial.exercise .container1 {
+  left: 3em;
+}
+.screen .dial.exercise .container1 .wedge {
+  -webkit-animation: rotate-bg-dial-2-1 5s 0.5s linear forwards;
+  animation: rotate-bg-dial-2-1 5s 0.5s linear forwards;
+  border-radius: 8em 0 0 8em;
+  position: absolute;
+  background: #9cfc33;
+  left: -3em;
+  transform-origin: 100% 50%;
+}
+.screen .dial.exercise .marker {
+  width: 1em;
+  height: 1em;
+  background: #9cfc33;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.48em);
+}
+.screen .dial.exercise .end {
+  -webkit-animation: rotate-marker-dial-2 5s 0.5s linear forwards;
+  animation: rotate-marker-dial-2 5s 0.5s linear forwards;
+  transform-origin: 45% 3em;
+}
+.screen .dial.stand {
+  position: absolute;
+  width: 4em;
+  height: 4em;
+  top: 2em;
+  left: 2em;
+}
+.screen .dial.stand::before {
+  background-size: 50%;
+  content: "";
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: -0.28em;
+  left: calc(50% - 0.75em);
+  z-index: 10;
+}
+.screen .dial.stand::after {
+  content: "";
+  background: #000;
+  border-radius: 50%;
+  width: 2em;
+  height: 2em;
+  position: absolute;
+  top: 1em;
+  left: 1em;
+}
+.screen .dial.stand .dial-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4em;
+  overflow: hidden;
+}
+.screen .dial.stand .wedge {
+  border-radius: 50%;
+  width: 2em;
+  height: 4em;
+  position: absolute;
+}
+.screen .dial.stand .container1 {
+  left: 2em;
+}
+.screen .dial.stand .container1 .wedge {
+  position: absolute;
+  -webkit-animation: rotate-bg-dial-3-1 5s 0.5s linear forwards;
+  animation: rotate-bg-dial-3-1 5s 0.5s linear forwards;
+  background: #32cbd4;
+  border-radius: 8em 0 0 8em;
+  left: -2em;
+  transform-origin: 100% 50%;
+}
+.screen .dial.stand .marker {
+  width: 1em;
+  height: 1em;
+  background: #32cbd4;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.5em);
+}
+.screen .dial.stand .end {
+  -webkit-animation: rotate-marker-dial-3 5s 0.5s linear forwards;
+  animation: rotate-marker-dial-3 5s 0.5s linear forwards;
+  transform-origin: 50% 2em;
+}
+.screen .dial-background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 50%;
+}
+.screen .dial-background.one {
+  background: #400818;
+}
+.screen .dial-background.two {
+  background: #2d400c;
+}
+.screen .dial-background.three {
+  background: #163d3b;
+}
+
+.pips {
+  -webkit-animation: show-dials 5s 0.1s forwards ease-out;
+  animation: show-dials 5s 0.1s forwards ease-out;
+  position: absolute;
+  bottom: 0;
+  left: calc(50% - 1em);
+  width: 2em;
+}
+.pips div {
+  width: 0.25em;
+  height: 0.25em;
+  background-color: #353535;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 0 0.02em;
+}
+.pips div:first-child {
+  background-color: #fff;
+}
+
+/** Animations **/
+@-webkit-keyframes rotate-marker-dial-1 {
+  0%,
+  6% {
+    transform: none;
+  }
+  28%,
+  94% {
+    transform: rotateZ(220deg);
+  }
+  95%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes rotate-marker-dial-1 {
+  0%,
+  6% {
+    transform: none;
+  }
+  28%,
+  94% {
+    transform: rotateZ(220deg);
+  }
+  95%,
+  100% {
+    transform: none;
+  }
+}
+@-webkit-keyframes rotate-bg-dial-1-1 {
+  0%,
+  6% {
+    transform: rotateZ(0);
+  }
+  24%,
+  94% {
+    transform: rotateZ(180deg);
+  }
+  95%,
+  100% {
+    transform: rotateZ(0);
+  }
+}
+@keyframes rotate-bg-dial-1-1 {
+  0%,
+  6% {
+    transform: rotateZ(0);
+  }
+  24%,
+  94% {
+    transform: rotateZ(180deg);
+  }
+  95%,
+  100% {
+    transform: rotateZ(0);
+  }
+}
+@-webkit-keyframes rotate-bg-dial-1-2 {
+  24% {
+    transform: rotateZ(0);
+  }
+  28%,
+  94% {
+    transform: rotateZ(40deg);
+  }
+  95%,
+  100% {
+    transform: rotateZ(0);
+  }
+}
+@keyframes rotate-bg-dial-1-2 {
+  24% {
+    transform: rotateZ(0);
+  }
+  28%,
+  94% {
+    transform: rotateZ(40deg);
+  }
+  95%,
+  100% {
+    transform: rotateZ(0);
+  }
+}
+@-webkit-keyframes rotate-marker-dial-2 {
+  20%,
+  90% {
+    transform: rotateZ(160deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes rotate-marker-dial-2 {
+  20%,
+  90% {
+    transform: rotateZ(160deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@-webkit-keyframes rotate-bg-dial-2-1 {
+  0%,
+  0.5% {
+    transform: none;
+  }
+  19%,
+  90% {
+    transform: rotateZ(160deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes rotate-bg-dial-2-1 {
+  0%,
+  0.5% {
+    transform: none;
+  }
+  19%,
+  90% {
+    transform: rotateZ(160deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@-webkit-keyframes rotate-marker-dial-3 {
+  19%,
+  90% {
+    transform: rotateZ(90deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes rotate-marker-dial-3 {
+  19%,
+  90% {
+    transform: rotateZ(90deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@-webkit-keyframes rotate-bg-dial-3-1 {
+  0%,
+  1% {
+    transform: none;
+  }
+  19%,
+  90% {
+    transform: rotateZ(90deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
+@keyframes rotate-bg-dial-3-1 {
+  0%,
+  1% {
+    transform: none;
+  }
+  19%,
+  90% {
+    transform: rotateZ(90deg);
+  }
+  91%,
+  100% {
+    transform: none;
+  }
+}
