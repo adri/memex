@@ -31,17 +31,17 @@ let liveSocket = new LiveSocket("/live", Socket, {
 liveSocket.connect();
 
 // Show progress bar on live navigation and form submits
-let progressTimeout = null;
-window.addEventListener("phx:page-loading-start", () => {
-  clearTimeout(progressTimeout);
-  progressTimeout = setTimeout(NProgress.start, 100);
-});
-window.addEventListener("phx:page-loading-stop", () => {
-  clearTimeout(progressTimeout);
-  NProgress.done();
-});
+// let progressTimeout = null;
+// window.addEventListener("phx:page-loading-start", () => {
+//   clearTimeout(progressTimeout);
+//   progressTimeout = setTimeout(NProgress.start, 100);
+// });
+// window.addEventListener("phx:page-loading-stop", () => {
+//   clearTimeout(progressTimeout);
+//   NProgress.done();
+// });
 
-import NProgress from "nprogress";
+// import NProgress from "nprogress";
 
 // expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()
