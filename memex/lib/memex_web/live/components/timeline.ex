@@ -15,7 +15,7 @@ defmodule MemexWeb.Timeline do
   def render(assigns) do
     ~F"""
     <div id={"hits-#{unique_query_id(@query)}"} phx-update="replace">
-      <div :for.with_index={{hit, index} <- @results}>
+      <div id={"hit-#{hit["id"]}"} :for.with_index={{hit, index} <- @results}>
         <div
           :if={index !== 0}
           :for={hit <- MemexWeb.TimelineView.timestamp_start_between(@results, hit["timestamp_unix"]..previous_timestamp(@results, index))}
@@ -37,7 +37,7 @@ defmodule MemexWeb.Timeline do
           <ProviderIcon />
           <DateBorder date={date(hit["timestamp_unix"])} days_between={days_between(hit["timestamp_unix"], @results, index)}/>
         </div>
-        <div id={"hit-#{hit["id"]}"} class="ml-12 md:ml-20">
+        <div class="ml-12 md:ml-20">
           <div class="flex w-auto items-start">
             <VerticalLine class={"#{timeline_classes(@results, hit, index)}"} />
             <Time date={date(hit["timestamp_unix"])} />
