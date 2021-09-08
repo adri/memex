@@ -69,7 +69,7 @@ defmodule MemexWeb.Sidebars.PersonLive do
           <h3 class="dark:text-white">Photos</h3>
           <div class="grid gap-4">
           <%= for hit <- @photos do %>
-              <img class="object-cover h-20 w-20 rounded inline-block" width="60" height="60" src="<%= Routes.photo_path(@socket, :image, hit["photo_file_path"]) %>" />
+              <img class="object-cover h-20 w-20 rounded inline-block" width="60" height="60" src="<%= Routes.photo_path(MemexWeb.Endpoint, :image, hit["photo_file_path"]) %>" />
           <% end %>
           </div>
         </div>

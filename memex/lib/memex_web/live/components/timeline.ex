@@ -81,7 +81,7 @@ defmodule MemexWeb.Timeline do
                 </div>
                 <pre :if={hit["provider"] === "terminal"} class="text-sm overflow-scroll"><code>{raw String.replace(String.trim(hit["_formatted"]["command"]), "\n", "<br />")}</code></pre>
                 <div :if={hit["provider"] === "Photos"}>
-                  <img class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src={"#{Routes.photo_path(@socket, :image, hit["photo_file_path"])}"} />
+                  <img class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src={Routes.photo_path(MemexWeb.Endpoint, :image, hit["photo_file_path"])} />
                   <p class="text-xs truncate">{raw Enum.join(hit["_formatted"]["photo_labels"], ", ")}</p>
                   <p class="text-xs text-gray-400 dark:text-gray-500">
                       {raw hit["_formatted"]["device_name"]}

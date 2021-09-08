@@ -34,29 +34,35 @@ defmodule Memex.MixProject do
   defp deps do
     [
       {:con_cache, "~> 0.13"},
-      {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
-      {:phoenix, "~> 1.5.7"},
-      {:phoenix_live_view, "~> 0.15.7"},
-      {:floki, ">= 0.27.0", only: :test},
-      {:finch, "~> 0.5"},
-      {:git_diff, "~> 0.6.2"},
-      {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.4"},
-      {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_poller, "~> 0.4"},
-      {:tzdata, "~> 1.0"},
-      {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.4"},
-      {:postgrex, "~> 0.15.9"},
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
+      {:finch, "~> 0.5"},
+      {:floki, ">= 0.27.0", only: :test},
       {:gettext, "~> 0.11"},
-      {:tesla, "~> 1.4.0"},
-      {:surface, "~> 0.5.0"},
-      {:money, "~> 1.4"},
-      {:month, "~> 2.1"},
+      {:git_diff, "~> 0.6.2"},
       {:hackney, "~> 1.16.0"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      # Use repo until they release 1.9
+      {:money,
+       git: "https://github.com/elixirmoney/money",
+       ref: "4baf948a6e915ac71338112163afee66dc7bda71"},
+      {:month, "~> 2.1"},
+      {:phoenix_ecto, "~> 4.4"},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_dashboard, "~> 0.5"},
+      {:phoenix_live_reload, "~> 1.3", only: :dev},
+      {:phoenix_live_view, "~> 0.16.0"},
+      {:phoenix, "~> 1.6.0-rc.0", override: true},
+      {:plug_cowboy, "~> 2.0"},
+      {:postgrex, "~> 0.15.9"},
+      {:surface,
+       git: "https://github.com/surface-ui/surface",
+       ref: "3a6a3a454704a9aaf83cd23a6393cbd09bdca8bd"},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_poller, "~> 0.5"},
+      {:tesla, "~> 1.4.0"},
+      {:tzdata, "~> 1.0"}
     ]
   end
 
@@ -68,7 +74,12 @@ defmodule Memex.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "cmd npm install --prefix assets"]
+      setup: ["deps.get", "cmd npm install --prefix assets"],
+      "assets.deploy": [
+        "cmd --cd assets npm run deploy",
+        "esbuild default --minify",
+        "phx.digest"
+      ]
     ]
   end
 end

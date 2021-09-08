@@ -37,7 +37,7 @@ defmodule MemexWeb.PageLive do
         <div class="w-1/5 overflow-hidden pl-5 text-white">
            <DatesFacet dates={@dates} />
         </div>
-        <SidebarsComponent sidebars={@sidebars} />
+        <SidebarsComponent sidebars={@sidebars} socket={assigns.socket} />
       </div>
     </div>
     """

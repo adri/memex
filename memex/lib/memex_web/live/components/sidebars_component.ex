@@ -2,6 +2,7 @@ defmodule MemexWeb.SidebarsComponent do
   use Surface.Component
 
   prop(sidebars, :list, required: true)
+  prop(socket, :any, required: true)
 
   def render(assigns) do
     ~F"""
