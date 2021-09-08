@@ -187,6 +187,22 @@ defmodule MemexWeb.TimelineView do
     end
   end
 
+  def number_short(number) do
+    cond do
+      number < 1000 ->
+        number
+
+      number < 1_000_000 ->
+        "#{Float.round(number / 1000, 1)}K"
+
+      number < 1_000_000_000 ->
+        "#{Float.round(number / 1_000_000, 1)}M"
+
+      true ->
+        number
+    end
+  end
+
   def number_to_currency(_number, nil), do: nil
   def number_to_currency(nil, _options), do: nil
 

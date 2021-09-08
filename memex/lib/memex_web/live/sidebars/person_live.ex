@@ -40,40 +40,36 @@ defmodule MemexWeb.Sidebars.PersonLive do
       <h2 class="text-lg flex-grow dark:text-white leading-7"><%= @name %></h2>
     </div>
 
-    <div class="flex items-start justify-between gap-4">
-      <div class="flex-grow w-24">
+    <div class="flex space-x-4">
+      <%= for {provider, count} <- @counts do %>
+        <div class="flex-1 rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 shadow-md overflow-hidden dark:text-white">
+          <span class="float-right rounded-full bg-gray-700 px-2 py-1 text-xs"><%= MemexWeb.TimelineView.number_short(count) %></span>
+          <p class="dark:text-white truncate"><%= provider %></p>
+          <%= if provider === "Photos" do %>
+            <div class="flex space-x-2 mt-2">
+            <%= for hit <- @photos do %>
+                <img class="object-cover w-10 h-10 rounded inline-block" width="60" height="60" src="<%= Routes.photo_path(MemexWeb.Endpoint, :image, hit["photo_file_path"]) %>" />
+            <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex flex-col justify-between gap-4">
         <h3 class="dark:text-white">Timeline</h3>
         <%= for hit <- @last do %>
-          <div class="flex-grow rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 shadow-md overflow-hidden dark:text-white">
+          <div class="rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 shadow-md overflow-hidden dark:text-white">
             <p class="dark:text-white truncate"><%= hit["message_text"] %></p>
           </div>
         <% end %>
 
         <h3 class="dark:text-white">Links</h3>
         <%= for hit <- @links do %>
-          <div class="rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 my-2 shadow-md overflow-hidden dark:text-white">
+          <div class="rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 shadow-md overflow-hidden dark:text-white">
             <span class="dark:text-white truncate block"><%= hit["message_text"] %></span>
           </div>
         <% end %>
-      </div>
-
-      <div class="flex-none w-1/4 min-w-full">
-        <div class="">
-          <%= for {provider, count} <- @counts do %>
-              <p class="dark:text-white"><%= provider %></p>
-              <p class="dark:text-white"><%= count %></p>
-          <% end %>
-        </div>
-
-        <div class="p-2">
-          <h3 class="dark:text-white">Photos</h3>
-          <div class="grid gap-4">
-          <%= for hit <- @photos do %>
-              <img class="object-cover h-20 w-20 rounded inline-block" width="60" height="60" src="<%= Routes.photo_path(MemexWeb.Endpoint, :image, hit["photo_file_path"]) %>" />
-          <% end %>
-          </div>
-        </div>
-      </div>
     </div>
     """
   end
