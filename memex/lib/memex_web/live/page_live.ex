@@ -49,13 +49,15 @@ defmodule MemexWeb.PageLive do
       assign(socket,
         sidebars: Sidebars.init(),
         query: "",
+        results: [],
         page: 1,
         suggestion: nil,
         surroundings: nil,
         search_ref: nil
       )
 
-    {:ok, socket, temporary_assigns: [results: [], dates: %{}, metadata: nil]}
+    # maybe move results: [] in temporary_assigns again, if change tracking is fixed in surface (using component functions)
+    {:ok, socket, temporary_assigns: [dates: %{}, metadata: nil]}
   end
 
   @impl true
@@ -72,6 +74,13 @@ defmodule MemexWeb.PageLive do
       true ->
         handle_event("search", %{"query" => query}, socket)
     end
+  end
+
+  @impl true
+  def handle_event("search", %{"query" => ""}, socket) do
+    {:noreply,
+     socket
+     |> assign(query: "", page: 1, surroundings: nil, suggestion: nil, results: [])}
   end
 
   @impl true
@@ -125,8 +134,6 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
-    data = data |> IO.inspect(label: "detail view data")
-
     {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
   end
 
