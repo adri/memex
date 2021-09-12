@@ -1,7 +1,6 @@
 defmodule MemexWeb.Sidebars.PersonLive do
   use MemexWeb, :live_view
 
-  alias Memex.Search.Postgres, as: Search
   alias Memex.Search.Query
 
   @impl true
@@ -11,7 +10,7 @@ defmodule MemexWeb.Sidebars.PersonLive do
 
     {:ok,
      socket
-     |> assign(name: name, hit: hit, last: [], counts: %{})
+     |> assign(name: name, hit: hit, last: [])
      |> async_query(:last, [], %Query{
        filters: %{"person_name" => name},
        order_by: ["created_at_desc"],
@@ -28,13 +27,14 @@ defmodule MemexWeb.Sidebars.PersonLive do
        order_by: ["created_at_desc"],
        limit: 3
      })
-     |> assign_async(:counts, fn -> {:counts, Search.count_by_name(name)} end)}
+     |> async_query(:counts, [], %Query{
+       select: [facet: "provider"],
+       filters: %{"person_name" => name}
+     })}
   end
 
   @impl true
   def render(assigns) do
-    assigns |> IO.inspect(label: "36")
-
     ~L"""
     <div class="flex place-items-start justify-between">
       <h2 class="text-lg flex-grow dark:text-white leading-7"><%= @name %></h2>

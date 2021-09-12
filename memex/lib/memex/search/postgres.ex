@@ -23,48 +23,6 @@ defmodule Memex.Search.Postgres do
     end
   end
 
-  def find_person(name, limit \\ 10) do
-    {processing_time, [counts, last, places]} =
-      :timer.tc(fn ->
-        Task.await_many([
-          Task.async(fn -> count_by_name(name) end),
-          Task.async(fn -> last_by_name(name, limit) end),
-          Task.async(fn ->
-            _places =
-              from(d in Document,
-                select: {fragment("body ->> 'place_name'"), count(d.id)},
-                where:
-                  fragment("body -> 'person_name' \\? ?", ^name) or
-                    fragment("body -> 'tweet_user_name' \\? ?", ^name),
-                group_by: fragment("body ->> 'place_name'")
-              )
-              |> Repo.all()
-              |> Enum.into(%{})
-          end)
-        ])
-      end)
-
-    {:ok,
-     %{
-       "provider_counts" => counts,
-       "last_actions" => last,
-       "top_places" => places,
-       "processing_time" => processing_time / 1000
-     }}
-  end
-
-  def last_by_name(name, limit) do
-    from(d in Document,
-      select: d.body,
-      where:
-        fragment("body -> 'person_name' \\? ?", ^name) or
-          fragment("body -> 'tweet_user_name' \\? ?", ^name),
-      order_by: [desc: d.created_at],
-      limit: ^limit
-    )
-    |> Repo.all()
-  end
-
   def count_by_name(name) do
     from(d in Document,
       select: {fragment("body ->> 'provider'"), count(d.id)},
@@ -101,6 +59,13 @@ defmodule Memex.Search.Postgres do
     from(q in q,
       select: {fragment("to_char(date_trunc('month', created_at), 'yyyy-mm')"), count(q.id)},
       group_by: fragment("date_trunc('month', created_at)")
+    )
+  end
+
+  defp add_select(q, %Query{select: [facet: "provider"]} = _query) do
+    from(q in q,
+      select: {fragment("? -> 'provider'", q.body), count(q.id)},
+      group_by: fragment("? -> 'provider'", q.body)
     )
   end
 
