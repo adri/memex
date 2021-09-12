@@ -5,14 +5,12 @@ defmodule MemexWeb.AlfredController do
   alias Memex.Search.Postgres, as: Search
 
   def search(conn, params) do
-    query =
-      Query.from_string(params["q"] || "")
-      |> Query.disable_highlights()
+    query = %{Query.from_string(params["q"] || "") | limit: 20}
 
-    with {:ok, results} <- Search.search(query, 1, nil) do
+    with {:ok, results} <- Search.query(query) do
       conn
       |> put_resp_content_type("application/json", "utf-8")
-      |> send_resp(200, Jason.encode!(alfred_format_hits(results["hits"])))
+      |> send_resp(200, Jason.encode!(alfred_format_hits(results)))
     else
       {:error, error} ->
         conn

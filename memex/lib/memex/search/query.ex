@@ -1,19 +1,19 @@
 defmodule Memex.Search.Query do
-  defstruct count: nil,
+  # :hits_with_highlights, :total_hits, facet: "month"
+  defstruct select: :hits_with_highlights,
             query: "",
             filters: %{},
             page: 1,
-            limit: 20,
-            highlights: true,
+            limit: nil,
             order_by: []
 
   def add_filter(query, key, value), do: put_in(query.filters[key], value)
 
   def add_sort(query, sort), do: pop_in(query.sort, sort)
 
-  def has_filters(query), do: query.filters !== %{}
+  def select(query, select), do: put_in(query.select, select)
 
-  def disable_highlights(query), do: %{query | highlights: false}
+  def has_filters(query), do: query.filters !== %{}
 
   def to_string(query) do
     []

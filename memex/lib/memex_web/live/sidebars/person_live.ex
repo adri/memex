@@ -28,7 +28,7 @@ defmodule MemexWeb.Sidebars.PersonLive do
        order_by: ["created_at_desc"],
        limit: 3
      })
-     |> assign_async(fn -> {:counts, Search.count_by_name(name)} end)}
+     |> assign_async(:counts, fn -> {:counts, Search.count_by_name(name)} end)}
   end
 
   @impl true

@@ -3,23 +3,12 @@ defmodule MemexWeb.PageLive do
 
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
-  alias Memex.Search.Postgres, as: Search
   alias MemexWeb.Timeline
   alias MemexWeb.SearchResultStats
   alias MemexWeb.SearchBar
   alias MemexWeb.DatesFacet
   alias MemexWeb.CloseCircles
   alias MemexWeb.SidebarsComponent
-
-  @default_assigns [
-    results: [],
-    dates: %{},
-    metadata: nil,
-    suggestion: nil,
-    surroundings: nil,
-    search_ref: nil
-  ]
-  @highlight_regex ~r/<em>(.*)<\/em>/u
 
   @impl true
   def render(assigns) do
@@ -31,11 +20,11 @@ defmodule MemexWeb.PageLive do
       </div>
       <div :if={@query != ""} class="flex items-start">
         <div class="w-4/5 mt-8">
-          <SearchResultStats totalHits={@metadata["totalHits"]} processingTimeMs={@metadata["processingTimeMs"]} />
+          <SearchResultStats total_hits={@total_hits} />
           <Timeline query={@query} results={@results} page={@page} />
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
-           <DatesFacet dates={@dates} />
+           <DatesFacet dates={@dates}  />
         </div>
         <SidebarsComponent sidebars={@sidebars} socket={assigns.socket} />
       </div>
@@ -50,14 +39,14 @@ defmodule MemexWeb.PageLive do
         sidebars: Sidebars.init(),
         query: "",
         results: [],
-        page: 1,
-        suggestion: nil,
-        surroundings: nil,
-        search_ref: nil
+        dates: [],
+        total_hits: nil,
+        page: 1
       )
 
-    # maybe move results: [] in temporary_assigns again, if change tracking is fixed in surface (using component functions)
-    {:ok, socket, temporary_assigns: [dates: %{}, metadata: nil]}
+    # todo: maybe move some data in temporary_assigns again,
+    # if change tracking is fixed in surface (using component functions)
+    {:ok, socket}
   end
 
   @impl true
@@ -80,13 +69,12 @@ defmodule MemexWeb.PageLive do
   def handle_event("search", %{"query" => ""}, socket) do
     {:noreply,
      socket
-     |> assign(query: "", page: 1, surroundings: nil, suggestion: nil, results: [])}
+     |> assign(query: "", page: 1, results: [])}
   end
 
   @impl true
   def handle_event("search", %{"query" => query}, socket) do
-    {:noreply,
-     socket |> assign(query: query, page: 1, surroundings: nil, suggestion: nil) |> search()}
+    {:noreply, socket |> assign(query: query, page: 1) |> search()}
   end
 
   @impl true
@@ -104,32 +92,7 @@ defmodule MemexWeb.PageLive do
       Query.from_string(string)
       |> Query.add_filter(key, value)
 
-    {:noreply,
-     socket |> assign(query: Query.to_string(query), page: 1, surroundings: nil) |> search()}
-  end
-
-  @impl true
-  def handle_event("show-surrounding", %{"timestamp" => timestamp}, socket) do
-    {:noreply, socket |> assign(surroundings: String.to_integer(timestamp)) |> search()}
-  end
-
-  @impl true
-  def handle_event(
-        "accept-suggestion",
-        %{"key" => "ArrowRight"},
-        %{assigns: %{suggestion: suggestion}} = socket
-      )
-      when not is_nil(suggestion) do
-    {:noreply,
-     socket
-     |> assign(query: suggestion, suggestion: nil, page: 1)
-     |> search()
-     |> push_event("force-input-value", %{value: suggestion})}
-  end
-
-  @impl true
-  def handle_event("accept-suggestion", _key, socket) do
-    {:noreply, socket}
+    {:noreply, socket |> assign(query: Query.to_string(query), page: 1) |> search()}
   end
 
   @impl true
@@ -142,67 +105,20 @@ defmodule MemexWeb.PageLive do
     {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
-  defp search(%{assigns: %{page: page, query: string, surroundings: surroundings}} = socket) do
-    pid = self()
+  defp search(%{assigns: %{page: page, query: string}} = socket) do
+    query = Query.from_string(string)
 
     socket
-    |> cancel_current_search()
-    |> assign(query: string)
-    |> assign(
-      search_ref:
-        spawn(fn ->
-          query = Query.from_string(string)
-          result = Search.search(query, page, surroundings)
-          send(pid, {:search_result, string, result})
-        end)
-    )
-  end
+    |> async_query(:results, [], %{
+      query
+      | select: :hits_with_highlights,
+        order_by: ["created_at_desc"],
+        limit: 10 * page
+    })
+    |> async_query(:dates, [], %{query | select: [facet: "month"]})
+    |> async_query(:total_hits, nil, %{query | select: :total_hits})
 
-  defp cancel_current_search(socket) do
-    socket.assigns.search_ref && Process.exit(socket.assigns.search_ref, :kill)
-
-    socket
-  end
-
-  @impl true
-  def handle_info({:search_result, string, result}, socket) do
-    socket =
-      case result do
-        {:ok, response} ->
-          socket
-          |> assign(
-            query: string,
-            results: response["hits"],
-            metadata: %{
-              "totalHits" => response["nbHits"],
-              "processingTimeMs" => response["processingTimeMs"]
-            },
-            dates: response["facetsDistribution"]["date_month"],
-            suggestion: get_suggestion(response["hits"]),
-            search_ref: nil
-          )
-          |> push_patch(to: Routes.page_path(socket, :index, query: string))
-
-        _ ->
-          socket
-          |> assign(@default_assigns ++ [query: string, page: 1])
-      end
-
-    {:noreply, socket}
-  end
-
-  defp get_suggestion(results) do
-    with result when not is_nil(result) <- Enum.at(results, 0) do
-      Enum.find_value(result["_formatted"], nil, fn {_key, value} ->
-        with value when is_binary(value) <- value,
-             [_, found] <- Regex.run(@highlight_regex, value) do
-          found
-        else
-          _ -> false
-        end
-      end)
-    end
-
-    nil
+    # todo: decide to keep updating the URL or not
+    # |> push_patch(to: Routes.page_path(socket, :index, query: string))
   end
 end
