@@ -1,12 +1,17 @@
 defmodule MemexWeb.DatesFacet do
   use Surface.Component
 
-  prop(dates, :map)
+  prop(dates, :list)
+  prop(max_count, :number)
+  prop(loading, :boolean, default: false)
 
   def render(assigns) do
+    assigns = update(assigns)
+
     ~F"""
-    <div :if={@dates} id="date-facet" class="cursor-pointer relative">
-      <div :for={{date, count} <- Enum.sort(@dates, &(&1 > &2))} class="group hover:dark:bg-gray-600 hover:bg-gray-100 text-xs"
+    <div id="date-facet" class={"cursor-pointer relative", "opacity-50": @loading}>
+      <div :for={{date, count} <- @dates} class="group text-xs hover:bg-gray-100 hover:dark:bg-gray-600"
+        id={"facet-#{date}"}
         phx-click="filter-date"
         phx-value-key="month"
         phx-value-value={date}>
@@ -15,18 +20,19 @@ defmodule MemexWeb.DatesFacet do
         <button
           id={date}
           title={"#{date} (#{count})"}
-          class="dark:bg-gray-700 bg-gray-300 group-hover:dark:bg-gray-500 group-hover:bg-gray-200 ml-auto block mb-px h-2"
-          style={"width: #{unless max_count(@dates) == 0 do round(max(1, (100 / max_count(@dates)) * count )) else 1 end}%;"}></button>
+          class="dark:bg-gray-700 bg-gray-300 group-hover:dark:bg-gray-500 group-hover:bg-gray-200 ml-auto block mb-px h-2 transition-all"
+          style={"width: #{unless @max_count == 0 do round(max(1, (100 / @max_count) * count )) else 1 end}%;"}></button>
       </div>
     </div>
     """
   end
 
+  defp update(assigns) do
+    assign(assigns, :max_count, max_count(assigns.dates))
+  end
+
   defp max_count(dates) do
-    try do
-      Enum.max(Map.values(dates))
-    rescue
-      Enum.EmptyError -> 0
-    end
+    Enum.max_by(dates, fn {_date, count} -> count end, fn -> {"", 0} end)
+    |> elem(1)
   end
 end
