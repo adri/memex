@@ -104,12 +104,12 @@ defmodule MemexWeb.Timeline do
                 <div :if={hit["provider"] === "git-notes"}>
                   <div :for={patch <- parse_patch(hit["commit_diff"])}>
                     <a href={"obsidian://open?#{URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)})}"} target="_blank">
-                        {MemexWeb.TimelineView.nl2br(patch.from)}
+                        {raw MemexWeb.TimelineView.highlight_line_text(patch.from, hit["_formatted"]["commit_diff"])}
                     </a>
                     <span :for={chunk <- patch.chunks}>
-                      <pre :for={line <- chunk.lines} class={"text-sm overflow-scroll #{case MemexWeb.TimelineView.line_type(line) do
-                        "remove" -> "line-through text-gray-600"
-                        _ -> "" end}"}><code>{raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"])}</code></pre>
+                      <div :for={line <- chunk.lines} class={"text-sm break-normal", "line-through text-gray-600":  MemexWeb.TimelineView.line_type(line) == "remove"}>
+                        <span>{raw MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"])}</span>
+                      </div>
                     </span>
                   </div>
                 </div>
