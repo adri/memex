@@ -91,7 +91,7 @@ defmodule MemexWeb.Timeline do
                   <span :if={hit["tweet_liked"] != 0} class="float-right rounded-full dark:bg-gray-700 ml-2 p-2 text-xs">Liked</span>
                   <span :if={hit["tweet_retweeted"] != 0} class="float-right rounded-full dark:bg-gray-700 p-2 text-xs">Retweeted</span>
                   <a href={"https://twitter.com/#{hit["tweet_user_screen_name"]}"} class="block text-xs text-gray-300 dark:text-gray-500 truncate" target="_blank">
-                    <img class="rounded-full float-left mr-2 mb-1" src={"#{hit["tweet_user_avatar_url"]}"} width="20" height="20" />
+                    <img class="rounded-full float-left mr-2 mb-1" src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: "#{hit["tweet_user_avatar_url"]}" ) } width="20" height="20" />
                     {raw hit["_formatted"]["tweet_user_screen_name"]}<span :if={hit["_formatted"]["tweet_user_location"] != ""}>, {raw hit["_formatted"]["tweet_user_location"]}</span>
                   </a>
                   <a href={"#{hit["tweet_url"]}"} target="_blank">
@@ -130,7 +130,7 @@ defmodule MemexWeb.Timeline do
                 </div>
               </#template>
               <#template slot="media">
-                <img :if={MemexWeb.TimelineView.is_youtube_url(hit["website_url"])} class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src={"http://i3.ytimg.com/vi/#{MemexWeb.TimelineView.parse_youtube_id(hit["website_url"])}/mqdefault.jpg"} />
+                <img :if={MemexWeb.TimelineView.is_youtube_url(hit["website_url"])} class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4" width="60" height="60" src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: "http://i3.ytimg.com/vi/#{MemexWeb.TimelineView.parse_youtube_id(hit["website_url"])}/mqdefault.jpg" )} />
                 <img :if={hit["verb"] === "visited"} class="object-cover h-24 w-24 -m-4 rounded-l mr-4" width="82" height="82" src={"https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/pin-l-embassy+f74e4e(#{hit["place_longitude"]},#{hit["place_latitude"]})/#{hit["place_longitude"]},#{hit["place_latitude"]},15/100x100@2x?access_token=#{System.get_env("MAPBOX_API_KEY")}"} />
               </#template>
               <#template slot="right">

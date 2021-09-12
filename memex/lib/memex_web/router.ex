@@ -20,6 +20,7 @@ defmodule MemexWeb.Router do
     live "/", PageLive, :index
     live "/person", Sidebars.PersonLive, :index
     get "/photos/:path", PhotoController, :image
+    get "/https_proxy/", PhotoController, :https_proxy
     get "/alfred/search", AlfredController, :search
   end
 

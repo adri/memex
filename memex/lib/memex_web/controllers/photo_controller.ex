@@ -19,4 +19,18 @@ defmodule MemexWeb.PhotoController do
         |> send_resp(404, "Not found")
     end
   end
+
+  # Insecure but needed to avoid HTTPS on localhost
+  def https_proxy(conn, %{"url" => url} = _params) do
+    Tesla.get(url)
+    |> case do
+      {:ok, %{status: 200} = response} ->
+        conn
+        |> send_resp(200, response.body)
+
+      _ ->
+        conn
+        |> send_resp(404, "Not found")
+    end
+  end
 end
