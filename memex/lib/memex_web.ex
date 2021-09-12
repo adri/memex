@@ -108,16 +108,32 @@ defmodule MemexWeb do
     quote do
       defp async_query(socket, key, default, query) do
         socket
-        |> assign(key, default)
-        |> assign_async(fn -> {key, Memex.Search.Postgres.query(query)} end)
+        |> assign_default_if_not_set(key, default)
+        |> assign_async(key, fn -> {key, Memex.Search.Postgres.query(query)} end)
       end
 
-      defp assign_async(socket, callback) do
+      defp assign_default_if_not_set(socket, key, default) do
+        case socket.assigns[key] do
+          nil -> assign(socket, key, default)
+          _ -> socket
+        end
+      end
+
+      defp assign_async(socket, key, callback) do
+        cancel_current_assign(socket.assigns["#{key}_pid"])
+
         pid = self()
-        spawn(fn -> send(pid, {:async_assign, callback.()}) end)
+        child_pid = spawn(fn -> send(pid, {:async_assign, callback.()}) end)
 
         socket
+        |> assign("#{key}_pid", child_pid)
       end
+
+      defp assign_async_loading?(socket, key) do
+        socket.assigns["#{key}_pid"] != nil
+      end
+
+      defp cancel_current_assign(pid), do: pid && Process.exit(pid, :kill)
 
       @impl true
       def handle_info({:async_assign, {key, result}}, socket) do
