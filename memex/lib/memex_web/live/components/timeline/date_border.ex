@@ -10,7 +10,7 @@ defmodule MemexWeb.Timeline.DateBorder do
       <span>{format(@date)}</span>
 
       <span class="hidden md:inline-block text-xs transition-opacity opacity-0 group-hover:opacity-100">
-      {days_between_to_text(@days_between)}
+        {days_between_to_text(@days_between)}
       </span>
     </div>
     """
