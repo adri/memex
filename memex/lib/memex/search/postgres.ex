@@ -105,6 +105,9 @@ defmodule Memex.Search.Postgres do
               fragment("? -> 'tweet_user_name' \\? ?", q.body, ^name)
         )
 
+      {"created_at_between", [from_date, to_date]}, q ->
+        from(q in q, where: q.created_at >= ^from_date and q.created_at <= ^to_date)
+
       {key, name}, q ->
         from(q in q,
           where: fragment("? -> ?::text \\? ?", q.body, ^key, ^name)

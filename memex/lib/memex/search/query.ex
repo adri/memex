@@ -1,5 +1,10 @@
 defmodule Memex.Search.Query do
-  # :hits_with_highlights, :total_hits, facet: "month"
+  @moduledoc """
+  Options for select:
+  - `:hits_with_highlights`: Return hits with highlights (formatted as HTML)
+  - `:total_hits`: Return total hits count
+  - `facet: "month"`: Return facet counts for each month
+  """
   defstruct select: :hits_with_highlights,
             query: "",
             filters: %{},

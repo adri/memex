@@ -6,8 +6,8 @@ defmodule Memex.Schema.Document do
 
   schema "documents" do
     field(:body, :map)
-    field(:created_at, :naive_datetime)
-    field(:update_at, :naive_datetime, virtual: true)
+    field(:created_at, :utc_datetime)
+    field(:update_at, :utc_datetime, virtual: true)
     has_many(:relations, Relation, foreign_key: :id)
   end
 end
