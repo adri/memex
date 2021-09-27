@@ -9,6 +9,6 @@
      "autoprefixer": "^10.2.0",
      "postcss": "^8.3.5",
      "postcss-import": "^14.0.2",
-     "tailwindcss": "^2.2.15"
+     "tailwindcss": "^2.2.16"
    }
  }
