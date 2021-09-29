@@ -7,6 +7,7 @@ import.sh sqlite-to-json/Photos.sh
 import.sh sqlite-to-json/Safari.sh
 import.sh sqlite-to-json/terminal.sh
 import.sh sqlite-to-json/Arc-visits.sh
+import.sh sqlite-to-json/Arc-activities.sh
 
 #./github-to-sqlite/import-database.sh
 #import.sh sqlite-to-json/github.sh
