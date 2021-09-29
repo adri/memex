@@ -41,18 +41,8 @@ defmodule Memex.Search.Postgres do
     from(q in q, where: fragment("? @@ to_tsquery('simple', ?)", q.search, ^to_tsquery(query)))
   end
 
-  defp add_select(q, %Query{select: :hits_with_highlights} = query) do
-    from(q in q,
-      select: %{
-        "hit" => q.body,
-        "formatted" =>
-          fragment(
-            "ts_headline(?, to_tsquery('simple', ?), 'StartSel=<em>, StopSel=</em>')",
-            q.body,
-            ^to_tsquery_inverse(query)
-          )
-      }
-    )
+  defp add_select(q, %Query{select: :hits_with_highlights} = _query) do
+    from(q in q, select: %{"hit" => q.body})
   end
 
   defp add_select(q, %Query{select: [facet: "month"]} = _query) do
@@ -160,14 +150,9 @@ defmodule Memex.Search.Postgres do
     |> String.trim()
   end
 
-  defp to_tsquery_inverse(%Query{} = query) do
-    to_tsquery(query)
-    |> String.replace(" & ", " | ")
-  end
-
-  defp format_results(results, %Query{select: :hits_with_highlights} = _query) do
+  defp format_results(results, %Query{select: :hits_with_highlights} = query) do
     results
-    |> Enum.map(&put_in(&1, ["hit", "_formatted"], &1["formatted"]))
+    |> Enum.map(&put_in(&1, ["hit", "_formatted"], format_hit(&1["hit"], query)))
     |> Enum.map(&put_in(&1, ["hit", "_relations"], &1["relations"]))
     |> Enum.map(&get_in(&1, ["hit"]))
   end
@@ -178,6 +163,24 @@ defmodule Memex.Search.Postgres do
   end
 
   defp format_results(results, %Query{} = _query), do: results
+
+  # Surround all values in the map that match the words in the query with <em></em>
+  defp format_hit(hit, %Query{query: query} = _query) do
+    words =
+      query
+      |> String.replace("\"", "")
+      |> String.split(~r/\s+/, trim: true)
+
+    for {k, v} <- hit, into: %{}, do: {k, format_hit_value(v, words)}
+  end
+
+  defp format_hit_value(value, words) when is_binary(value),
+    do: String.replace(value, ~r/(#{Enum.join(words, "|")})/i, "<em>\\1</em>")
+
+  defp format_hit_value(value, words) when is_list(value),
+    do: Enum.map(value, &format_hit_value(&1, words))
+
+  defp format_hit_value(value, _words), do: value
 
   defp month_range_cached() do
     ConCache.get_or_store(:search, "month_range", &month_range/0)
