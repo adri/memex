@@ -48,6 +48,7 @@ defmodule MemexWeb.ArcController do
             "type" => "LineString",
             "coordinates" =>
               item["samples"]
+              |> Enum.filter(fn sample -> not is_nil(sample["location"]["longitude"]) end)
               |> Enum.map(fn sample ->
                 [sample["location"]["longitude"], sample["location"]["latitude"]]
               end)
