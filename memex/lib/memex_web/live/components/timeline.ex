@@ -8,24 +8,26 @@ defmodule MemexWeb.Timeline do
   alias MemexWeb.Timeline.DateBorder
   alias MemexWeb.Router.Helpers, as: Routes
 
-  prop(query, :string, required: true)
-  prop(page, :number, required: true)
-  prop(results, :list, required: true)
+  prop query, :string, default: ""
+  prop page, :number, default: 1
+  prop items, :list, required: true
+  prop enable_load_more, :boolean, default: false
+  prop class, :css_class, default: "ml-12"
 
   def render(assigns) do
     ~F"""
-    <div id={"hits-#{unique_query_id(@query)}"} phx-update="replace">
-      <div id={"hit-#{hit["id"]}"} :for.with_index={{hit, index} <- @results}>
+    <div id={"hits-#{unique_query_id(@query)}"} class={@class}>
+      <div id={"hit-#{hit["id"]}"} :for.with_index={{hit, index} <- @items}>
         <div
           :if={index !== 0}
           :for={hit <-
             MemexWeb.TimelineView.timestamp_start_between(
-              @results,
-              hit["timestamp_unix"]..previous_timestamp(@results, index)
+              @items,
+              hit["timestamp_unix"]..previous_timestamp(@items, index)
             )}
-          class="flex w-auto items-start group ml-12 md:ml-20"
+          class="flex w-auto items-start group"
         >
-          <VerticalLine class={"#{previous_timeline_classes(@results, hit, index)}"} />
+          <VerticalLine class={"#{previous_timeline_classes(@items, hit, index)}"} />
           <Time date={date(hit["timestamp_start_unix"])} />
           <ProviderIcon provider={hit["provider"]} />
           <div class="text-xs text-gray-500 p-3 dark:text-gray-500">
@@ -38,22 +40,22 @@ defmodule MemexWeb.Timeline do
           </div>
         </div>
         <div
-          :if={index === 0 || days_between(hit["timestamp_unix"], @results, index) > 0}
-          class="flex w-auto items-start group ml-12 md:ml-20"
+          :if={index === 0 || days_between(hit["timestamp_unix"], @items, index) > 0}
+          class="flex w-auto items-start group"
         >
-          <VerticalLine class={"#{timeline_classes(@results, hit, index)}"} />
+          <VerticalLine class={"#{timeline_classes(@items, hit, index)}"} />
           <ProviderIcon />
           <DateBorder
             date={date(hit["timestamp_unix"])}
-            days_between={days_between(hit["timestamp_unix"], @results, index)}
+            days_between={days_between(hit["timestamp_unix"], @items, index)}
           />
         </div>
-        <div class="ml-12 md:ml-20">
+        <div class="">
           <div class="flex w-auto items-start">
-            <VerticalLine class={"#{timeline_classes(@results, hit, index)}"} />
+            <VerticalLine class={"#{timeline_classes(@items, hit, index)}"} />
             <Time date={date(hit["timestamp_unix"])} />
             <ProviderIcon provider={hit["provider"]} />
-            <Card>
+            <Card class="ml-2">
               <:content>
                 <a :if={hit["provider"] === "Safari"} href={hit["website_url"]} target="_blank">
                   <p class="truncate">{raw(hit["_formatted"]["website_title"])}</p>
@@ -61,7 +63,7 @@ defmodule MemexWeb.Timeline do
                     {hit["device_name"]}: {raw(hit["_formatted"]["website_url"])}
                   </div>
                 </a>
-                <a :if={hit["provider"] === "GitHub"} href={"#{hit["repo_homepage"]}"} target="_blank">
+                <a :if={hit["provider"] === "GitHub"} href={"https://github.com/#{hit["repo_name"]}"} target="_blank">
                   {raw(hit["_formatted"]["repo_name"])}
                   <p class="text-sm text-gray-400 dark:text-gray-400 truncate">
                     {raw(hit["_formatted"]["repo_description"])}
@@ -172,7 +174,7 @@ defmodule MemexWeb.Timeline do
                   :if={hit["provider"] === "Arc"}
                   class="flex cursor-pointer"
                   phx-click="open-sidebar"
-                  phx-value-type="activity"
+                  phx-value-type={if hit["verb"] === "visited" do "visit" else "activity" end}
                   phx-value-id={"#{hit["id"]}"}
                 >
                   <div :if={hit["verb"] === "visited"} class="flex-grow truncate">
@@ -281,7 +283,13 @@ defmodule MemexWeb.Timeline do
           </div>
         </div>
       </div>
-      <div id="loader" phx-hook="InfiniteScroll" data-page={"#{@page}"} />
+      <div
+        :if={@enable_load_more}
+        id="loader"
+        phx-hook="InfiniteScroll"
+        data-page={"#{@page}"}
+        date-load-more="load_more"
+      />
     </div>
     """
   end
@@ -315,18 +323,18 @@ defmodule MemexWeb.Timeline do
     |> DateTime.shift_zone!("Europe/Amsterdam")
   end
 
-  defp days_between(timestamp, results, index) do
-    MemexWeb.TimelineView.days_between(timestamp, previous_timestamp(results, index))
+  defp days_between(timestamp, items, index) do
+    MemexWeb.TimelineView.days_between(timestamp, previous_timestamp(items, index))
   end
 
-  defp previous_timestamp(results, index), do: Enum.at(results, index - 1)["timestamp_unix"]
+  defp previous_timestamp(items, index), do: Enum.at(items, index - 1)["timestamp_unix"]
   defp unique_query_id(query), do: Base.encode16(query)
 
-  defp timeline_classes(results, hit, index) do
+  defp timeline_classes(items, hit, index) do
     previous_results_between =
-      MemexWeb.TimelineView.count_results_between(results, previous_timestamp(results, index))
+      MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
 
-    results_between = MemexWeb.TimelineView.count_results_between(results, hit["timestamp_unix"])
+    results_between = MemexWeb.TimelineView.count_results_between(items, hit["timestamp_unix"])
 
     timeline_classes =
       if results_between > previous_results_between do
@@ -343,11 +351,11 @@ defmodule MemexWeb.Timeline do
     end
   end
 
-  defp previous_timeline_classes(results, hit, index) do
+  defp previous_timeline_classes(items, hit, index) do
     previous_results_between =
-      MemexWeb.TimelineView.count_results_between(results, previous_timestamp(results, index))
+      MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
 
-    results_between = MemexWeb.TimelineView.count_results_between(results, hit["timestamp_unix"])
+    results_between = MemexWeb.TimelineView.count_results_between(items, hit["timestamp_unix"])
 
     timeline_classes =
       if results_between > previous_results_between do
