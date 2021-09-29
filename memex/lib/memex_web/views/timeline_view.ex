@@ -177,6 +177,8 @@ defmodule MemexWeb.TimelineView do
   def line_text(text), do: " " <> nl2br(text)
 
   @highlight_regex ~r/<em>(.*)<\/em>/u
+  def highlight_line_text(text, _highlight_text) when is_nil(text), do: line_text(text)
+
   def highlight_line_text(text, highlight_text) do
     with [_, highlights] <- Regex.run(@highlight_regex, highlight_text) do
       text
