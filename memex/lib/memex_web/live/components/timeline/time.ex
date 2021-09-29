@@ -1,7 +1,7 @@
 defmodule MemexWeb.Timeline.Time do
   use Surface.Component
 
-  prop(date, :date)
+  prop(date, :datetime)
 
   def render(assigns) do
     ~F"""

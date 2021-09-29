@@ -21,7 +21,7 @@ defmodule MemexWeb.PageLive do
       <div :if={@query != ""} class="flex items-start">
         <div class="w-4/5 mt-8">
           <SearchResultStats total_hits={@total_hits} />
-          <Timeline query={@query} results={@results} page={@page} />
+          <Timeline query={@query} items={@items} page={@page} class="ml-12 md:ml-20" enable_load_more />
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
           <DatesFacet dates={@dates} />
@@ -38,7 +38,7 @@ defmodule MemexWeb.PageLive do
       assign(socket,
         sidebars: Sidebars.init(),
         query: "",
-        results: [],
+        items: [],
         dates: [],
         total_hits: nil,
         page: 1
@@ -67,9 +67,7 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("search", %{"query" => ""}, socket) do
-    {:noreply,
-     socket
-     |> assign(query: "", page: 1, results: [])}
+    {:noreply, socket |> assign(query: "", page: 1, items: [])}
   end
 
   @impl true
@@ -91,8 +89,9 @@ defmodule MemexWeb.PageLive do
     query =
       Query.from_string(string)
       |> Query.add_filter(key, value)
+      |> Query.to_string()
 
-    {:noreply, socket |> assign(query: Query.to_string(query), page: 1) |> search()}
+    {:noreply, socket |> assign(query: query, page: 1) |> search()}
   end
 
   @impl true
@@ -109,7 +108,7 @@ defmodule MemexWeb.PageLive do
     query = Query.from_string(string)
 
     socket
-    |> async_query(:results, [], %{
+    |> async_query(:items, [], %{
       query
       | select: :hits_with_highlights,
         order_by: ["created_at_desc"],
