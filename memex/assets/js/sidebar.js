@@ -3,7 +3,7 @@ export const Sidebar = {
     this.toggleOnEscape();
   },
   updated() {
-    if (this.el.dataset.open === "true") {
+    if (this.el.dataset.state === "open") {
       this.lockScroll();
     } else {
       this.unlockScroll();
