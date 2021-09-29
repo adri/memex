@@ -9,6 +9,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.mapboxgl-ctrl-attrib-inner {
+  display: none;
+}
+
 em {
   background-color: rgba(251, 191, 36, 0.7);
   font-style: normal;

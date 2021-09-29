@@ -18,11 +18,18 @@ defmodule MemexWeb.Router do
     pipe_through :browser
 
     live "/", PageLive, :index
-    live "/activity", Sidebars.ActivityLive, :index
-    live "/person", Sidebars.PersonLive, :index
     get "/photos/:path", PhotoController, :image
     get "/https_proxy/", PhotoController, :https_proxy
+    get "/arc/geopoints", ArcController, :geopoint
+    get "/arc/gpx", ArcController, :gpx
+    get "/arc/geojson", ArcController, :geojson
     get "/alfred/search", AlfredController, :search
+  end
+
+  scope "/sidebar", MemexWeb do
+    pipe_through :browser
+    live "/activity", Sidebars.ActivityLive, :index
+    live "/person", Sidebars.PersonLive, :index
   end
 
   # Other scopes may use custom stacks.
