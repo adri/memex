@@ -1,61 +1,73 @@
 defmodule MemexWeb.Sidebars.ActivityLive do
-  use MemexWeb, :live_view
+  use MemexWeb, :surface_live_view
 
   alias Memex.Search.Postgres
   alias Memex.Search.Query
+  alias MemexWeb.Timeline
+  alias MemexWeb.Map
+  alias MemexWeb.Timeline.Card
+  alias MemexWeb.TimeDuration
 
-  @impl true
   def mount(params, session, socket) do
     {:ok, doc} = Postgres.find(session["id"] || params["id"])
+    {:ok, previous} = Postgres.find(doc["id_previous"])
+    {:ok, next} = Postgres.find(doc["id_next"])
+    # doc |> IO.inspect(label: "15")
+    # previous |> IO.inspect(label: "16")
+    # next |> IO.inspect(label: "17")
 
     {:ok,
      socket
-     |> assign(name: "test", doc: doc)
-     |> async_query(:results, [], %Query{
+     |> assign(doc: doc, next: next, previous: previous)
+     |> async_query(:items, [], %Query{
        limit: 20,
-       filters: %{"created_at_between" => [doc["timestamp_start_utc"], doc["timestamp_utc"]]}
+       filters: %{"created_at_between" => [doc["timestamp_start_utc"], doc["timestamp_utc"]]},
+       order_by: ["created_at_desc"]
      })}
   end
 
   @impl true
   def render(assigns) do
-    # %{
-    #   "activity_active_energy_burned" => 153.8450000000001,
-    #   "activity_floors_ascended" => 3,
-    #   "activity_floors_descended" => 3,
-    #   "activity_heart_rate_average" => 128.34691152211295,
-    #   "activity_heart_rate_max" => 156,
-    #   "activity_step_count" => 2856,
-    #   "activity_type" => "walking",
-    #   "date_month" => "2021-06",
-    #   "id" => "arc-851A756E-3D59-43AE-B856-0B4509BABE64",
-    #   "id_next" => "arc-B4632356-D802-45E0-A650-D44EA491E76A",
-    #   "id_previous" => "arc-52E7C0F8-3D46-42E6-9EE0-77F8C99CC3B4",
-    #   "provider" => "Arc",
-    #   "timestamp_start_unix" => 1624013913,
-    #   "timestamp_start_utc" => "2021-06-18T10:58:33Z",
-    #   "timestamp_unix" => 1624015412,
-    #   "timestamp_utc" => "2021-06-18T11:23:32Z",
-    #   "verb" => "moved"
-    # }
-    # Todo: find all timeline items within that time frame timestamp_start_unix -> timestamp_unix
+    ~F"""
+    <div class="inline-flex items-center space-x-3 mb-2">
+      <!-- todo: Icon for activity type -->
+      <h2 class="text-xl flex-grow dark:text-white leading-7">
+        {String.capitalize(@doc["activity_type"])}
+        {#unless is_nil(@previous["place_name"] || @previous["place_address"])}from <b>{@previous["place_name"] || @previous["place_address"]}</b>{/unless}
+        {#unless is_nil(@next["place_name"])} to <b>{@next["place_name"]}</b>{/unless}
+      </h2>
 
-    ~L"""
-    <div class="flex place-items-start justify-between">
-      <!-- Icon for activity type -->
-      <h2 class="text-lg flex-grow dark:text-white leading-7"><%= @doc["activity_type"] %></h2>
-      timestamp_start_unix -> timestamp_unix
     </div>
 
-    <!-- todo: Load geopoints and display as map -->
+    <Map height={250} items={@items} geojson_path={Routes.arc_path(MemexWeb.Endpoint, :geojson, date: String.slice(@doc["timestamp_utc"], 0..9), id: @doc["id"])} />
 
-          <h3 class="dark:text-white">Timeline</h3>
-        <%= for hit <- @results do %>
-          <div class="rounded-md bg-white dark:bg-gray-900 hover:border-blue-100 transition-colors p-4 shadow-md overflow-hidden dark:text-white">
-            <p class="dark:text-white truncate"><%= hit["verb"] %></p>
-          </div>
-        <% end %>
+    <div class="flex w-full space-x-3">
+      <div class="w-8/12">
+        <Timeline items={@items} />
+      </div>
+      <div class="">
+        <TimeDuration start_time={@doc["timestamp_start_unix"]} end_time={@doc["timestamp_unix"]} />
+        <Card>
+          <:content>
+          Distance: xx<br>
+          Most common speed: xx km/h<br>
+          Steps: {@doc["activity_step_count"]}<br>
+          Flights climbed: {@doc["activity_floors_ascended"]} up, {@doc["activity_floors_descended"]} down<br>
+          Altitude: xx meters<br>
+          </:content>
+        </Card>
+        <!-- Chart Heartrate -->
+        <Card>
+          <:content>
+          Heartrate<br>
+          Average: {@doc["activity_heart_rate_average"]}<br>
+          Max: {@doc["activity_heart_rate_max"]}<br>
+          </:content>
+        </Card>
 
+        <!-- Chart Trip speed -->
+      </div>
+    </div>
     """
   end
 end
