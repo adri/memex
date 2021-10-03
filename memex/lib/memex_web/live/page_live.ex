@@ -9,6 +9,15 @@ defmodule MemexWeb.PageLive do
   alias MemexWeb.DatesFacet
   alias MemexWeb.CloseCircles
   alias MemexWeb.SidebarsComponent
+  alias MemexWeb.Components.Icons.SettingsIcon
+  alias MemexWeb.Components.Badge
+
+  data query, :string, default: ""
+  data items, :list, default: []
+  data page, :number, default: 1
+  data dates, :list, default: []
+  data total_hits, :number, default: 0
+  data sidebars, :list, default: Sidebars.init()
 
   @impl true
   def render(assigns) do
@@ -32,63 +41,22 @@ defmodule MemexWeb.PageLive do
     """
   end
 
-  @impl true
-  def mount(_params, _session, socket) do
-    socket =
-      assign(socket,
-        sidebars: Sidebars.init(),
-        query: "",
-        items: [],
-        dates: [],
-        total_hits: nil,
-        page: 1
-      )
-
-    # todo: maybe move some data in temporary_assigns again,
-    # if change tracking is fixed in surface (using component functions)
-    {:ok, socket}
-  end
-
-  @impl true
-  def handle_params(params, _url, socket) do
-    query = Map.get(params, "query", "")
-
-    cond do
-      query == "" ->
-        {:noreply, socket}
-
-      query == socket.assigns.query ->
-        {:noreply, socket}
-
-      true ->
-        handle_event("search", %{"query" => query}, socket)
-    end
-  end
-
-  @impl true
   def handle_event("search", %{"query" => ""}, socket) do
     {:noreply, socket |> assign(query: "", page: 1, items: [])}
   end
 
-  @impl true
   def handle_event("search", %{"query" => query}, socket) do
     {:noreply, socket |> assign(query: query, page: 1) |> search()}
   end
 
-  @impl true
   def handle_event("load-more", _, %{assigns: assigns} = socket) do
     {:noreply, socket |> assign(page: assigns.page + 1) |> search()}
   end
 
-  @impl true
-  def handle_event(
-        "filter-date",
-        %{"key" => key, "value" => value},
-        %{assigns: %{query: string}} = socket
-      ) do
+  def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
     query =
       Query.from_string(string)
-      |> Query.add_filter(key, value)
+      |> Query.add_filter(data["key"], data["value"])
       |> Query.to_string()
 
     {:noreply, socket |> assign(query: query, page: 1) |> search()}
@@ -96,12 +64,12 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
-    {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
+    {:noreply, socket |> assign(sidebars: Sidebars.open(sidebars, data))}
   end
 
   @impl true
   def handle_event("close-last-sidebar", _key, %{assigns: %{sidebars: sidebars}} = socket) do
-    {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
+    {:noreply, socket |> assign(sidebars: Sidebars.close_last(sidebars))}
   end
 
   defp search(%{assigns: %{page: page, query: string}} = socket) do
@@ -116,8 +84,5 @@ defmodule MemexWeb.PageLive do
     })
     |> async_query(:dates, [], %{query | select: [facet: "month"]})
     |> async_query(:total_hits, nil, %{query | select: :total_hits})
-
-    # todo: decide to keep updating the URL or not
-    # |> push_patch(to: Routes.page_path(socket, :index, query: string))
   end
 end
