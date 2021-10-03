@@ -23,18 +23,6 @@ defmodule Memex.Search.Postgres do
     end
   end
 
-  def count_by_name(name) do
-    from(d in Document,
-      select: {fragment("body ->> 'provider'"), count(d.id)},
-      where:
-        fragment("body -> 'person_name' \\? ?", ^name) or
-          fragment("body -> 'tweet_user_name' \\? ?", ^name),
-      group_by: fragment("body ->> 'provider'")
-    )
-    |> Repo.all()
-    |> Enum.into(%{})
-  end
-
   defp add_search(q, %Query{query: ""} = _query), do: q
 
   defp add_search(q, %Query{} = query) do
@@ -82,11 +70,11 @@ defmodule Memex.Search.Postgres do
 
   defp add_filters(q, filters) do
     Enum.reduce(filters, q, fn
-      {"month", date_month}, q ->
-        from(q in q,
-          where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^date_month)
-          # todo: can this be done with more efficient query?
-        )
+      {"month", month}, q ->
+        from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^month))
+
+      {"date", date}, q ->
+        from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm-dd') = ?", q, ^date))
 
       {"person_name", name}, q ->
         from(q in q,
@@ -99,9 +87,7 @@ defmodule Memex.Search.Postgres do
         from(q in q, where: q.created_at >= ^from_date and q.created_at <= ^to_date)
 
       {key, name}, q ->
-        from(q in q,
-          where: fragment("? -> ?::text \\? ?", q.body, ^key, ^name)
-        )
+        from(q in q, where: fragment("? -> ?::text \\? ?", q.body, ^key, ^name))
 
       _, q ->
         q
@@ -165,6 +151,8 @@ defmodule Memex.Search.Postgres do
   defp format_results(results, %Query{} = _query), do: results
 
   # Surround all values in the map that match the words in the query with <em></em>
+  defp format_hit(hit, %Query{query: ""} = _query), do: hit
+
   defp format_hit(hit, %Query{query: query} = _query) do
     words =
       query
