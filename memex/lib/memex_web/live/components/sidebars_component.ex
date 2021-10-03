@@ -40,6 +40,7 @@ defmodule MemexWeb.SidebarsComponent do
         </button>
         <div class="-mt-2" :if={hit["type"] === "person"}>{live_render(@socket, MemexWeb.Sidebars.PersonLive, id: "person", session: %{"hit" => hit})}</div>
         <div class="-mt-2" :if={hit["type"] === "activity"}>{live_render(@socket, MemexWeb.Sidebars.ActivityLive, id: "activity", session: hit)}</div>
+        <div class="-mt-2" :if={hit["type"] === "settings"}>{live_render(@socket, MemexWeb.Sidebars.SettingsLive, id: "settings")}</div>
         <div
           :if={hit["location_latitude"] && hit["location_longitude"]}
           class="rounded-md col-span-3"
