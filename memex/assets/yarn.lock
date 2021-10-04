@@ -51,10 +51,10 @@
   resolved "https://registry.yarnpkg.com/@mapbox/point-geometry/-/point-geometry-0.1.0.tgz#8a83f9335c7860effa2eeeca254332aa0aeed8f2"
   integrity sha1-ioP5M1x4YO/6Lu7KJUMyqgru2PI=
 
-"@mapbox/tiny-sdf@^1.2.5":
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/@mapbox/tiny-sdf/-/tiny-sdf-1.2.5.tgz#424c620a96442b20402552be70a7f62a8407cc59"
-  integrity sha512-cD8A/zJlm6fdJOk6DqPUV8mcpyJkRz2x2R+/fYcWDYG3oWbG7/L7Yl/WqQ1VZCjnL9OTIMAn6c+BC5Eru4sQEw==
+"@mapbox/tiny-sdf@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@mapbox/tiny-sdf/-/tiny-sdf-2.0.2.tgz#89b477f350c146be84fb263eb67f60f0ee2f59cf"
+  integrity sha512-XBQG3wvIaya9t2OHcWLFYv8cdg48roqOj8XhKzKSvAIg5D1scC+a+tlq0wGjPZkL+k6dL8TyOBR7RKDGh3kefQ==
 
 "@mapbox/unitbezier@^0.0.0":
   version "0.0.0"
@@ -661,17 +661,17 @@ lodash@^4.17.21:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
-mapbox-gl@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-2.4.1.tgz#cd17d35bd4262bc6a9e0e49fef165f8f0dbf6fef"
-  integrity sha512-iTF5UPm63ojEi91A2lSpM5wDfnttuPXJmJRwD65R4n2mAYoQjjRwXvXIgcxKDnZDpdczF1jIFeS1R+H8jp1NCQ==
+mapbox-gl@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-2.5.0.tgz#c0c7f09f4ce987b7397b92ea4b2780a8213ac10b"
+  integrity sha512-yIC3TCaY+CfTj1gU4z3DrB1hMck8ijAAPlWBsLMu+5BcTCk6F9mgi595Zv1DKDacFjyphHoWS29AMRJHjYnKzg==
   dependencies:
     "@mapbox/geojson-rewind" "^0.5.0"
     "@mapbox/geojson-types" "^1.0.2"
     "@mapbox/jsonlint-lines-primitives" "^2.0.2"
     "@mapbox/mapbox-gl-supported" "^2.0.0"
     "@mapbox/point-geometry" "^0.1.0"
-    "@mapbox/tiny-sdf" "^1.2.5"
+    "@mapbox/tiny-sdf" "^2.0.2"
     "@mapbox/unitbezier" "^0.0.0"
     "@mapbox/vector-tile" "^1.3.1"
     "@mapbox/whoots-js" "^3.1.0"
