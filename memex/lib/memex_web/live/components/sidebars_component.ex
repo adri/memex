@@ -38,6 +38,7 @@ defmodule MemexWeb.SidebarsComponent do
             stroke="currentColor"
           ><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
+        <div class="-mt-2" :if={hit["type"] === "generic"}>{live_render(@socket, MemexWeb.Sidebars.GenericLive, id: "generic", session: hit)}</div>
         <div class="-mt-2" :if={hit["type"] === "person"}>{live_render(@socket, MemexWeb.Sidebars.PersonLive, id: "person", session: %{"hit" => hit})}</div>
         <div class="-mt-2" :if={hit["type"] === "activity"}>{live_render(@socket, MemexWeb.Sidebars.ActivityLive, id: "activity", session: hit)}</div>
         <div class="-mt-2" :if={hit["type"] === "settings"}>{live_render(@socket, MemexWeb.Sidebars.SettingsLive, id: "settings")}</div>

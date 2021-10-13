@@ -86,6 +86,12 @@ defmodule Memex.Search.Postgres do
       {"created_at_between", [from_date, to_date]}, q ->
         from(q in q, where: q.created_at >= ^from_date and q.created_at <= ^to_date)
 
+      {"created_at_within", date}, q ->
+        from(q in q,
+          where:
+            q.created_at <= ^date and fragment("? -> 'timestamp_start_utc' >= ?", q.body, ^date)
+        )
+
       {key, name}, q ->
         from(q in q, where: fragment("? -> ?::text \\? ?", q.body, ^key, ^name))
 
