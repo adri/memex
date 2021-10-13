@@ -15,9 +15,10 @@ defmodule Memex.Application do
       {Phoenix.PubSub, name: Memex.PubSub},
       # Start the Endpoint (http/https)
       MemexWeb.Endpoint,
-      {Memex.Repo, []}
+      {Memex.Repo, []},
       # Start a worker by calling: Memex.Worker.start_link(arg)
       # {Memex.Worker, arg}
+      {Memex.Scheduler, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
