@@ -30,6 +30,8 @@ defmodule MemexWeb.Router do
     pipe_through :browser
     live "/activity", Sidebars.ActivityLive, :index
     live "/person", Sidebars.PersonLive, :index
+    live "/settings", Sidebars.SettingsLive, :index
+    live "/generic", Sidebars.GenericLive, :index
   end
 
   # Other scopes may use custom stacks.
