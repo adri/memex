@@ -57,22 +57,47 @@ defmodule MemexWeb.Timeline do
             <ProviderIcon provider={hit["provider"]} />
             <Card class="ml-2">
               <:content>
-                <a :if={hit["provider"] === "Safari"} href={hit["website_url"]} target="_blank">
+                <a :if={hit["provider"] === "Safari"} href="#" :on-click="open-sidebar" :values={type: "generic", id: hit["id"]}>
                   <p class="truncate">{raw(hit["_formatted"]["website_title"])}</p>
                   <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {hit["device_name"]}: {raw(hit["_formatted"]["website_url"])}
+                    {hit["device_name"]}: <a href={hit["website_url"]} target="_blank" class="underline">{raw(hit["_formatted"]["website_url"])}</a>
                   </div>
                 </a>
-                <a :if={hit["provider"] === "GitHub"} href={"https://github.com/#{hit["repo_name"]}"} target="_blank">
-                  {raw(hit["_formatted"]["repo_name"])}
-                  <p class="text-sm text-gray-400 dark:text-gray-400 truncate">
+                <div :if={hit["provider"] === "GitHub"}>
+                  <p class="text-xs text-gray-400 dark:text-gray-500">
+                      {raw(hit["_formatted"]["verb"])} in {raw(hit["_formatted"]["repo_name"])}
+                  </p>
+                  <p :if={hit["comment_body"]} class="mb-2">
+                    {raw(hit["_formatted"]["comment_body"])}
+                  </p>
+                  <p :if={hit["review_body"]} class="mb-2">
+                    <span :if={hit["review_state"] === "approved"}>✅</span>
+
+                    {raw(hit["_formatted"]["review_body"])}
+                  </p>
+                  <p :if={Enum.member?(["merged", "requested"], hit["verb"])} class="mb-2">
+                    <a href={hit["issue_url"]} target="_blank">{raw(hit["_formatted"]["issue_title"])}</a>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">{raw(hit["_formatted"]["issue_body"])}</p>
+                  </p>
+                  <p :if={hit["issue_url"] && not Enum.member?(["merged", "requested"], hit["verb"])} class="text-xs text-gray-400 dark:text-gray-500">
+                    <img
+                      class="rounded-full float-left mr-2"
+                      src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: hit["github_user_avatar"])}
+                      width="16"
+                      height="16"
+                    />
+                    <a href={hit["issue_url"]} target="_blank">{raw(hit["_formatted"]["issue_title"])}</a>
+                  </p>
+
+                  <p :if={hit["repo_description"]} class="text-sm text-gray-400 dark:text-gray-400 truncate">
                     {raw(hit["_formatted"]["repo_description"])}
                   </p>
-                  <p class="text-xs text-gray-400 dark:text-gray-500 truncate">
+
+                  <p :if={hit["repo_license"]} class="text-xs text-gray-400 dark:text-gray-500 truncate">
                     <span class="capitalize">{hit["repo_license"]}</span>,
                     {hit["repo_language"]}, {hit["repo_stars_count"]} stars
                   </p>
-                </a>
+                </div>
                 <div :if={hit["provider"] === "iMessage"}>
                   <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
                     {case hit["message_direction"] do
@@ -154,6 +179,7 @@ defmodule MemexWeb.Timeline do
                     <a
                       href={"obsidian://open?#{URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)})}"}
                       target="_blank"
+                      class="text-xs text-gray-400 dark:text-gray-400"
                     >
                       {raw(MemexWeb.TimelineView.highlight_line_text(patch.from, hit["_formatted"]["commit_diff"]))}
                     </a>
