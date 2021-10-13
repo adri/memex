@@ -36,7 +36,7 @@ defmodule MemexWeb.PageLive do
           <Timeline query={@query} items={@items} page={@page} class="ml-12 md:ml-20" enable_load_more />
         </div>
         <div class="w-1/5 overflow-hidden pl-5 text-white">
-          <DatesFacet dates={@dates} />
+          <DatesFacet dates={@dates} loading={false} />
         </div>
         <SidebarsComponent sidebars={@sidebars} socket={assigns.socket} />
       </div>
