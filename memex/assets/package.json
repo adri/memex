@@ -6,7 +6,7 @@
       "mapbox-gl": "2.5.1"
    },
    "devDependencies": {
-     "autoprefixer": "^10.2.0",
+     "autoprefixer": "^10.3.7",
      "postcss": "^8.3.9",
      "postcss-import": "^14.0.2",
      "tailwindcss": "^2.2.16"
