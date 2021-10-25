@@ -24,8 +24,22 @@ defmodule Memex.MixProject do
     ]
   end
 
+  def catalogues do
+    [
+      # Local catalogue
+      "priv/catalogue",
+      # Dependencies catalogues
+      "deps/surface/priv/catalogue",
+      "deps/surface_bulma/priv/catalogue",
+      # External catalogues
+      Path.expand("../my_componensts/priv/catalogue"),
+      "/Users/johndoe/workspace/other_componensts/priv/catalogue"
+    ]
+  end
+
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib"] ++ catalogues()
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -34,9 +48,11 @@ defmodule Memex.MixProject do
   defp deps do
     [
       {:con_cache, "~> 0.13"},
+      {:earmark, "~> 1.4.16"},
       {:ecto_sql, "~> 3.4"},
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
+      {:exqlite, "~> 0.7.5"},
       {:finch, "~> 0.8.2"},
       {:floki, ">= 0.27.0", only: :test},
       {:gettext, "~> 0.11"},
@@ -53,11 +69,9 @@ defmodule Memex.MixProject do
       {:phoenix, "~> 1.6.0"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, "~> 0.15.9"},
-      {:surface,
-       git: "https://github.com/surface-ui/surface",
-       ref: "c33bb3abbb92315585ccde7a58c342d548c01e36",
-       override: true},
-      {:surface_formatter, "~> 0.5.4", only: :dev},
+      {:surface, "0.6.0"},
+      {:surface_catalogue, "~> 0.2.0"},
+      {:surface_formatter, "~> 0.6.0", only: :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},
       {:tesla, "~> 1.4.0"},
