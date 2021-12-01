@@ -4,6 +4,7 @@ image:
 tasks:
   - init: |
       docker-compose pull
+      docker-compose up -d
       cd memex
       mix local.hex --force
       mix local.rebar --force
@@ -14,4 +15,5 @@ tasks:
       PRINT_ME: "Hello World!"
       POSTGRES_DSN: "postgresql://postgres:memex@localhost:65432/memex"
     command: |
+      docker-compose up -d
       iex -S mix phx.server
