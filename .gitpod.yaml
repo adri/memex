@@ -1,0 +1,12 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - init: |
+      docker-compose pull
+      cd memex
+      mix deps.get
+      mix ecto.migrate
+      cd assets && yarn && cd ..
+    command: |
+      iex -S mix phx.server
