@@ -5,8 +5,9 @@ tasks:
   - init: |
       docker-compose pull
       cd memex
-      mix local.hex
-      mix deps.get
+      mix local.hex --force
+      mix local.rebar --force
+      mix deps.get --force
       mix ecto.migrate
       cd assets && yarn && cd ..
     env:
