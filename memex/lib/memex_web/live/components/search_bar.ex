@@ -5,7 +5,7 @@ defmodule MemexWeb.SearchBar do
 
   def render(assigns) do
     ~F"""
-    <div class="p-5 font-san items-center justify-center">
+    <div class="p-5 pt-0 font-san items-center justify-center">
       <header class="flex block fixed md:ml-4 text-black w-8/12 dark:text-white shadow-lg dark:bg-black bg-white rounded-xl">
         <div class="flex justify-center items-center flex-grow relative">
           <button class="flex items-center justify-center absolute left-0 top-5 rounded-l-xl px-4 text-black dark:text-white">

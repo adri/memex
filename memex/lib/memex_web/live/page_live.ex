@@ -25,17 +25,17 @@ defmodule MemexWeb.PageLive do
     <div class="mx-auto mt-3">
       <SearchBar query={@query} />
       <div :if={@query == ""}>
-        <Badge class="absolute right-1" click="open-sidebar" values={type: "settings"}>
+        <Badge class="absolute right-2 top-6" click="open-sidebar" values={type: "settings"}>
           <:icon><SettingsIcon /></:icon>
         </Badge>
         <CloseCircles />
       </div>
-      <div :if={@query != ""} class="flex items-start">
-        <div class="w-4/5 mt-8">
+      <div class="flex items-start">
+        <div :if={@query != ""} class="w-4/5 mt-8">
           <SearchResultStats total_hits={@total_hits} />
           <Timeline query={@query} items={@items} page={@page} class="ml-12 md:ml-20" enable_load_more />
         </div>
-        <div class="w-1/5 overflow-hidden pl-5 text-white">
+        <div :if={@query != ""} class="w-1/5 overflow-hidden pl-5 text-white">
           <DatesFacet dates={@dates} loading={false} />
         </div>
         <SidebarsComponent sidebars={@sidebars} socket={assigns.socket} />

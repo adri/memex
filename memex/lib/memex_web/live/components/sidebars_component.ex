@@ -57,11 +57,11 @@ defmodule MemexWeb.SidebarsComponent do
 
   defp width(index) do
     case index do
-      0 -> "w-10/12"
-      1 -> "w-9/12"
-      2 -> "w-8/12"
-      3 -> "w-7/12"
-      _ -> "w-6/12"
+      0 -> "w-11/12"
+      1 -> "w-10/12"
+      2 -> "w-9/12"
+      3 -> "w-8/12"
+      _ -> "w-7/12"
     end
   end
 

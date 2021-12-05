@@ -8,7 +8,10 @@ defmodule MemexWeb.Map do
 
   def render(assigns) do
     ~F"""
-    <div class="rounded-md overflow-hidden mb-2 min-w-full dark:bg-gray-900" style={"height: #{@height}px"}>
+    <div
+      class="rounded-md overflow-hidden mb-2 min-w-full dark:bg-gray-900"
+      style={"height: #{@height}px"}
+    >
       <div
         class="relative flex-grow rounded-md"
         style={"height: #{@height}px"}
