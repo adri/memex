@@ -6,7 +6,13 @@ defmodule Memex.Importer do
 
   def parse_body(""), do: {:error, :no_data}
   def parse_body([]), do: {:error, :no_data}
-  def parse_body(body), do: {:ok, body |> Enum.map(&[body: &1])}
+  def parse_body(list), do: {:ok, list |> Enum.map(&[body: &1])}
+
+  def insert(list) do
+    with {:ok, documents} <- parse_body(list) do
+      bulk_upsert_documents(documents)
+    end
+  end
 
   def bulk_upsert_documents(documents) do
     {current_batch, next_batch} = Enum.split(documents, @max_records_per_batch)
