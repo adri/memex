@@ -9,6 +9,17 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  height  : 100%;
+  overflow: hidden;
+  position: relative;
+}
+body {
+  height  : 100%;
+  overflow: auto;
+  position: relative;
+}
+
 .mapboxgl-ctrl-attrib-inner {
   display: none;
 }
