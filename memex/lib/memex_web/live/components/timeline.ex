@@ -57,7 +57,12 @@ defmodule MemexWeb.Timeline do
             <ProviderIcon provider={hit["provider"]} />
             <Card class="ml-2">
               <:content>
-                <a :if={hit["provider"] === "Safari"} href="#" :on-click="open-sidebar" :values={type: "generic", id: hit["id"]}>
+                <a
+                  :if={hit["provider"] === "Safari"}
+                  href="#"
+                  :on-click="open-sidebar"
+                  :values={type: "generic", id: hit["id"]}
+                >
                   <p class="truncate">{raw(hit["_formatted"]["website_title"])}</p>
                   <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
                     {hit["device_name"]}: <a href={hit["website_url"]} target="_blank" class="underline">{raw(hit["_formatted"]["website_url"])}</a>
@@ -65,7 +70,7 @@ defmodule MemexWeb.Timeline do
                 </a>
                 <div :if={hit["provider"] === "GitHub"}>
                   <p class="text-xs text-gray-400 dark:text-gray-500">
-                      {raw(hit["_formatted"]["verb"])} in {raw(hit["_formatted"]["repo_name"])}
+                    {raw(hit["_formatted"]["verb"])} in {raw(hit["_formatted"]["repo_name"])}
                   </p>
                   <p :if={hit["comment_body"]} class="mb-2">
                     {raw(hit["_formatted"]["comment_body"])}
@@ -77,9 +82,12 @@ defmodule MemexWeb.Timeline do
                   </p>
                   <p :if={Enum.member?(["merged", "requested"], hit["verb"])} class="mb-2">
                     <a href={hit["issue_url"]} target="_blank">{raw(hit["_formatted"]["issue_title"])}</a>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{raw(hit["_formatted"]["issue_body"])}</p>
+                    <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(hit["_formatted"]["issue_body"], compact_output: true))}</div>
                   </p>
-                  <p :if={hit["issue_url"] && not Enum.member?(["merged", "requested"], hit["verb"])} class="text-xs text-gray-400 dark:text-gray-500">
+                  <p
+                    :if={hit["issue_url"] && not Enum.member?(["merged", "requested"], hit["verb"])}
+                    class="text-xs text-gray-400 dark:text-gray-500"
+                  >
                     <img
                       class="rounded-full float-left mr-2"
                       src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: hit["github_user_avatar"])}
@@ -200,7 +208,11 @@ defmodule MemexWeb.Timeline do
                   :if={hit["provider"] === "Arc"}
                   class="flex cursor-pointer"
                   phx-click="open-sidebar"
-                  phx-value-type={if hit["verb"] === "visited" do "visit" else "activity" end}
+                  phx-value-type={if hit["verb"] === "visited" do
+                    "visit"
+                  else
+                    "activity"
+                  end}
                   phx-value-id={"#{hit["id"]}"}
                 >
                   <div :if={hit["verb"] === "visited"} class="flex-grow truncate">

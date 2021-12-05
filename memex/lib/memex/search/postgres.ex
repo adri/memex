@@ -89,7 +89,8 @@ defmodule Memex.Search.Postgres do
       {"created_at_within", date}, q ->
         from(q in q,
           where:
-            q.created_at <= ^date and fragment("? -> 'timestamp_start_utc' >= ?", q.body, ^date)
+            q.created_at >= ^date and
+              fragment("(? ->> 'timestamp_start_utc')::timestamp <= ?", q.body, ^date)
         )
 
       {key, name}, q ->
