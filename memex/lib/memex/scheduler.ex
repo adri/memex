@@ -1,5 +1,6 @@
 defmodule Memex.Scheduler do
   alias Memex.Importers.GithubImporter
+  alias Memex.Importers.SafariImporter
 
   use GenServer
 
@@ -21,6 +22,7 @@ defmodule Memex.Scheduler do
   defp run() do
     IO.inspect("Running importer", label: "scheduler")
     GithubImporter.import()
+    SafariImporter.import()
   end
 
   defp schedule() do
