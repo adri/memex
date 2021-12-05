@@ -15,5 +15,6 @@ tasks:
       PRINT_ME: "Hello World!"
       POSTGRES_DSN: "postgresql://postgres:memex@localhost:65432/memex"
     command: |
+      cd memex
       docker-compose up -d
       iex -S mix phx.server
