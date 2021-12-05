@@ -11,9 +11,13 @@ defmodule MemexWeb.Components.Badge do
   def render(assigns) do
     ~F"""
     <button
-    :on-click={@click}
-    :values={@values}
-    class={"bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-md", @class}>
+      :on-click={@click}
+      :values={@values}
+      class={
+        "bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded-md",
+        @class
+      }
+    >
       <#slot name="icon" />
       <#slot />
     </button>
