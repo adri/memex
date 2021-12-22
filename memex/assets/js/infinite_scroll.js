@@ -26,6 +26,11 @@ export const InfiniteScroll = {
     this.observer.unobserve(this.el);
   },
   updated() {
+    if (this.el.dataset.query && this.el.dataset.query != this.query) {
+      document.body.scrollTo(0, 0);
+    }
+
+    this.query = this.el.dataset.query;
     this.pending = this.page();
   },
 };

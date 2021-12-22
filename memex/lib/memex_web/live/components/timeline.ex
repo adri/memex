@@ -326,6 +326,7 @@ defmodule MemexWeb.Timeline do
         id="loader"
         phx-hook="InfiniteScroll"
         data-page={"#{@page}"}
+        data-query={"#{@query}"}
         date-load-more="load_more"
       />
     </div>
