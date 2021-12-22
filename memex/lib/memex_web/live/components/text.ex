@@ -24,7 +24,7 @@ defmodule MemexWeb.Components.Text do
     slot default
     def render(assigns) do
       ~F"""
-      <p class="dark:text-gray-300"><#slot /></p>
+      <p class="dark:text-gray-400"><#slot /></p>
       """
     end
   end
