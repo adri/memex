@@ -122,7 +122,8 @@ defmodule Memex.Search.Postgres do
             'related', ?
           )) FILTER (WHERE ? IS NOT NULL), '[]')", r.type, rd.body, rd.id)
       },
-      group_by: [o.body, o.created_at]
+      group_by: [o.body, o.created_at],
+      order_by: [desc: o.created_at]
     )
   end
 
