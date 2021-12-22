@@ -19,6 +19,12 @@ defmodule MemexWeb.PageLive do
   data total_hits, :number, default: 0
   data sidebars, :list, default: Sidebars.init()
 
+  def mount(_params, _session, socket) do
+    Sidebars.subscribe()
+
+    {:ok, socket}
+  end
+
   @impl true
   def render(assigns) do
     ~F"""
@@ -87,5 +93,9 @@ defmodule MemexWeb.PageLive do
     })
     |> async_query(:dates, [], %{query | select: [facet: "month"]})
     |> async_query(:total_hits, nil, %{query | select: :total_hits})
+  end
+
+  def handle_info(%{event: event, payload: payload}, socket) do
+    handle_event(event, payload, socket)
   end
 end

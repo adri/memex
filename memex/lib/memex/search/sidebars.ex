@@ -4,6 +4,7 @@ defmodule Memex.Search.Sidebars do
   sidebar at the end so that a new one can animate in.
   """
   @closed %{"closed" => true}
+  @topic "sidebars"
 
   def init(), do: append_closed([])
 
@@ -14,6 +15,11 @@ defmodule Memex.Search.Sidebars do
 
   def close_last([%{"closed" => false} = _data]), do: append_closed([])
   def close_last(sidebars), do: append_closed(Enum.drop(sidebars, -2))
+
+  def subscribe(), do: MemexWeb.Endpoint.subscribe(@topic)
+
+  def broadcast_open(sidebar), do:
+    MemexWeb.Endpoint.broadcast(@topic, "open-sidebar", sidebar)
 
   defp append_closed(sidebars), do: sidebars ++ [@closed]
 end

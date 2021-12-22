@@ -20,13 +20,13 @@ defmodule MemexWeb.SidebarsComponent do
       :for.with_index={{hit, index} <- @sidebars}
       id={"sidebar-#{index}"}
       class={
-        "fixed inset-0 transition backdrop-filter backdrop-blur-lg",
+        "fixed inset-0 transition backdrop-filter backdrop-blur-md",
         "backdrop-filter-none pointer-events-none": hit["closed"],
         "bg-black bg-opacity-50": not hit["closed"]
       }
     >
       <div phx-click="close-last-sidebar" class="fixed inset-0 text-white" />
-      <div class={"fixed border-l dark:border-gray-700 dark:bg-gray-800 bg-gray-50 p-5 inset-y-0 right-0 shadow-2xl #{width(index)} overflow-scroll transform transition-transform #{if hit["closed"] do
+      <div class={"fixed border-l dark:border-gray-700 dark:bg-gray-800 bg-gray-50 p-5 inset-y-0 right-0 shadow-2xl #{width(index, length(@sidebars))} overflow-scroll transform transition-transform #{if hit["closed"] do
         "translate-x-full"
       end}"}>
         <button phx-click="close-last-sidebar" aria-label="Close" class="dark:text-white float-right">
@@ -55,8 +55,8 @@ defmodule MemexWeb.SidebarsComponent do
     """
   end
 
-  defp width(index) do
-    case index do
+  defp width(index, length) do
+    case  index do
       0 -> "w-11/12"
       1 -> "w-10/12"
       2 -> "w-9/12"
