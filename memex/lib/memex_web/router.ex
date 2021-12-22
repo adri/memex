@@ -1,5 +1,6 @@
 defmodule MemexWeb.Router do
   use MemexWeb, :router
+  import Surface.Catalogue.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -53,6 +54,7 @@ defmodule MemexWeb.Router do
     scope "/" do
       pipe_through :browser
       live_dashboard "/dashboard", metrics: MemexWeb.Telemetry
+      surface_catalogue("/catalogue")
     end
   end
 end
