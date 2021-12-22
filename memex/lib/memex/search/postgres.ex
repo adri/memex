@@ -8,10 +8,10 @@ defmodule Memex.Search.Postgres do
     from(d in Document)
     |> add_search(query)
     |> add_select(query)
-    |> add_relations(query)
     |> add_filters(prepare_filters(query))
     |> add_limit(query)
     |> add_order_by(query.order_by)
+    |> add_relations(query)
     |> run(query)
     |> format_results(query)
   end
@@ -30,7 +30,7 @@ defmodule Memex.Search.Postgres do
   end
 
   defp add_select(q, %Query{select: :hits_with_highlights} = _query) do
-    from(q in q, select: %{"hit" => q.body})
+    from(q in q, select: q)
   end
 
   defp add_select(q, %Query{select: [facet: "month"]} = _query) do
@@ -112,16 +112,17 @@ defmodule Memex.Search.Postgres do
   end
 
   defp add_relations(q, %Query{select: :hits_with_highlights} = _query) do
-    from(q in q,
-      left_join: r in assoc(q, :relations),
+    from(o in subquery(q),
+      left_join: r in assoc(o, :relations),
       left_join: rd in assoc(r, :source),
-      select_merge: %{
+      select: %{
+        "hit" => o.body,
         "relations" => fragment("COALESCE(json_agg(json_build_object(
             'type', ?,
             'related', ?
           )) FILTER (WHERE ? IS NOT NULL), '[]')", r.type, rd.body, rd.id)
       },
-      group_by: [q.body, q.created_at]
+      group_by: [o.body, o.created_at]
     )
   end
 
@@ -169,8 +170,13 @@ defmodule Memex.Search.Postgres do
     for {k, v} <- hit, into: %{}, do: {k, format_hit_value(v, words)}
   end
 
-  defp format_hit_value(value, words) when is_binary(value),
-    do: String.replace(value, ~r/(#{Enum.join(words, "|")})/i, "<em>\\1</em>")
+  defp format_hit_value(value, words) when is_binary(value) do
+    encoded = words
+    |> Enum.map(&Regex.escape/1)
+    |> Enum.join("|")
+
+    String.replace(value, ~r/(#{encoded})/i, "<em>\\1</em>")
+  end
 
   defp format_hit_value(value, words) when is_list(value),
     do: Enum.map(value, &format_hit_value(&1, words))
