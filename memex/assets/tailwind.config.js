@@ -16,7 +16,7 @@ module.exports = {
       current: "currentColor",
       black: colors.black,
       white: colors.white,
-      gray: { ...colors.zinc, '800': '#2c2b2b'}, // or colors.neutral
+      gray: { ...colors.zinc, '800': '#262728'}, // or colors.neutral
       green: colors.green,
       indigo: colors.indigo,
       red: colors.rose,
