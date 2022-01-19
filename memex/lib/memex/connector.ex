@@ -14,4 +14,11 @@ defmodule Memex.Connector do
       {:ok, Enum.map(rows, &Jason.decode!(&1))}
     end
   end
+
+  def cmd(command, args \\ []) do
+    case System.cmd(command, args) do
+      {result, 0} -> {:ok, result}
+      {result, exit_status} -> {:error, result, exit_status}
+    end
+  end
 end

@@ -48,7 +48,6 @@ defmodule MemexWeb.Sidebars.SettingsLive do
     """
   end
 
-
   @impl true
   def handle_event("open-sidebar", sidebar, socket) do
     Sidebars.broadcast_open(sidebar)

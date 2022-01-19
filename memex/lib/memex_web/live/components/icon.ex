@@ -1,6 +1,7 @@
 defmodule MemexWeb.Components.Icon do
   defmodule Plus do
     use Surface.Component
+
     def render(assigns) do
       ~F"""
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -16,6 +17,7 @@ defmodule MemexWeb.Components.Icon do
 
   defmodule Settings do
     use Surface.Component
+
     def render(assigns) do
       ~F"""
       <svg
@@ -41,5 +43,4 @@ defmodule MemexWeb.Components.Icon do
       """
     end
   end
-
 end

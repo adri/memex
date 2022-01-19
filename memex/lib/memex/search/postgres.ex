@@ -172,9 +172,10 @@ defmodule Memex.Search.Postgres do
   end
 
   defp format_hit_value(value, words) when is_binary(value) do
-    encoded = words
-    |> Enum.map(&Regex.escape/1)
-    |> Enum.join("|")
+    encoded =
+      words
+      |> Enum.map(&Regex.escape/1)
+      |> Enum.join("|")
 
     String.replace(value, ~r/(#{encoded})/i, "<em>\\1</em>")
   end

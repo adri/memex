@@ -18,8 +18,7 @@ defmodule Memex.Search.Sidebars do
 
   def subscribe(), do: MemexWeb.Endpoint.subscribe(@topic)
 
-  def broadcast_open(sidebar), do:
-    MemexWeb.Endpoint.broadcast(@topic, "open-sidebar", sidebar)
+  def broadcast_open(sidebar), do: MemexWeb.Endpoint.broadcast(@topic, "open-sidebar", sidebar)
 
   defp append_closed(sidebars), do: sidebars ++ [@closed]
 end

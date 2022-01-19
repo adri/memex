@@ -3,6 +3,15 @@ defmodule Memex.Importer do
 
   alias Memex.Repo
   alias Memex.Schema.Document
+  import Memex.Connector
+
+  defmodule Sqlite do
+    defstruct [:location, :query]
+  end
+
+  defmodule Command do
+    defstruct [:command, :arguments]
+  end
 
   def parse_body(""), do: {:error, :no_data}
   def parse_body([]), do: {:error, :no_data}
@@ -12,6 +21,64 @@ defmodule Memex.Importer do
     with {:ok, documents} <- parse_body(list) do
       bulk_upsert_documents(documents)
     end
+  end
+
+  def import(module) do
+    with config <- module.default_config(),
+         # todo: get dynamic config via config(provider)
+         {:ok, result} <- fetch(module, config),
+         {:ok, documents, _invalid} <- transform(module, result),
+         {:ok} <- store(module, documents) do
+      {:ok}
+    end
+  end
+
+  defp fetch(module, config) do
+    case module.fetch(config) do
+      %Sqlite{location: location, query: query} ->
+        sqlite_json(location, query)
+
+      %Command{command: command, arguments: args} ->
+        cmd(command, args)
+
+      _ ->
+        {:error, :unkown_fetch_type}
+    end
+  end
+
+  defp transform(module, result) do
+    fields = module.__schema__(:fields)
+
+    result =
+      if function_exported?(module, :transform, 1) do
+        module.transform(result)
+      else
+        result
+      end
+
+    documents =
+      result
+      |> Enum.map(fn item -> Ecto.Changeset.cast(struct(module), item, fields) end)
+
+    valid =
+      documents
+      |> Enum.filter(fn document -> document.valid? end)
+      |> Enum.map(fn document -> document.changes end)
+
+    invalid =
+      documents
+      |> Enum.filter(fn document -> not document.valid? end)
+
+    {:ok, valid, invalid}
+  end
+
+  defp store(module, documents) do
+    documents
+    # |> IO.inspect(label: "74")
+    |> Enum.map(fn document -> [body: document] end)
+    |> bulk_upsert_documents()
+
+    {:ok}
   end
 
   def bulk_upsert_documents(documents) do
