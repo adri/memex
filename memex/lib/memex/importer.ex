@@ -13,6 +13,10 @@ defmodule Memex.Importer do
     defstruct [:command, :arguments]
   end
 
+  defmodule Shell do
+    defstruct [:command]
+  end
+
   def parse_body(""), do: {:error, :no_data}
   def parse_body([]), do: {:error, :no_data}
   def parse_body(list), do: {:ok, list |> Enum.map(&[body: &1])}
@@ -40,6 +44,9 @@ defmodule Memex.Importer do
 
       %Command{command: command, arguments: args} ->
         cmd(command, args)
+
+      %Shell{command: command} ->
+        shell(command)
 
       _ ->
         {:error, :unkown_fetch_type}

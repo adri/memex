@@ -2,6 +2,7 @@ defmodule Memex.Scheduler do
   alias Memex.Importer
   alias Memex.Importers.GithubImporter
   alias Memex.Importers.SafariImporter
+  alias Memex.Importers.Notes
 
   use GenServer
 
@@ -24,7 +25,7 @@ defmodule Memex.Scheduler do
     IO.inspect("Running importer", label: "scheduler")
     GithubImporter.import()
 
-    [SafariImporter.Document, Memex.Importers.FishShell.Document]
+    [SafariImporter.Document, Memex.Importers.FishShell.Document, Notes]
     # todo:
     # - loop all importers
     # - loop all documents of an importer

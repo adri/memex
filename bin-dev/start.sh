@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Start Postgres
 docker compose up -d

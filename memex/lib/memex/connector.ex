@@ -21,4 +21,11 @@ defmodule Memex.Connector do
       {result, exit_status} -> {:error, result, exit_status}
     end
   end
+
+  def shell(command) do
+    case System.shell(command) do
+      {result, 0} -> {:ok, result}
+      {result, exit_status} -> {:error, result, exit_status}
+    end
+  end
 end
