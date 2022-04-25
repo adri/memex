@@ -346,10 +346,10 @@ lilconfig@^2.0.5:
   resolved "https://registry.yarnpkg.com/lilconfig/-/lilconfig-2.0.5.tgz#19e57fd06ccc3848fd1891655b5a447092225b25"
   integrity sha512-xaYmXZtTHPAw5m+xLN8ab9C+3a8YmV3asNSPOATITbtwrfbwaLJj8h66H1WMIpALCkqsIzK3h7oQ+PdX+LQ9Eg==
 
-mapbox-gl@2.7.1:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-2.7.1.tgz#40ed8ed7be6210f521766158cedbce44dff23aea"
-  integrity sha512-7nR+GPWn7Dy60i5mqH/V94Rp+GbSETFEDaDD49RgWYMGywoSQsTGzMDm+sJsegXv3zwSiTuyQtBOj6BwzIyG4w==
+mapbox-gl@2.8.2:
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/mapbox-gl/-/mapbox-gl-2.8.2.tgz#d1e68536878018645ba484e434cea00b5b3ab7f8"
+  integrity sha512-73TgEQlh15TF1UeYhej9Tz1iU4ZhuxIwM6t+e6MxaA7Mu9vqUCZc1kZtZRAXrVeMcDHBSO6gUUjeDBOnsUZVmQ==
   dependencies:
     "@mapbox/geojson-rewind" "^0.5.1"
     "@mapbox/geojson-types" "^1.0.2"
