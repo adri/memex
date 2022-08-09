@@ -28,4 +28,17 @@ defmodule Memex.Connector do
       {result, exit_status} -> {:error, result, exit_status}
     end
   end
+
+  def json_file(path, compresed) do
+    path
+    |> File.stream!(
+      if compresed do
+        [:compressed]
+      else
+        []
+      end
+    )
+    |> Enum.into("")
+    |> Jason.decode()
+  end
 end

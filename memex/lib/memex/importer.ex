@@ -17,6 +17,14 @@ defmodule Memex.Importer do
     defstruct [:command]
   end
 
+  defmodule JsonEndpoint do
+    defstruct [:url, :headers]
+  end
+
+  defmodule JsonFile do
+    defstruct [:location, :compressed]
+  end
+
   def parse_body(""), do: {:error, :no_data}
   def parse_body([]), do: {:error, :no_data}
   def parse_body(list), do: {:ok, list |> Enum.map(&[body: &1])}
@@ -31,7 +39,7 @@ defmodule Memex.Importer do
     with config <- module.default_config(),
          # todo: get dynamic config via config(provider)
          {:ok, result} <- fetch(module, config),
-         {:ok, documents, _invalid} <- transform(module, result),
+         {:ok, documents, _invalid} <- transform(module, result, config),
          {:ok} <- store(module, documents) do
       {:ok}
     end
@@ -48,17 +56,31 @@ defmodule Memex.Importer do
       %Shell{command: command} ->
         shell(command)
 
+      %JsonEndpoint{url: url, headers: headers} ->
+        response = Tesla.get!(url, headers: headers)
+        {:ok, Jason.decode!(response.body)}
+
+      %JsonFile{location: location, compressed: compressed} ->
+        json_file(location, compressed)
+
       _ ->
         {:error, :unkown_fetch_type}
     end
   end
 
-  defp transform(module, result) do
+  defp transform(module, result, config) do
     fields = module.__schema__(:fields)
 
     result =
       if function_exported?(module, :transform, 1) do
         module.transform(result)
+      else
+        result
+      end
+
+    result =
+      if function_exported?(module, :transform, 2) do
+        module.transform(result, config)
       else
         result
       end
@@ -79,7 +101,7 @@ defmodule Memex.Importer do
     {:ok, valid, invalid}
   end
 
-  defp store(module, documents) do
+  defp store(_module, documents) do
     documents
     # |> IO.inspect(label: "74")
     |> Enum.map(fn document -> [body: document] end)
