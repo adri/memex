@@ -65,6 +65,16 @@ defmodule MemexWeb.PageLive do
   def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
     query =
       Query.from_string(string)
+      |> Query.remove_filter("time")
+      |> Query.add_filter(data["key"], data["value"])
+      |> Query.to_string()
+
+    {:noreply, socket |> assign(query: query, page: 1) |> search()}
+  end
+
+  def handle_event("filter-reset", data, socket) do
+    query =
+      Query.from_string("")
       |> Query.add_filter(data["key"], data["value"])
       |> Query.to_string()
 
