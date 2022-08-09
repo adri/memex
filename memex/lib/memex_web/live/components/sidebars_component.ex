@@ -22,7 +22,7 @@ defmodule MemexWeb.SidebarsComponent do
       class={
         "fixed inset-0 transition backdrop-filter backdrop-blur-md",
         "backdrop-filter-none pointer-events-none": hit["closed"],
-        "bg-black bg-opacity-50": not hit["closed"]
+        "bg-black/50": not hit["closed"]
       }
     >
       <div phx-click="close-last-sidebar" class="fixed inset-0 text-white" />

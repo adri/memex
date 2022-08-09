@@ -1,15 +1,13 @@
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  mode: "jit",
-  purge: [
+  content: [
     "../lib/**/*.ex",
     "../lib/**/*.leex",
     "../lib/**/*.heex",
     "../lib/**/*.eex",
     "./js/**/*.js",
   ],
-  darkMode: "media", // false or 'media' or 'class'
   theme: {
     colors: {
       transparent: "transparent",
@@ -22,9 +20,6 @@ module.exports = {
       red: colors.rose,
       yellow: colors.amber,
     },
-    extend: {},
-  },
-  variants: {
     extend: {},
   },
   plugins: [],
