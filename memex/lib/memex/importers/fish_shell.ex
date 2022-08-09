@@ -8,62 +8,60 @@ defmodule Memex.Importers.FishShell do
   - how documents are fetched, validated, stored and displayed
   """
 
-  defmodule Document do
-    use Ecto.Schema
+  use Ecto.Schema
 
-    @primary_key false
-    schema "document" do
-      field :provider, :string
-      field :verb, :string
-      field :id, :string
-      field :date_month, :string
-      field :timestamp_utc, :string
-      field :timestamp_unix, :integer
-      field :command, :string
-    end
+  @primary_key false
+  schema "document" do
+    field :provider, :string
+    field :verb, :string
+    field :id, :string
+    field :date_month, :string
+    field :timestamp_utc, :string
+    field :timestamp_unix, :integer
+    field :command, :string
+  end
 
-    def default_config() do
+  def default_config() do
+    %{
+      schedule: :watcher
+    }
+  end
+
+  def fetch(config) do
+    %Importer.Command{
+      command: "fish",
+      arguments: ["--command=history --show-time='<-SNIP->%s-;-%F %T-;-%Y-%m-;-'"]
+    }
+  end
+
+  def transform(result) do
+    result
+    |> String.split("<-SNIP->")
+    |> Enum.map(&String.split(&1, "-;-"))
+    |> Enum.filter(&(&1 != [""]))
+    |> Enum.map(fn [timestamp_unix, timestamp_utc, date_month, command] ->
       %{
-        schedule: :watcher
+        id: "terminal-#{Base.encode16(:crypto.hash(:sha256, timestamp_unix <> command))}",
+        verb: "commanded",
+        provider: "terminal",
+        timestamp_unix: timestamp_unix,
+        timestamp_utc: timestamp_utc,
+        date_month: date_month,
+        command: String.trim(command)
       }
-    end
+    end)
+  end
 
-    def fetch(config) do
-      %Importer.Command{
-        command: "fish",
-        arguments: ["--command=history --show-time='<-SNIP->%s-;-%F %T-;-%Y-%m-;-'"]
-      }
-    end
+  defmodule TimeLineItem do
+    use Surface.Component
 
-    def transform(result) do
-      result
-      |> String.split("<-SNIP->")
-      |> Enum.map(&String.split(&1, "-;-"))
-      |> Enum.filter(&(&1 != [""]))
-      |> Enum.map(fn [timestamp_unix, timestamp_utc, date_month, command] ->
-        %{
-          id: "terminal-#{Base.encode16(:crypto.hash(:sha256, timestamp_unix <> command))}",
-          verb: "commanded",
-          provider: "terminal",
-          timestamp_unix: timestamp_unix,
-          timestamp_utc: timestamp_utc,
-          date_month: date_month,
-          command: String.trim(command)
-        }
-      end)
-    end
+    prop doc, :map, required: true
+    prop highlighted, :map
 
-    defmodule TimeLineItem do
-      use Surface.Component
-
-      prop doc, :map, required: true
-      prop highlighted, :map
-
-      def render(assigns) do
-        ~F"""
-        <div></div>
-        """
-      end
+    def render(assigns) do
+      ~F"""
+      <div></div>
+      """
     end
   end
 end
