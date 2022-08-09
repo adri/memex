@@ -76,6 +76,15 @@ defmodule Memex.Search.Postgres do
       {"date", date}, q ->
         from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm-dd') = ?", q, ^date))
 
+      {"time", time}, q ->
+        case DateTime.from_iso8601(time) do
+          {:ok, parsed, _} ->
+            from(q in q, where: fragment("?.created_at <= ?", q, ^parsed))
+
+          {:error, _error} ->
+            q
+        end
+
       {"person_name", name}, q ->
         from(q in q,
           where:
