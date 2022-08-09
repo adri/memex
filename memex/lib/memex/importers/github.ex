@@ -1,44 +1,40 @@
-defmodule Memex.Importers.GithubImporter do
+defmodule Memex.Importers.Github do
+  @moduledoc """
+  [Github Event Documentation](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types)
+  """
   @provider_id "github"
   @defaults %{"provider" => "GitHub"}
   @ignore_item %{}
 
   alias Memex.Importer
 
-  @doc """
-  [Github Event Documentation](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types)
-  """
-  def import() do
-    # todo: support full and incremental import?
-    # todo: return stream for speed and memory use?
-    config = config()
+  use Ecto.Schema
 
-    fetch(config)
-    |> parse(config)
-    |> Importer.bulk_upsert_documents()
+  @primary_key false
+  schema "document" do
+    field :provider, :string
+    field :verb, :string
+    field :id, :string
+    field :date_month, :string
+    field :timestamp_utc, :string
+    field :timestamp_unix, :integer
+    field :issue_title, :string
+    field :issue_body, :string
+    field :issue_url, :string
+    field :review_body, :string
+    field :review_state, :string
+    field :review_url, :string
+    field :comment_body, :string
+    field :comment_url, :string
+    field :github_user_name, :string
+    field :github_user_avatar, :string
   end
 
-  def fetch(config) do
-    feed = fetch_feed(config["username"], config["access_token"])
-
-    Jason.decode!(feed.body)
-  end
-
-  def parse(items, config) do
-    items
-    |> Enum.filter(fn event -> not Enum.member?(config["ignore_repos"], event["repo"]["name"]) end)
-    |> Enum.map(&parse_item(&1))
-    |> Enum.filter(&match?(%{"verb" => _}, &1))
-    |> Enum.map(&[body: &1])
-  end
-
-  defp config() do
-    # todo:
-    # - make typed config? So it can generate a UI to edit it?
-    # - files to watch or auto-watch files
+  def default_config() do
     Map.merge(
       %{
-        "username" => "",
+        "user_name" => "",
+        "page" => 1,
         "access_token" => "",
         "ignore_repos" => ["adri/notes"]
       },
@@ -46,19 +42,24 @@ defmodule Memex.Importers.GithubImporter do
     )
   end
 
-  defp fetch_feed(username, access_token, page \\ 1) do
-    # Todo: Pagination:
-    # Link: <https://api.github.com/resource?page=2>; rel="next",
-    #       <https://api.github.com/resource?page=5>; rel="last"
-
-    Tesla.get!(
-      "https://api.github.com/users/#{username}/events?page=#{page}",
+  def fetch(config) do
+    %Importer.JsonEndpoint{
+      url: "https://api.github.com/users/#{config["user_name"]}/events?page=#{config["page"]}",
       headers: [
         {"Accept", "application/vnd.github.v3+json"},
         {"User-Agent", "curl/7.64.1"},
-        {"Authorization", "Basic #{Base.encode64("#{username}:#{access_token}")}"}
+        {"Authorization",
+         "Basic #{Base.encode64("#{config["user_name"]}:#{config["access_token"]}")}"}
       ]
-    )
+    }
+  end
+
+  def transform(result, config) do
+    result
+    |> Enum.filter(fn event -> not Enum.member?(config["ignore_repos"], event["repo"]["name"]) end)
+    |> Enum.map(&parse_item(&1))
+    |> Enum.filter(&match?(%{"verb" => _}, &1))
+    |> IO.inspect(label: "62")
   end
 
   defp parse_item(item) do
