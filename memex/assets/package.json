@@ -3,7 +3,7 @@
      "deploy": "NODE_ENV=production tailwindcss --postcss --minify -i css/app.css -o ../priv/static/assets/app.css"
    },
    "dependencies": {
-      "mapbox-gl": "2.8.2"
+      "mapbox-gl": "2.9.2"
    },
    "devDependencies": {
      "autoprefixer": "^10.4.7",
