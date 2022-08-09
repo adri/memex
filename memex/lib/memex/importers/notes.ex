@@ -53,7 +53,6 @@ defmodule Memex.Importers.Notes do
         commit_sha: sha1,
         commit_diff: String.replace(diff, "\\\n\\\\ No newline at end of file", "")
       }
-      |> IO.inspect(label: "55")
     end)
   end
 
