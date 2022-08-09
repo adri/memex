@@ -14,7 +14,7 @@ defmodule Memex.Search.Query do
 
   def add_filter(query, key, value), do: put_in(query.filters[key], value)
 
-  def add_sort(query, sort), do: pop_in(query.sort, sort)
+  def remove_filter(query, key), do: elem(pop_in(query.filters[key]), 1)
 
   def select(query, select), do: put_in(query.select, select)
 
