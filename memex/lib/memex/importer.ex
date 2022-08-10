@@ -6,7 +6,7 @@ defmodule Memex.Importer do
   import Memex.Connector
 
   defmodule Sqlite do
-    defstruct [:location, :query]
+    defstruct [:location, :query, :setup]
   end
 
   defmodule Command do
@@ -39,16 +39,17 @@ defmodule Memex.Importer do
     with config <- module.default_config(),
          # todo: get dynamic config via config(provider)
          {:ok, result} <- fetch(module, config),
-         {:ok, documents, _invalid} <- transform(module, result, config),
+         {:ok, documents, invalid} <- transform(module, result, config),
+         # todo: keep fetching until items show up that are already stored
          {:ok} <- store(module, documents) do
-      {:ok}
+      {:ok, documents, invalid}
     end
   end
 
   defp fetch(module, config) do
     case module.fetch(config) do
-      %Sqlite{location: location, query: query} ->
-        sqlite_json(location, query)
+      %Sqlite{location: location, query: query, setup: setup} ->
+        sqlite_json(location, query, [], setup)
 
       %Command{command: command, arguments: args} ->
         cmd(command, args)

@@ -52,7 +52,7 @@ defmodule Memex.MixProject do
       {:ecto_sql, "~> 3.4"},
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
-      {:exqlite, "~> 0.7.5"},
+      {:exqlite, "~> 0.11.3"},
       {:finch, "~> 0.8.2"},
       {:floki, ">= 0.27.0", only: :test},
       {:gettext, "~> 0.11"},

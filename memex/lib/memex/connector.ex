@@ -2,16 +2,26 @@ defmodule Memex.Connector do
   alias Exqlite.Basic, as: Sqlite3
   alias Exqlite.Connection
 
-  def sqlite(path, query, args \\ []) do
-    with {:ok, conn} <- Connection.connect(database: path, journal_mode: :wal),
-         {:ok, rows, _columns} <- Sqlite3.exec(conn, query, args) |> Sqlite3.rows() do
-      {:ok, rows}
+  def sqlite_json(path, query, args \\ [], setup \\ []) do
+    with {:ok, conn} <- Connection.connect(database: path, journal_mode: :wal, mode: :readonly),
+         {:ok, _} <- sqlite_queries(conn, setup),
+         {:ok, rows} <- sqlite_query(conn, query, args) do
+      {:ok, Enum.map(rows, &Jason.decode!(&1))}
     end
   end
 
-  def sqlite_json(path, query, args \\ []) do
-    with {:ok, rows} <- sqlite(path, query, args) do
-      {:ok, Enum.map(rows, &Jason.decode!(&1))}
+  defp sqlite_queries(conn, queries) do
+    Enum.reduce_while(queries, {:ok, []}, fn query, {:ok, acc} ->
+      case sqlite_query(conn, query) do
+        {:ok, rows} -> {:cont, {:ok, [rows | acc]}}
+        {:error, _} = err -> {:halt, err}
+      end
+    end)
+  end
+
+  defp sqlite_query(conn, query, args \\ []) do
+    with {:ok, rows, _columns} <- Sqlite3.rows(Sqlite3.exec(conn, query, args)) do
+      {:ok, rows}
     end
   end
 

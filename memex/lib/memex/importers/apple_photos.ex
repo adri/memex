@@ -13,12 +13,12 @@ defmodule Memex.Importers.ApplePhotos do
     field(:photo_file_path, :string)
     field(:photo_file_name, :string)
     field(:photo_kind, :string)
-    field(:photo_labels, :string)
-    field(:place_name, :string)
-    field(:person_id, :string)
-    field(:person_name, :string)
-    field(:location_latitude, :string)
-    field(:location_longitude, :string)
+    field(:photo_labels, {:array, :string})
+    field(:place_name, {:array, :string})
+    field(:person_id, {:array, :string})
+    field(:person_name, {:array, :string})
+    field(:location_latitude, :float)
+    field(:location_longitude, :float)
     field(:device_name, :string)
   end
 
@@ -30,14 +30,16 @@ defmodule Memex.Importers.ApplePhotos do
   end
 
   def fetch(config) do
-    config.location |> IO.inspect(label: "34")
-
     %Importer.Sqlite{
       location: "#{config.location}/database/Photos.sqlite",
+      setup: [
+        """
+        -- Machine learning metadata information from psi.sqlite
+        ATTACH DATABASE '#{config.location}/database/search/psi.sqlite' as psi;
+        """
+      ],
       query: """
-      -- Machine learning metadata information from psi.sqlite
-      -- The set UUID is split into two integers (uuid_0, uuid_1) and needs to be converted manually.
-      ATTACH DATABASE '#{config.location}/database/search/psi.sqlite}' as psi;
+      -- The UUID is split into two integers (uuid_0, uuid_1) in 'psi' and needs to be converted manually.
       WITH metadata AS (
           SELECT
               substr(printf('%p', assets.uuid_0), 15, 2)
@@ -108,14 +110,24 @@ defmodule Memex.Importers.ApplePhotos do
       LEFT JOIN ZEXTENDEDATTRIBUTES ON ZEXTENDEDATTRIBUTES.ZASSET = ZASSET.Z_PK
       LEFT JOIN ZDETECTEDFACE ON ZDETECTEDFACE.ZASSET = ZASSET.Z_PK
       LEFT JOIN ZPERSON ON ZDETECTEDFACE.ZPERSON = ZPERSON.Z_PK
-      JOIN metadata ON ZASSET.ZUUID=metadata.uuid
+      LEFT JOIN metadata ON ZASSET.ZUUID=metadata.uuid
       GROUP BY ZASSET.Z_PK
+      LIMIT 200
       """
     }
   end
 
   def transform(result, _config) do
     result
+    |> Enum.map(fn item ->
+      %{
+        item
+        | "place_name" => Enum.reject(item["place_name"] || [], fn x -> x in ["", nil] end),
+          "photo_labels" => Enum.reject(item["photo_labels"] || [], fn x -> x in ["", nil] end),
+          "person_id" => Enum.reject(item["person_id"] || [], fn x -> x in ["", nil] end),
+          "person_name" => Enum.reject(item["person_name"] || [], fn x -> x in ["", nil] end)
+      }
+    end)
     |> IO.inspect(label: "62")
   end
 
@@ -171,11 +183,3 @@ end
 # 2055: favorites
 
 # sqlite3 -readonly "$PHOTOS_DB_PATH" "
-
-# " \
-# | jq -s -c '. | map(. + {
-#     place_name: .place_name | map(select(. != null)),
-#     person_name: .person_name | map(select(. != "" and . != null)),
-#     person_id: .person_id | map(select(. != null)),
-# })' \
-# | jq -c -r '.[]'

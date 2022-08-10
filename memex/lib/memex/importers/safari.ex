@@ -1,13 +1,6 @@
 defmodule Memex.Importers.Safari do
   alias Memex.Importer
 
-  """
-  Each importer defines:
-  - the data structure of one or more documents
-  - fetch configuration options
-  - how documents are fetched, validated, stored and displayed
-  """
-
   use Ecto.Schema
 
   @primary_key false
