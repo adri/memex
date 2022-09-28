@@ -26,6 +26,7 @@ defmodule Memex.Importers.Safari do
   def fetch(config) do
     %Importer.Sqlite{
       location: config.location,
+      setup: [],
       query: """
       SELECT
           json_object(
@@ -46,7 +47,7 @@ defmodule Memex.Importers.Safari do
           history_visits.id
       ORDER BY
           history_visits.visit_time DESC
-      LIMIT 1000
+      LIMIT 10000
       """
     }
   end

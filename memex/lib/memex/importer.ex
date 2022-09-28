@@ -6,7 +6,7 @@ defmodule Memex.Importer do
   import Memex.Connector
 
   defmodule Sqlite do
-    defstruct [:location, :query, :setup]
+    defstruct [:location, :query, setup: []]
   end
 
   defmodule Command do
@@ -104,7 +104,6 @@ defmodule Memex.Importer do
 
   defp store(_module, documents) do
     documents
-    # |> IO.inspect(label: "74")
     |> Enum.map(fn document -> [body: document] end)
     |> bulk_upsert_documents()
 
