@@ -15,9 +15,9 @@ defmodule MemexWeb.Timeline.Card do
   def render(assigns) do
     ~F"""
     <div class={"#{@class} flex-grow rounded-md bg-white dark:bg-gray-900 hover:shadow-lg hover:pt-3 hover:pb-5 hover:ring-gray-700 hover:ring-2 cursor-pointer transition-all p-4 my-2 shadow-md overflow-hidden dark:text-white"}>
-      <div class="float-right"><#slot name="right" /></div>
-      <div class="float-left"><#slot name="media" /></div>
-      <#slot name="content" />
+      <div class="float-right"><#slot {@right} /></div>
+      <div class="float-left"><#slot {@media} /></div>
+      <#slot {@content} />
     </div>
     """
   end

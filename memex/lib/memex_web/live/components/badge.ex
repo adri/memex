@@ -18,7 +18,7 @@ defmodule MemexWeb.Components.Badge do
         @class
       }
     >
-      <#slot name="icon" />
+      <#slot {@icon} />
       <#slot />
     </button>
     """
