@@ -64,7 +64,7 @@ defmodule Memex.Importers.Notes do
 
     def render(assigns) do
       ~F"""
-      <div></div>
+      <div />
       """
     end
   end

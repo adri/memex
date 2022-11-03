@@ -60,7 +60,7 @@ defmodule Memex.Importers.FishShell do
 
     def render(assigns) do
       ~F"""
-      <div></div>
+      <div />
       """
     end
   end

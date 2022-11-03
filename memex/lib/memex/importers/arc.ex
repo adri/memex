@@ -107,7 +107,7 @@ defmodule Memex.Importers.Arc do
 
     def render(assigns) do
       ~F"""
-      <div></div>
+      <div />
       """
     end
   end
