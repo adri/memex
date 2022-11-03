@@ -10,6 +10,7 @@ defmodule MemexWeb.Timeline do
 
   prop query, :string, default: ""
   prop page, :number, default: 1
+  prop selected_index, :number, default: 0
   prop items, :list, required: true
   prop enable_load_more, :boolean, default: false
   prop class, :css_class, default: "ml-12"
@@ -55,7 +56,7 @@ defmodule MemexWeb.Timeline do
             <VerticalLine class={"#{timeline_classes(@items, hit, index)}"} />
             <Time date={date(hit["timestamp_unix"])} />
             <ProviderIcon provider={hit["provider"]} />
-            <Card class="ml-2">
+            <Card class="ml-2" selected={index === @selected_index}>
               <:content>
                 <a
                   :if={hit["provider"] === "Safari"}

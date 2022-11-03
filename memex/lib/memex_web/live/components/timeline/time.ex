@@ -9,7 +9,8 @@ defmodule MemexWeb.Timeline.Time do
       phx-click="filter-reset"
       phx-value-key="time"
       phx-value-value={"\"#{to_iso(@date)}\""}
-      class="flex-none cursor-pointer self-center text-right text-gray-400 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5">
+      class="flex-none cursor-pointer self-center text-right text-gray-400 dark:text-gray-500 text-xs md:text-md -ml-12 md:-ml-32 w-12 md:w-32 pr-5"
+    >
       {to_time(@date)}
     </div>
     """

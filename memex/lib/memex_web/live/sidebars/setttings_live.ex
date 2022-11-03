@@ -20,7 +20,8 @@ defmodule MemexWeb.Sidebars.SettingsLive do
 
       <Text.H2>Integrations</Text.H2>
       <Badge class="text-white bg-gray-900 float-right" click="open-sidebar" values={type: "settings"}>
-        <:icon><Icon.Plus /></:icon> Add new
+        <:icon><Icon.Plus /></:icon>
+        Add new
       </Badge>
       <Text.SubtTitle>Configure integrations and what can be searched for.</Text.SubtTitle>
 

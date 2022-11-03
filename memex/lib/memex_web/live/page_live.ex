@@ -15,6 +15,7 @@ defmodule MemexWeb.PageLive do
   data query, :string, default: ""
   data items, :list, default: []
   data page, :number, default: 1
+  data selected_index, :number, default: 0
   data dates, :list, default: []
   data total_hits, :number, default: 0
   data sidebars, :list, default: Sidebars.init()
@@ -34,12 +35,24 @@ defmodule MemexWeb.PageLive do
         <Badge class="absolute right-2 top-6" click="open-sidebar" values={type: "settings"}>
           <:icon><SettingsIcon /></:icon>
         </Badge>
-        <CloseCircles />
+        <div class="flex items-start">
+          <CloseCircles />
+          <!-- <Memex.Importers.Github.HomepageItem /> -->
+          <div>
+          </div>
+        </div>
       </div>
       <div class="flex items-start">
         <div :if={@query != ""} class="w-4/5 mt-8">
           <SearchResultStats total_hits={@total_hits} />
-          <Timeline query={@query} items={@items} page={@page} class="ml-12 md:ml-20" enable_load_more />
+          <Timeline
+            query={@query}
+            items={@items}
+            selected_index={@selected_index}
+            page={@page}
+            class="ml-12 md:ml-20"
+            enable_load_more
+          />
         </div>
         <div :if={@query != ""} class="w-1/5 overflow-hidden pl-5 text-white">
           <DatesFacet dates={@dates} loading={false} />
@@ -51,16 +64,44 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("search", %{"query" => ""}, socket) do
-    {:noreply, socket |> assign(query: "", page: 1, items: [])}
+    {:noreply, socket |> assign(query: "", page: 1, selected_index: 0, items: [])}
   end
 
   def handle_event("search", %{"query" => query}, socket) do
-    {:noreply, socket |> assign(query: query, page: 1) |> search()}
+    {:noreply, socket |> assign(query: query, selected_index: 0, page: 1) |> search()}
   end
 
   def handle_event("load-more", _, %{assigns: assigns} = socket) do
     {:noreply, socket |> assign(page: assigns.page + 1) |> search()}
   end
+
+  def handle_event("key-pressed", %{"key" => "Enter"}, %{assigns: assigns} = socket) do
+    case Enum.at(assigns.items, assigns.selected_index) do
+      nil ->
+        {:noreply, socket}
+
+      %{"website_url" => url} ->
+        {:reply, %{}, redirect(socket, external: url)}
+
+      _item ->
+        {:noreply, socket}
+    end
+  end
+
+  def handle_event("key-pressed", %{"key" => "ArrowDown"}, %{assigns: assigns} = socket) do
+    assigns.selected_index |> IO.inspect(label: "next")
+
+    {:noreply,
+     socket |> assign(selected_index: min(assigns.selected_index + 1, length(assigns.items)))}
+  end
+
+  def handle_event("key-pressed", %{"key" => "ArrowUp"}, %{assigns: assigns} = socket) do
+    assigns.selected_index |> IO.inspect(label: "prev")
+
+    {:noreply, socket |> assign(selected_index: max(assigns.selected_index - 1, 0))}
+  end
+
+  def handle_event("key-pressed", _, socket), do: {:noreply, socket}
 
   def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
     query =

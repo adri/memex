@@ -23,6 +23,7 @@ defmodule MemexWeb.SearchBar do
             id="search-form"
             phx-change="search"
             phx-submit="search"
+            phx-window-keydown="key-pressed"
             role="search"
             novalidate=""
           >
