@@ -101,7 +101,7 @@ defmodule MemexWeb.Timeline do
                     {raw(hit["_formatted"]["transaction_account_name"])} - {raw(hit["_formatted"]["transaction_purpose"])}
                   </div>
                 </div>
-                <pre :if={hit["provider"] === "terminal"} class="text-sm overflow-scroll"><code>{raw(String.replace(String.trim(hit["_formatted"]["command"]), "\n", "<br />"))}</code></pre>
+                <div :if={hit["provider"] === "terminal"}><Memex.Importers.FishShell.TimelineItem item={hit} /></div>
                 <div :if={hit["provider"] === "Photos"}>
                   <img
                     class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4"

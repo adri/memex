@@ -27,7 +27,7 @@ defmodule Memex.Importers.FishShell do
     }
   end
 
-  def fetch(config) do
+  def fetch(_config) do
     %Importer.Command{
       command: "fish",
       arguments: ["--command=history --show-time='<-SNIP->%s-;-%F %T-;-%Y-%m-;-'"]
@@ -52,16 +52,21 @@ defmodule Memex.Importers.FishShell do
     end)
   end
 
-  defmodule TimeLineItem do
+  defmodule TimelineItem do
     use Surface.Component
 
-    prop doc, :map, required: true
-    prop highlighted, :map
+    alias Phoenix.LiveView.JS
+
+    prop item, :map, required: true
 
     def render(assigns) do
       ~F"""
-      <div />
+      <pre phx-click={open()} class="text-sm overflow-scroll"><code>{raw(String.replace(String.trim(@item["_formatted"]["command"]), "\n", "<br />"))}</code></pre>
       """
+    end
+
+    def open() do
+      JS.dispatch("memex:clipcopy")
     end
   end
 end
