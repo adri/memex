@@ -69,42 +69,7 @@ defmodule MemexWeb.Timeline do
                   </div>
                 </a>
                 <div :if={hit["provider"] === "GitHub"}>
-                  <p class="text-xs text-gray-400 dark:text-gray-500">
-                    {raw(hit["_formatted"]["verb"])} in {raw(hit["_formatted"]["repo_name"])}
-                  </p>
-                  <p :if={hit["comment_body"]} class="mb-2">
-                    {raw(hit["_formatted"]["comment_body"])}
-                  </p>
-                  <p :if={hit["review_body"]} class="mb-2">
-                    <span :if={hit["review_state"] === "approved"}>✅</span>
-
-                    {raw(hit["_formatted"]["review_body"])}
-                  </p>
-                  <p :if={Enum.member?(["merged", "requested"], hit["verb"])} class="mb-2">
-                    <a href={hit["issue_url"]} target="_blank">{raw(hit["_formatted"]["issue_title"])}</a>
-                    <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(hit["_formatted"]["issue_body"], compact_output: true))}</div>
-                  </p>
-                  <p
-                    :if={hit["issue_url"] && not Enum.member?(["merged", "requested"], hit["verb"])}
-                    class="text-xs text-gray-400 dark:text-gray-500"
-                  >
-                    <img
-                      class="rounded-full float-left mr-2"
-                      src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: hit["github_user_avatar"])}
-                      width="16"
-                      height="16"
-                    />
-                    <a href={hit["issue_url"]} target="_blank">{raw(hit["_formatted"]["issue_title"])}</a>
-                  </p>
-
-                  <p :if={hit["repo_description"]} class="text-sm text-gray-400 dark:text-gray-400 truncate">
-                    {raw(hit["_formatted"]["repo_description"])}
-                  </p>
-
-                  <p :if={hit["repo_license"]} class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    <span class="capitalize">{hit["repo_license"]}</span>,
-                    {hit["repo_language"]}, {hit["repo_stars_count"]} stars
-                  </p>
+                  <Memex.Importers.Github.TimelineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "iMessage"}>
                   <div class="text-xs text-gray-400 dark:text-gray-500 truncate">

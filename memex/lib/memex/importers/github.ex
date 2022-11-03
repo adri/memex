@@ -18,6 +18,7 @@ defmodule Memex.Importers.Github do
     field :date_month, :string
     field :timestamp_utc, :string
     field :timestamp_unix, :integer
+    field :repo_name, :string
     field :issue_title, :string
     field :issue_body, :string
     field :issue_url, :string
@@ -154,4 +155,61 @@ defmodule Memex.Importers.Github do
       "github_user_name" => user["login"],
       "github_user_avatar" => user["avatar_url"]
     }
+
+  defmodule TimelineItem do
+    use Surface.Component
+
+    prop item, :map
+
+    def render(assigns) do
+      ~F"""
+      <p class="text-xs text-gray-400 dark:text-gray-500">
+        {raw(@item["_formatted"]["verb"])} in {raw(@item["_formatted"]["repo_name"])} {@item["repo_name"]}
+      </p>
+      <p :if={@item["comment_body"]} class="mb-2">
+        {raw(@item["_formatted"]["comment_body"])}
+      </p>
+      <p :if={@item["review_body"]} class="mb-2">
+        <span :if={@item["review_state"] === "approved"}>✅</span>
+
+        {raw(@item["_formatted"]["review_body"])}
+      </p>
+      <p :if={Enum.member?(["merged", "requested"], @item["verb"])} class="mb-2">
+        <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
+        <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(@item["_formatted"]["issue_body"], compact_output: true))}</div>
+      </p>
+      <p
+        :if={@item["issue_url"] && not Enum.member?(["merged", "requested"], @item["verb"])}
+        class="text-xs text-gray-400 dark:text-gray-500"
+      >
+        <img
+          class="rounded-full float-left mr-2"
+          src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: @item["github_user_avatar"])}
+          width="16"
+          height="16"
+        />
+        <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
+      </p>
+
+      <p :if={@item["repo_description"]} class="text-sm text-gray-400 dark:text-gray-400 truncate">
+        {raw(@item["_formatted"]["repo_description"])}
+      </p>
+
+      <p :if={@item["repo_license"]} class="text-xs text-gray-400 dark:text-gray-500 truncate">
+        <span class="capitalize">{@item["repo_license"]}</span>,
+        {@item["repo_language"]}, {@item["repo_stars_count"]} stars
+      </p>
+      """
+    end
+  end
+
+  defmodule HomepageItem do
+    use Surface.Component
+
+    def render(assigns) do
+      ~F"""
+      test
+      """
+    end
+  end
 end
