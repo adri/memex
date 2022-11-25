@@ -20,12 +20,12 @@ defmodule Memex.Importers.Arc do
     field(:place_longitude, :string)
     field(:place_altitude, :string)
     field(:place_foursquare_venue_id, :string)
-    field(:activity_step_count, :string)
-    field(:activity_floors_ascended, :string)
-    field(:activity_floors_descended, :string)
-    field(:activity_heart_rate_average, :string)
-    field(:activity_heart_rate_max, :string)
-    field(:activity_active_energy_burned, :string)
+    field(:activity_step_count, :integer)
+    field(:activity_floors_ascended, :integer)
+    field(:activity_floors_descended, :integer)
+    field(:activity_heart_rate_average, :float)
+    field(:activity_heart_rate_max, :float)
+    field(:activity_active_energy_burned, :float)
   end
 
   def default_config() do
