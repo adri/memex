@@ -47,6 +47,11 @@ defmodule Memex.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:axon, "~> 0.3.0"},
+      {:axon_onnx, path: "./axon_onnx"},
+      {:bumblebee, "~> 0.1.0"},
+      {:exla, "~> 0.4.0"},
+      {:nx, "~> 0.4.0"},
       {:con_cache, "~> 0.13"},
       {:earmark, "~> 1.4.16"},
       {:ecto_sql, "~> 3.4"},
@@ -58,6 +63,7 @@ defmodule Memex.MixProject do
       {:gettext, "~> 0.11"},
       {:git_diff, "~> 0.6.2"},
       {:hackney, "~> 1.16.0"},
+      {:heroicons, "~> 0.2.2"},
       {:jason, "~> 1.0"},
       {:money, "~> 1.9"},
       {:month, "~> 2.1"},
@@ -68,12 +74,15 @@ defmodule Memex.MixProject do
       {:phoenix, "~> 1.6.0"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, "~> 0.15.9"},
+      {:pgvector, "~> 0.1.0"},
+      {:rustler, ">= 0.0.0", optional: true},
       {:surface, "~> 0.9.0"},
       {:surface_catalogue, "~> 0.5.0"},
       {:surface_formatter, "~> 0.7.5", only: :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},
       {:tesla, "~> 1.4.0"},
+      {:tokenizers, "~> 0.2.0"},
       {:tzdata, "~> 1.0"}
     ]
   end
