@@ -23,11 +23,14 @@ defmodule Memex.Scheduler do
     IO.inspect("Running importer", label: "scheduler")
 
     [
-      Memex.Importers.Safari,
+      Memex.Importers.AppleMessages,
+      Memex.Importers.ApplePhotos,
+      Memex.Importers.ApplePodcasts,
+      Memex.Importers.Arc,
       Memex.Importers.FishShell,
-      Memex.Importers.Notes,
       Memex.Importers.Github,
-      Memex.Importers.Arc
+      Memex.Importers.Notes,
+      Memex.Importers.Safari
     ]
     # todo:
     # - loop all importers

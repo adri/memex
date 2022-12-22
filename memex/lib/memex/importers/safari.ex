@@ -38,11 +38,13 @@ defmodule Memex.Importers.Safari do
               'timestamp_unix', CAST(strftime('%s', datetime(history_visits.visit_time + 978314400, 'unixepoch', 'utc')) AS INT),
               'website_title', history_visits.title,
               'website_url', history_items.URL,
-              'device_name', (CASE origin WHEN 1 THEN 'iPhone 11 Pro' WHEN 0 THEN 'MacBook Pro' END)
+              'device_name', (CASE origin WHEN 1 THEN 'iPhone 11 Pro' WHEN 2 THEN 'iPad' WHEN 0 THEN 'MacBook Pro' END)
           )
       FROM
           history_visits
           INNER JOIN history_items ON history_items.id = history_visits.history_item
+      WHERE
+          history_visits.redirect_destination IS NULL
       GROUP BY
           history_visits.id
       ORDER BY

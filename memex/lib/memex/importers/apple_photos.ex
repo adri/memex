@@ -112,6 +112,7 @@ defmodule Memex.Importers.ApplePhotos do
       LEFT JOIN ZPERSON ON ZDETECTEDFACE.ZPERSON = ZPERSON.Z_PK
       LEFT JOIN metadata ON ZASSET.ZUUID=metadata.uuid
       GROUP BY ZASSET.Z_PK
+      ORDER BY ZASSET.Z_PK DESC
       LIMIT 200
       """
     }
@@ -128,7 +129,6 @@ defmodule Memex.Importers.ApplePhotos do
           "person_name" => Enum.reject(item["person_name"] || [], fn x -> x in ["", nil] end)
       }
     end)
-    |> IO.inspect(label: "62")
   end
 
   defmodule TimeLineItem do

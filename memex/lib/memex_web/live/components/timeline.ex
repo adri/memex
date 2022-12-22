@@ -69,6 +69,9 @@ defmodule MemexWeb.Timeline do
                     {hit["device_name"]}: <a href={hit["website_url"]} target="_blank" class="underline">{raw(hit["_formatted"]["website_url"])}</a>
                   </div>
                 </a>
+                <a :if={hit["provider"] === "Podcasts"} href="#">
+                  <Memex.Importers.ApplePodcasts.TimelineItem item={hit} />
+                </a>
                 <div :if={hit["provider"] === "GitHub"}>
                   <Memex.Importers.Github.TimelineItem item={hit} />
                 </div>
@@ -181,19 +184,7 @@ defmodule MemexWeb.Timeline do
                   end}
                   phx-value-id={"#{hit["id"]}"}
                 >
-                  <div :if={hit["verb"] === "visited"} class="flex-grow truncate">
-                    {raw(hit["_formatted"]["place_name"] || hit["_formatted"]["place_address"])}
-                    <p class="text-xs text-gray-400 dark:text-gray-500">
-                      Spent {MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"])}.
-                      <span :if={hit["place_address"]}>{raw(hit["_formatted"]["place_address"])}</span>
-                    </p>
-                  </div>
-                  <div :if={hit["verb"] === "moved"} class="flex-grow truncate">
-                    Finished {raw(hit["_formatted"]["activity_type"])}
-                    <p class="text-xs text-gray-400 dark:text-gray-500">
-                      {MemexWeb.TimelineView.human_time_between(hit["timestamp_unix"], hit["timestamp_start_unix"])}.
-                    </p>
-                  </div>
+                  <Memex.Importers.Arc.TimelineItem item={hit} />
                 </div>
               </:content>
               <:media>
