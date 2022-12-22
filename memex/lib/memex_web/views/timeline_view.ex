@@ -119,6 +119,9 @@ defmodule MemexWeb.TimelineView do
       "Arc" ->
         "/images/Arc-small.png"
 
+      "Podcasts" ->
+        "/images/Podcasts-small.png"
+
       _ ->
         nil
     end
