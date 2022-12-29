@@ -76,28 +76,26 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("key-pressed", %{"key" => "Enter"}, %{assigns: assigns} = socket) do
-    case Enum.at(assigns.items, assigns.selected_index) do
-      nil ->
-        {:noreply, socket}
+    selected_item = Enum.at(assigns.items, assigns.selected_index)
 
-      %{"website_url" => url} ->
+    cond do
+      selected_item == nil && assigns.total_hits == 0 ->
+        {:noreply, redirect(socket, external: "https://duckduckgo.com/?q=#{assigns.query}")}
+
+      %{"website_url" => url} = selected_item ->
         {:reply, %{}, redirect(socket, external: url)}
 
-      _item ->
+      true ->
         {:noreply, socket}
     end
   end
 
   def handle_event("key-pressed", %{"key" => "ArrowDown"}, %{assigns: assigns} = socket) do
-    assigns.selected_index |> IO.inspect(label: "next")
-
     {:noreply,
      socket |> assign(selected_index: min(assigns.selected_index + 1, length(assigns.items)))}
   end
 
   def handle_event("key-pressed", %{"key" => "ArrowUp"}, %{assigns: assigns} = socket) do
-    assigns.selected_index |> IO.inspect(label: "prev")
-
     {:noreply, socket |> assign(selected_index: max(assigns.selected_index - 1, 0))}
   end
 
