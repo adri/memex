@@ -4,7 +4,10 @@ defmodule Memex.Schema.ImporterConfig do
   @primary_key {:id, :string, autogenerate: false}
 
   schema "importer_config" do
-    field(:config, :map, null: false)
+    field(:provider, :string, null: false)
+    field(:display_name, :string, null: false)
+    field(:encrypted_secrets, Memex.Schema.Encrypted.Map, null: false)
+    field(:config_overwrite, :map, null: false)
     timestamps()
   end
 end

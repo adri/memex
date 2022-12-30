@@ -29,6 +29,30 @@ defmodule Memex.Importer do
   def parse_body([]), do: {:error, :no_data}
   def parse_body(list), do: {:ok, list |> Enum.map(&[body: &1])}
 
+  def available_importers() do
+    with {:ok, list} <- :application.get_key(:memex, :modules) do
+      list
+      |> Enum.filter(&(&1 |> Module.split() |> Enum.take(2) == ~w|Memex Importers|))
+      |> Enum.filter(&(&1 |> function_exported?(:provider, 0)))
+      |> Enum.map(fn module -> {module.provider(), module} end)
+      |> Enum.into(%{})
+    end
+  end
+
+  def configured_importers() do
+    Repo.all(Memex.Schema.ImporterConfig)
+  end
+
+  def create_importer(name, provider, display_name, encrypted_secrets, config_overwrite) do
+    Repo.insert(%Memex.Schema.ImporterConfig{
+      id: name,
+      provider: provider,
+      display_name: display_name,
+      encrypted_secrets: encrypted_secrets,
+      config_overwrite: config_overwrite
+    })
+  end
+
   def insert(list) do
     with {:ok, documents} <- parse_body(list) do
       bulk_upsert_documents(documents)
@@ -124,7 +148,7 @@ defmodule Memex.Importer do
     end
   end
 
-  def config(provider_id) do
-    Repo.get(Memex.Schema.ImporterConfig, provider_id).config
+  def config(id) do
+    Repo.get(Memex.Schema.ImporterConfig, id).config
   end
 end

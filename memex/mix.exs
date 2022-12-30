@@ -49,6 +49,7 @@ defmodule Memex.MixProject do
     [
       {:con_cache, "~> 0.13"},
       {:earmark, "~> 1.4.16"},
+      {:cloak_ecto, "~> 1.2.0"},
       {:ecto_sql, "~> 3.4"},
       {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
