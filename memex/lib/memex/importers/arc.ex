@@ -1,7 +1,7 @@
 defmodule Memex.Importers.Arc do
   alias Memex.Importer
-  use Ecto.Schema
 
+  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -16,10 +16,11 @@ defmodule Memex.Importers.Arc do
     field(:timestamp_start_utc, :string)
     field(:place_name, :string)
     field(:place_address, :string)
-    field(:place_latitude, :string)
-    field(:place_longitude, :string)
-    field(:place_altitude, :string)
+    field(:place_latitude, :float)
+    field(:place_longitude, :float)
+    field(:place_altitude, :float)
     field(:place_foursquare_venue_id, :string)
+    field(:place_foursquare_category_id, :string)
     field(:activity_step_count, :integer)
     field(:activity_floors_ascended, :integer)
     field(:activity_floors_descended, :integer)
@@ -27,6 +28,8 @@ defmodule Memex.Importers.Arc do
     field(:activity_heart_rate_max, :float)
     field(:activity_active_energy_burned, :float)
   end
+
+  def provider(), do: "Arc"
 
   def default_config() do
     %{
@@ -80,13 +83,14 @@ defmodule Memex.Importers.Arc do
   defp parse_item(%{"isVisit" => true} = item) do
     parse_common(item)
     |> Map.merge(%{
-      verb: "visit",
+      verb: "visited",
       place_name: item["place"]["name"],
       place_address: item["place"]["address"],
-      place_latitude: item["place"]["latitude"],
-      place_longitude: item["place"]["longitude"],
-      place_altitude: item["place"]["altitude"],
-      place_foursquare_venue_id: item["place"]["foursquareVenueId"]
+      place_latitude: item["place"]["center"]["latitude"],
+      place_longitude: item["place"]["center"]["longitude"],
+      place_altitude: item["altitude"],
+      place_foursquare_venue_id: item["place"]["foursquareVenueId"],
+      place_foursquare_category_id: item["place"]["foursquareCategoryId"]
     })
   end
 
@@ -99,15 +103,27 @@ defmodule Memex.Importers.Arc do
 
   defp parse_item(_item), do: %{}
 
-  defmodule TimeLineItem do
+  defmodule TimelineItem do
     use Surface.Component
 
-    prop(doc, :map, required: true)
-    prop(highlighted, :map)
+    prop item, :map
 
     def render(assigns) do
       ~F"""
-      <div />
+      <div :if={@item["verb"] === "visited" || @item["verb"] === "visit"} class="flex-grow truncate">
+        {raw(@item["_formatted"]["place_name"] || @item["_formatted"]["place_address"])}
+        <p class="text-xs text-gray-400 dark:text-gray-500">
+          Spent {MemexWeb.TimelineView.human_time_between(@item["timestamp_unix"], @item["timestamp_start_unix"])}.
+          <span :if={@item["place_name"]}>{raw(@item["_formatted"]["place_name"])}</span>
+          <span :if={@item["place_address"]}>{raw(@item["_formatted"]["place_address"])}</span>
+        </p>
+      </div>
+      <div :if={@item["verb"] === "moved"} class="flex-grow truncate">
+        Finished {raw(@item["_formatted"]["activity_type"])}
+        <p class="text-xs text-gray-400 dark:text-gray-500">
+          {MemexWeb.TimelineView.human_time_between(@item["timestamp_unix"], @item["timestamp_start_unix"])}.
+        </p>
+      </div>
       """
     end
   end

@@ -1,15 +1,7 @@
 defmodule Memex.Importers.FishShell do
   alias Memex.Importer
 
-  """
-  Each importer defines:
-  - the data structure of one or more documents
-  - fetch configuration options
-  - how documents are fetched, validated, stored and displayed
-  """
-
   use Ecto.Schema
-
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -20,6 +12,8 @@ defmodule Memex.Importers.FishShell do
     field :timestamp_unix, :integer
     field :command, :string
   end
+
+  def provider(), do: "terminal"
 
   def default_config() do
     %{

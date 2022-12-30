@@ -2,7 +2,6 @@ defmodule Memex.Importers.Notes do
   alias Memex.Importer
 
   use Ecto.Schema
-
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -14,6 +13,8 @@ defmodule Memex.Importers.Notes do
     field :commit_sha, :string
     field :commit_diff, :string
   end
+
+  def provider(), do: "git-notes"
 
   def default_config() do
     %{
@@ -46,7 +47,7 @@ defmodule Memex.Importers.Notes do
       %{
         id: "git-#{sha1}",
         verb: "committed",
-        provider: "git-notes",
+        provider: provider(),
         timestamp_unix: String.to_integer(timestamp_unix),
         timestamp_utc: Calendar.strftime(timestamp, "%Y-%m-%d %H:%M:%S"),
         date_month: Calendar.strftime(timestamp, "%Y-%m"),

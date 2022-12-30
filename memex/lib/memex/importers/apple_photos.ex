@@ -1,7 +1,7 @@
 defmodule Memex.Importers.ApplePhotos do
   alias Memex.Importer
-  use Ecto.Schema
 
+  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -21,6 +21,8 @@ defmodule Memex.Importers.ApplePhotos do
     field(:location_longitude, :float)
     field(:device_name, :string)
   end
+
+  def provider(), do: "Photos"
 
   def default_config() do
     %{

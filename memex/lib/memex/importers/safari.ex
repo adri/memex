@@ -2,7 +2,6 @@ defmodule Memex.Importers.Safari do
   alias Memex.Importer
 
   use Ecto.Schema
-
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -15,6 +14,8 @@ defmodule Memex.Importers.Safari do
     field :website_url, :string
     field :device_name, :string
   end
+
+  def provider(), do: "Safari"
 
   def default_config() do
     %{

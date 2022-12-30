@@ -1,7 +1,7 @@
 defmodule Memex.Importers.ApplePodcasts do
   alias Memex.Importer
-  use Ecto.Schema
 
+  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -25,6 +25,8 @@ defmodule Memex.Importers.ApplePodcasts do
     field(:podcast_category, :string)
     field(:podcast_webpage_url, :string)
   end
+
+  def provider(), do: "Podcasts"
 
   def default_config() do
     %{

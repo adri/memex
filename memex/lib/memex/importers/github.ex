@@ -2,14 +2,13 @@ defmodule Memex.Importers.Github do
   @moduledoc """
   [Github Event Documentation](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types)
   """
-  @provider_id "github"
-  @defaults %{"provider" => "GitHub"}
+  @provider "GitHub"
+  @defaults %{"provider" => @provider}
   @ignore_item %{}
 
   alias Memex.Importer
 
   use Ecto.Schema
-
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -31,6 +30,8 @@ defmodule Memex.Importers.Github do
     field :github_user_avatar, :string
   end
 
+  def provider(), do: @provider
+
   def default_config() do
     Map.merge(
       %{
@@ -39,7 +40,7 @@ defmodule Memex.Importers.Github do
         "access_token" => "",
         "ignore_repos" => ["adri/notes"]
       },
-      Importer.config(@provider_id)
+      Importer.config(@provider)
     )
   end
 
@@ -60,7 +61,6 @@ defmodule Memex.Importers.Github do
     |> Enum.filter(fn event -> not Enum.member?(config["ignore_repos"], event["repo"]["name"]) end)
     |> Enum.map(&parse_item(&1))
     |> Enum.filter(&match?(%{"verb" => _}, &1))
-    |> IO.inspect(label: "62")
   end
 
   defp parse_item(item) do
@@ -77,7 +77,7 @@ defmodule Memex.Importers.Github do
     {:ok, date, _} = DateTime.from_iso8601(item["created_at"])
 
     %{
-      "id" => "#{@provider_id}_" <> item["id"],
+      "id" => "#{@provider}_" <> item["id"],
       "date_month" => Calendar.strftime(date, "%Y-%m"),
       "timestamp_utc" => item["created_at"],
       "timestamp_unix" => DateTime.to_unix(date),
@@ -158,6 +158,7 @@ defmodule Memex.Importers.Github do
 
   defmodule TimelineItem do
     use Surface.Component
+    alias MemexWeb.Router.Helpers, as: Routes
 
     prop item, :map
 

@@ -2,7 +2,6 @@ defmodule Memex.Importers.AppleMessages do
   alias Memex.Importer
 
   use Ecto.Schema
-
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -17,6 +16,8 @@ defmodule Memex.Importers.AppleMessages do
     field :person_name, :string
     field :person_id, :string
   end
+
+  def provider(), do: "iMessage"
 
   def default_config() do
     %{
