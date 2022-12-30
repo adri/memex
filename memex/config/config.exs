@@ -26,7 +26,8 @@ config :memex, ecto_repos: [Memex.Repo]
 config :memex, Memex.Repo,
   url: System.get_env("POSTGRES_DSN"),
   pool_size: 5,
-  timeout: 60_000
+  timeout: 60_000,
+  types: Memex.PostgrexTypes
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 

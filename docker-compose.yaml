@@ -1,13 +1,17 @@
 version: "2.2"
 services:
   postgres:
-    image: postgres:13
+    # image: postgres:13
+    build:
+      dockerfile: ./postgres.Dockerfile
     ports:
       - "65432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=memex
       - POSTGRES_DB=memex
+    networks:
+      - memex1
     volumes:
       - /dev/urandom:/dev/random # Required to get non-blocking entropy source
       - postgres-db:/var/lib/postgresql/data
@@ -23,7 +27,7 @@ services:
           "postgres",
           "-c",
           "select 1",
-          "memex",
+          "memex"
         ]
       interval: 10s
       timeout: 10s
@@ -32,3 +36,7 @@ services:
 
 volumes:
   postgres-db:
+
+
+networks:
+  memex1:

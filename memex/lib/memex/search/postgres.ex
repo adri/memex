@@ -8,6 +8,7 @@ defmodule Memex.Search.Postgres do
     from(d in Document)
     |> add_search(query)
     |> add_select(query)
+    # |> add_vector_search(query)
     |> add_filters(prepare_filters(query))
     |> add_limit(query)
     |> add_order_by(query.order_by)
@@ -27,6 +28,12 @@ defmodule Memex.Search.Postgres do
 
   defp add_search(q, %Query{} = query) do
     from(q in q, where: fragment("? @@ to_tsquery('simple', ?)", q.search, ^to_tsquery(query)))
+  end
+
+  defp add_vector_search(q, %Query{query: ""} = _query), do: q
+
+  defp add_vector_search(q, %Query{} = query) do
+    from(q in q, where: fragment("? <=> ? > 0.6", q.search_embedding, ^to_vector(query)))
   end
 
   defp add_select(q, %Query{select: :hits_with_highlights} = _query) do
@@ -152,6 +159,10 @@ defmodule Memex.Search.Postgres do
     |> Enum.concat(terms)
     |> Enum.join(" & ")
     |> String.trim()
+  end
+
+  defp to_vector(%Query{} = query) do
+    Memex.Ai.SentenceTransformers.embed(query.query)
   end
 
   defp format_results(results, %Query{select: :hits_with_highlights} = query) do

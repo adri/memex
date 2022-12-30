@@ -18,7 +18,11 @@ defmodule Memex.Application do
       {Memex.Repo, []},
       # Start a worker by calling: Memex.Worker.start_link(arg)
       # {Memex.Worker, arg}
-      {Memex.Scheduler, []}
+      {Memex.Scheduler, []},
+      {Nx.Serving,
+       serving: Memex.Ai.SentenceTransformers.serving(),
+       name: Memex.Ai.SentenceTransformers,
+       batch_timeout: 100}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
