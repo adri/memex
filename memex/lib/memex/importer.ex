@@ -1,8 +1,10 @@
 defmodule Memex.Importer do
   @max_records_per_batch 20000
+  @pubsub Memex.PubSub
 
   alias Memex.Repo
   alias Memex.Schema.Document
+  alias Memex.Schema.ImporterLog
   import Memex.Connector
 
   defmodule Sqlite do
@@ -57,20 +59,58 @@ defmodule Memex.Importer do
     })
   end
 
+  def subscribe() do
+    Phoenix.PubSub.subscribe(@pubsub, topic())
+  end
+
+  defp broadcast!(msg) do
+    Phoenix.PubSub.broadcast!(@pubsub, topic(), {__MODULE__, msg})
+  end
+
+  defp topic(), do: "importer:*"
+
   def insert(list) do
     with {:ok, documents} <- parse_body(list) do
       bulk_upsert_documents(documents)
     end
   end
 
-  def import(module) do
-    with config <- module.default_config(),
-         # todo: get dynamic config via config(provider)
-         {:ok, result} <- fetch(module, config),
-         {:ok, documents, invalid} <- transform(module, result, config),
+  def import(config) do
+    {:ok, log} = Repo.insert(%ImporterLog{state: "running", log: "", config_id: config.id})
+    broadcast!(log)
+    dynamic_config = Map.merge(config.config_overwrite, config.encrypted_secrets)
+
+    with {:ok, module} <- get_module(config),
+         merged_config <- module.default_config(dynamic_config),
+         {:fetch, {:ok, result}} <- {:fetch, fetch(module, merged_config)},
+         {:transform, {:ok, documents, invalid}} <-
+           {:transform, transform(module, result, merged_config)},
          # todo: keep fetching until items show up that are already stored
-         {:ok} <- store(module, documents) do
+         {:store, {:ok}} <- {:store, store(module, documents, log)} do
+      log
+      |> Ecto.Changeset.change(%{state: "success", log: Kernel.inspect(invalid)})
+      |> Repo.update!()
+      |> broadcast!()
+
       {:ok, documents, invalid}
+    else
+      {step, error} ->
+        log
+        |> Ecto.Changeset.change(%{state: "error", log: Kernel.inspect(error)})
+        |> Repo.update!()
+        |> broadcast!()
+
+        {:error, step, error}
+    end
+  end
+
+  defp get_module(config) do
+    case available_importers()[config.provider] do
+      nil ->
+        {:error, :no_importer_available}
+
+      module ->
+        {:ok, module}
     end
   end
 
@@ -130,9 +170,9 @@ defmodule Memex.Importer do
     {:ok, valid, invalid}
   end
 
-  defp store(_module, documents) do
+  defp store(_module, documents, log) do
     documents
-    |> Enum.map(fn document -> [body: document] end)
+    |> Enum.map(fn document -> [body: document, importer_log_id: log.id] end)
     |> bulk_upsert_documents()
 
     {:ok}

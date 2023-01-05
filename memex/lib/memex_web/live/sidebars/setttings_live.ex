@@ -1,14 +1,38 @@
 defmodule MemexWeb.Sidebars.SettingsLive do
   use MemexWeb, :surface_live_view
-  alias Memex.Search.Sidebars
+  alias Memex.Search.Query
   alias MemexWeb.Components.Badge
+  alias Memex.Importer
+  alias Memex.Schema.ImporterLog
+  alias Memex.Search.Sidebars
   alias MemexWeb.Components.Text
   alias MemexWeb.Components.Icon
-  alias MemexWeb.Components.Forms.ToggleSwitch
   alias MemexWeb.Timeline.Card
 
-  def mount(params, session, socket) do
-    {:ok, socket}
+  def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Importer.subscribe()
+    end
+
+    {:ok, socket |> fetch_data()}
+  end
+
+  def fetch_data(socket) do
+    importers = Importer.configured_importers()
+
+    socket =
+      Enum.reduce(importers, socket, fn importer, socket ->
+        query = Query.from_string("provider:#{importer.provider}")
+
+        socket
+        |> async_query("total_hits_#{importer.id}", nil, %{query | select: :total_hits})
+      end)
+
+    socket
+    |> assign(
+      importers: importers,
+      logs: ImporterLog.last_imports()
+    )
   end
 
   @impl true
@@ -18,35 +42,45 @@ defmodule MemexWeb.Sidebars.SettingsLive do
       <Text.H1>Settings</Text.H1>
       <Text.SubtTitle>Configure integrations and other settings.</Text.SubtTitle>
 
-      <Text.H2>Integrations</Text.H2>
+      <Text.H2>Importers</Text.H2>
       <Badge class="text-white bg-gray-900 float-right" click="open-sidebar" values={type: "settings"}>
         <:icon><Icon.Plus /></:icon>
         Add new
       </Badge>
-      <Text.SubtTitle>Configure integrations and what can be searched for.</Text.SubtTitle>
+      <Text.SubtTitle>Configure importers and what can be searched for.</Text.SubtTitle>
 
-      <Card>
-        <:media><ToggleSwitch id="github" click="toggle_importer" value={importer: :github} /></:media>
+      <Card :for={importer <- @importers}>
         <:content>
-          Github Events
-          <p class="text-xs dark:text-gray-500">Last import: 2 hours ago</p>
+          {importer.display_name}
+          <p :if={@logs[importer.id]} class="text-xs dark:text-gray-500">{state_to_emoij(@logs[importer.id]["state"])} Last import at {@logs[importer.id]["inserted_at"]}, took {Postgrex.Interval.to_string(@logs[importer.id]["duration"])}
+            <code :if={@logs[importer.id]["log"] != "[]"} class="text-xs dark:text-gray-500">{@logs[importer.id]["log"]}</code>
+            <!-- imported document counts or barchards per week? -->
+            <!-- average duration -->
+            <!-- errors -->
+            <!-- view documents [open another sidebar] -->
+          </p>
         </:content>
         <:right>
-          <Badge click="open-sidebar" values={type: "importer"}><:icon><Icon.Settings /></:icon>Settings</Badge>
+          <button :if={assigns["total_hits_#{importer.id}"]}>
+            {MemexWeb.TimelineView.number_short(assigns["total_hits_#{importer.id}"])} docs
+          </button>
+          <Badge click="import" values={id: importer.id}>
+            <:icon><Icon.Plus /></:icon>
+            Import
+          </Badge>
         </:right>
-      </Card>
-
-      <Card>
-        <:media><ToggleSwitch id="safari" click="toggle_importer" value={importer: :safari} /></:media>
-        <:content>Safari <p class="text-xs dark:text-gray-500">Last import: 2 hours ago</p></:content>
-      </Card>
-
-      <Card>
-        <:media><ToggleSwitch id="photos" click="toggle_importer" value={importer: :photos} /></:media>
-        <:content>Photos <p class="text-xs dark:text-gray-500">Last import: 2 hours ago</p></:content>
       </Card>
     </div>
     """
+  end
+
+  defp state_to_emoij(state) do
+    case state do
+      "success" -> "✅"
+      "error" -> "❌"
+      "running" -> "⏳"
+      _ -> "❓"
+    end
   end
 
   @impl true
@@ -59,4 +93,18 @@ defmodule MemexWeb.Sidebars.SettingsLive do
   def handle_event("toggle_importer", _, socket) do
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_event("import", %{"id" => id}, socket) do
+    config = Enum.find(socket.assigns.importers, &(&1.id == id))
+    Importer.import(config)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({Importer, event}, socket) when not is_nil(event) do
+    {:noreply, fetch_data(socket)}
+  end
+
+  def handle_info({Importer, _}, socket), do: {:noreply, socket}
 end

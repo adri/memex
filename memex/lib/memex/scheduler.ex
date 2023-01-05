@@ -22,16 +22,7 @@ defmodule Memex.Scheduler do
   defp run() do
     IO.inspect("Running importer", label: "scheduler")
 
-    [
-      Memex.Importers.AppleMessages,
-      Memex.Importers.ApplePhotos,
-      Memex.Importers.ApplePodcasts,
-      Memex.Importers.Arc,
-      Memex.Importers.FishShell,
-      Memex.Importers.Github,
-      Memex.Importers.Notes,
-      Memex.Importers.Safari
-    ]
+    Importer.configured_importers()
     # todo:
     # - loop all importers
     # - loop all documents of an importer
