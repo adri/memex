@@ -70,10 +70,10 @@ defmodule MemexWeb.Timeline do
                   </div>
                 </a>
                 <a :if={hit["provider"] === "Podcasts"} href="#">
-                  <Memex.Importers.ApplePodcasts.TimelineItem item={hit} />
+                  <Memex.Importers.ApplePodcasts.TimeLineItem item={hit} />
                 </a>
                 <div :if={hit["provider"] === "GitHub"}>
-                  <Memex.Importers.Github.TimelineItem item={hit} />
+                  <Memex.Importers.Github.TimeLineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "iMessage"}>
                   <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
@@ -86,25 +86,9 @@ defmodule MemexWeb.Timeline do
                   {raw(hit["_formatted"]["message_text"])}
                 </div>
                 <div :if={hit["provider"] === "MoneyMoney"}>
-                  <span class="font-mono">{MemexWeb.TimelineView.number_to_currency(
-                      abs(hit["transaction_amount"]),
-                      hit["transaction_currency"]
-                    )}</span>
-                  {if hit["transaction_amount"] < 0 do
-                    "to "
-                  else
-                    "from "
-                  end}
-                  <span>{raw(hit["_formatted"]["transaction_recipient"])}</span>
-                  <span
-                    :if={hit["_formatted"]["transaction_category"] != ""}
-                    class="float-right rounded-full dark:bg-gray-700 p-2 text-xs"
-                  >{raw(hit["_formatted"]["transaction_category"])}</span>
-                  <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {raw(hit["_formatted"]["transaction_account_name"])} - {raw(hit["_formatted"]["transaction_purpose"])}
-                  </div>
+                  <Memex.Importers.MoneyMoney.TimeLineItem item={hit} />
                 </div>
-                <div :if={hit["provider"] === "terminal"}><Memex.Importers.FishShell.TimelineItem item={hit} /></div>
+                <div :if={hit["provider"] === "terminal"}><Memex.Importers.FishShell.TimeLineItem item={hit} /></div>
                 <div :if={hit["provider"] === "Photos"}>
                   <img
                     class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4"
@@ -199,7 +183,7 @@ defmodule MemexWeb.Timeline do
                   )}
                 />
                 <img
-                  :if={hit["verb"] === "visited"}
+                  :if={hit["verb"] === "visited" and hit["place_latitude"] != nil and hit["place_longitude"] != nil}
                   class="object-cover h-24 w-24 -m-4 rounded-l mr-4"
                   width="82"
                   height="82"
