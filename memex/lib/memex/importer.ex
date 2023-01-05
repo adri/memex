@@ -33,6 +33,10 @@ defmodule Memex.Importer do
     with {:ok, list} <- :application.get_key(:memex, :modules) do
       list
       |> Enum.filter(&(&1 |> Module.split() |> Enum.take(2) == ~w|Memex Importers|))
+      |> Enum.map(fn module ->
+        {:module, module} = Code.ensure_loaded(module)
+        module
+      end)
       |> Enum.filter(&(&1 |> function_exported?(:provider, 0)))
       |> Enum.map(fn module -> {module.provider(), module} end)
       |> Enum.into(%{})
