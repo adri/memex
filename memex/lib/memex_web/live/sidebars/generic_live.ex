@@ -18,9 +18,6 @@ defmodule MemexWeb.Sidebars.GenericLive do
         filters: %{"created_at_within" => DateTime.from_unix!(doc["timestamp_unix"])}
       })
 
-    doc |> IO.inspect(label: "20")
-    within |> IO.inspect(label: "20")
-
     {
       :ok,
       socket

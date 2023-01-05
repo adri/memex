@@ -24,8 +24,6 @@ defmodule MemexWeb.ArcController do
     |> File.read()
     |> case do
       {:ok, content} ->
-        content |> IO.inspect(label: "16")
-
         conn
         |> put_resp_content_type("application/gpx+xml", "utf-8")
         |> send_resp(200, content)

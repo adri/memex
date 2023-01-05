@@ -138,7 +138,7 @@ defmodule MemexWeb do
 
       @impl true
       def handle_info({:async_assign, {key, result}}, socket) do
-        {:noreply, assign(socket, Keyword.put([], key, result))}
+        {:noreply, assign(socket, key, result)}
       end
     end
   end
