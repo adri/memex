@@ -8,7 +8,7 @@ defmodule Memex.Importer do
   import Memex.Connector
 
   defmodule Sqlite do
-    defstruct [:location, :query, setup: []]
+    defstruct [:location, :query, setup: [], key: nil]
   end
 
   defmodule Command do
@@ -75,32 +75,36 @@ defmodule Memex.Importer do
     end
   end
 
+  @doc """
+  Fetches, transforms and stores documents from a given importer config.
+  """
   def import(config) do
     {:ok, log} = Repo.insert(%ImporterLog{state: "running", log: "", config_id: config.id})
     broadcast!(log)
-    dynamic_config = Map.merge(config.config_overwrite, config.encrypted_secrets)
 
-    with {:ok, module} <- get_module(config),
-         merged_config <- module.default_config(dynamic_config),
-         {:fetch, {:ok, result}} <- {:fetch, fetch(module, merged_config)},
-         {:transform, {:ok, documents, invalid}} <-
-           {:transform, transform(module, result, merged_config)},
-         # todo: keep fetching until items show up that are already stored
-         {:store, {:ok}} <- {:store, store(module, documents, log)} do
-      log
-      |> Ecto.Changeset.change(%{state: "success", log: Kernel.inspect(invalid)})
-      |> Repo.update!()
-      |> broadcast!()
+    try do
+      with {:ok, module} <- get_module(config),
+           {:ok, merged_config} <- merge_module_config(module, config),
+           {:fetch, {:ok, result}} <- {:fetch, fetch(module, merged_config)},
+           {:transform, {:ok, documents, invalid}} <-
+             {:transform, transform(module, result, merged_config)},
+           # todo: keep fetching until items show up that are already stored
+           {:store, {:ok}} <- {:store, store(module, documents, log)} do
+        update_log(log, "success", Kernel.inspect(invalid))
 
-      {:ok, documents, invalid}
-    else
-      {step, error} ->
-        log
-        |> Ecto.Changeset.change(%{state: "error", log: Kernel.inspect(error)})
-        |> Repo.update!()
-        |> broadcast!()
+        {:ok, documents, invalid}
+      else
+        {step, error} ->
+          update_log(log, "error", Kernel.inspect(error))
+          {:error, step, error}
+      end
+    catch
+      error, reason ->
+        update_log(log, "error", Kernel.inspect(reason))
 
-        {:error, step, error}
+        IO.puts(:stderr, Exception.format(:error, reason, __STACKTRACE__))
+
+        {:error, error, reason}
     end
   end
 
@@ -114,10 +118,26 @@ defmodule Memex.Importer do
     end
   end
 
+  defp merge_module_config(module, config) do
+    merged =
+      module.default_config()
+      |> Map.merge(config.config_overwrite)
+      |> Map.merge(config.encrypted_secrets)
+
+    {:ok, merged}
+  end
+
+  defp update_log(log, state, message) do
+    log
+    |> Ecto.Changeset.change(%{state: state, log: message})
+    |> Repo.update!()
+    |> broadcast!()
+  end
+
   defp fetch(module, config) do
     case module.fetch(config) do
-      %Sqlite{location: location, query: query, setup: setup} ->
-        sqlite_json(location, query, [], setup)
+      %Sqlite{location: location, query: query, setup: setup, key: key} ->
+        sqlite_json(location, query, [], setup, key)
 
       %Command{command: command, arguments: args} ->
         cmd(command, args)

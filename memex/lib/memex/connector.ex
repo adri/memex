@@ -2,8 +2,12 @@ defmodule Memex.Connector do
   alias Exqlite.Basic, as: Sqlite3
   alias Exqlite.Connection
 
-  def sqlite_json(path, query, args \\ [], setup \\ []) do
-    with {:ok, conn} <- Connection.connect(database: path, journal_mode: :wal, mode: :readonly),
+  def sqlite_json(path, query, args \\ [], setup \\ [], key \\ nil) do
+    options =
+      [database: path, key: key, mode: :readonly, cipher_compatibility: 3]
+      |> Keyword.filter(fn {_k, v} -> not is_nil(v) end)
+
+    with {:ok, conn} <- Connection.connect(options),
          {:ok, _} <- sqlite_queries(conn, setup),
          {:ok, rows} <- sqlite_query(conn, query, args) do
       {:ok, Enum.map(rows, &Jason.decode!(&1))}
