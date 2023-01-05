@@ -26,6 +26,12 @@ defmodule MemexWeb.PhotoController do
     |> case do
       {:ok, %{status: 200} = response} ->
         conn
+        |> merge_resp_headers(
+          response.headers
+          |> Enum.filter(fn {key, _} ->
+            Enum.member?(["content-type", "content-length", "content-disposition", "ETag"], key)
+          end)
+        )
         |> send_resp(200, response.body)
 
       _ ->
