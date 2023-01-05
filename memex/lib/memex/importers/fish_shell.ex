@@ -46,7 +46,7 @@ defmodule Memex.Importers.FishShell do
     end)
   end
 
-  defmodule TimelineItem do
+  defmodule TimeLineItem do
     use Surface.Component
 
     alias Phoenix.LiveView.JS

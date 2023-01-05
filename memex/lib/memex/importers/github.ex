@@ -33,15 +33,12 @@ defmodule Memex.Importers.Github do
   def provider(), do: @provider
 
   def default_config() do
-    Map.merge(
-      %{
-        "user_name" => "",
-        "page" => 1,
-        "access_token" => "",
-        "ignore_repos" => ["adri/notes"]
-      },
-      Importer.config(@provider)
-    )
+    %{
+      "user_name" => "",
+      "page" => 1,
+      "access_token" => "",
+      "ignore_repos" => ["adri/notes"]
+    }
   end
 
   def fetch(config) do
@@ -156,7 +153,7 @@ defmodule Memex.Importers.Github do
       "github_user_avatar" => user["avatar_url"]
     }
 
-  defmodule TimelineItem do
+  defmodule TimeLineItem do
     use Surface.Component
     alias MemexWeb.Router.Helpers, as: Routes
 

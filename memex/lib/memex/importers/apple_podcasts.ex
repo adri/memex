@@ -75,7 +75,7 @@ defmodule Memex.Importers.ApplePodcasts do
     }
   end
 
-  defmodule TimelineItem do
+  defmodule TimeLineItem do
     use Surface.Component
 
     alias MemexWeb.Router.Helpers, as: Routes
