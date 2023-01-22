@@ -8,7 +8,7 @@ defmodule Memex.Importer do
   import Memex.Connector
 
   defmodule Sqlite do
-    defstruct [:location, :query, setup: [], key: nil]
+    defstruct [:location, :query, setup: [], connection_options: []]
   end
 
   defmodule Command do
@@ -136,8 +136,13 @@ defmodule Memex.Importer do
 
   defp fetch(module, config) do
     case module.fetch(config) do
-      %Sqlite{location: location, query: query, setup: setup, key: key} ->
-        sqlite_json(location, query, [], setup, key)
+      %Sqlite{
+        location: location,
+        query: query,
+        setup: setup,
+        connection_options: connection_options
+      } ->
+        sqlite_json(location, query, [], setup, connection_options)
 
       %Command{command: command, arguments: args} ->
         cmd(command, args)

@@ -34,6 +34,9 @@ defmodule Memex.Importers.ApplePhotos do
   def fetch(config) do
     %Importer.Sqlite{
       location: "#{config.location}/database/Photos.sqlite",
+      connection_options: [
+        journal_mode: :wal
+      ],
       setup: [
         """
         -- Machine learning metadata information from psi.sqlite

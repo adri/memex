@@ -33,7 +33,12 @@ defmodule Memex.Importers.MoneyMoney do
   def fetch(config) do
     %Importer.Sqlite{
       location: config["location"],
-      key: config["database_password"],
+      connection_options: [
+        custom_pragmas: [
+          key: config["database_password"],
+          cipher_compatibility: 3
+        ]
+      ],
       setup: [],
       query: """
       SELECT

@@ -2,9 +2,13 @@ defmodule Memex.Connector do
   alias Exqlite.Basic, as: Sqlite3
   alias Exqlite.Connection
 
-  def sqlite_json(path, query, args \\ [], setup \\ [], key \\ nil) do
+  def sqlite_json(path, query, args \\ [], setup \\ [], connection_options \\ []) do
     options =
-      [database: path, key: key, mode: :readonly, cipher_compatibility: 3]
+      connection_options
+      |> Keyword.merge(
+        database: path,
+        mode: :readonly
+      )
       |> Keyword.filter(fn {_k, v} -> not is_nil(v) end)
 
     with {:ok, conn} <- Connection.connect(options),

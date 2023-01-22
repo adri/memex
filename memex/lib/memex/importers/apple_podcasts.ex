@@ -41,6 +41,9 @@ defmodule Memex.Importers.ApplePodcasts do
 
     %Importer.Sqlite{
       location: "#{config.location}",
+      connection_options: [
+        journal_mode: :wal
+      ],
       setup: [],
       query: """
       SELECT

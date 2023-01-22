@@ -33,6 +33,9 @@ defmodule Memex.Importers.AppleMessages do
 
     %Importer.Sqlite{
       location: config.location,
+      connection_options: [
+        journal_mode: :wal
+      ],
       setup: [
         """
         ATTACH DATABASE '#{config.contacts_db}' as contacts;
