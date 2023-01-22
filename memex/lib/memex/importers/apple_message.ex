@@ -82,12 +82,18 @@ defmodule Memex.Importers.AppleMessages do
   defmodule TimeLineItem do
     use Surface.Component
 
-    prop doc, :map, required: true
-    prop highlighted, :map
+    prop item, :map, required: true
 
     def render(assigns) do
       ~F"""
-      <div />
+      <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
+        {case @item["message_direction"] do
+          "sent" -> "Sent to "
+          "received" -> "Received from "
+        end}
+        {raw(@item["_formatted"]["person_name"])}
+      </div>
+      {raw(@item["_formatted"]["message_text"])}
       """
     end
   end

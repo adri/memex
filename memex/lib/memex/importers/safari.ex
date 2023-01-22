@@ -61,12 +61,14 @@ defmodule Memex.Importers.Safari do
   defmodule TimeLineItem do
     use Surface.Component
 
-    prop doc, :map, required: true
-    prop highlighted, :map
+    prop item, :map, required: true
 
     def render(assigns) do
       ~F"""
-      <div />
+      <p class="truncate">{raw(@item["_formatted"]["website_title"])}</p>
+      <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
+        {@item["device_name"]}: <a href={@item["website_url"]} target="_blank" class="underline">{raw(@item["_formatted"]["website_url"])}</a>
+      </div>
       """
     end
   end

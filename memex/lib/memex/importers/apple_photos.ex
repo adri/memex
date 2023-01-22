@@ -139,12 +139,22 @@ defmodule Memex.Importers.ApplePhotos do
   defmodule TimeLineItem do
     use Surface.Component
 
-    prop(doc, :map, required: true)
-    prop(highlighted, :map)
+    alias MemexWeb.Router.Helpers, as: Routes
+
+    prop item, :map, required: true
 
     def render(assigns) do
       ~F"""
-      <div />
+      <img
+        class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4"
+        width="60"
+        height="60"
+        src={Routes.photo_path(MemexWeb.Endpoint, :image, @item["photo_file_path"])}
+      />
+      <p class="text-xs truncate">{raw(Enum.join(@item["_formatted"]["photo_labels"], ", "))}</p>
+      <p class="text-xs text-gray-400 dark:text-gray-500">
+        {raw(@item["_formatted"]["device_name"])}
+      </p>
       """
     end
   end

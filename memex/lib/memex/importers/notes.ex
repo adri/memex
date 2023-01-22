@@ -60,13 +60,38 @@ defmodule Memex.Importers.Notes do
   defmodule TimeLineItem do
     use Surface.Component
 
-    prop doc, :map, required: true
-    prop highlighted, :map
+    prop item, :map, required: true
 
     def render(assigns) do
       ~F"""
-      <div />
+      <div :for={patch <- parse_patch(@item["commit_diff"])}>
+        <a
+          href={"obsidian://open?#{URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)})}"}
+          target="_blank"
+          class="text-xs text-gray-400 dark:text-gray-400"
+        >
+          {raw(MemexWeb.TimelineView.highlight_line_text(patch.from, @item["_formatted"]["commit_diff"]))}
+        </a>
+        <span :for={chunk <- patch.chunks}>
+          <div
+            :for={line <- chunk.lines}
+            class={
+              "text-sm break-normal",
+              "line-through text-gray-600": MemexWeb.TimelineView.line_type(line) == "remove"
+            }
+          >
+            <span>{raw(MemexWeb.TimelineView.highlight_line_text(line.text, @item["_formatted"]["commit_diff"]))}</span>
+          </div>
+        </span>
+      </div>
       """
+    end
+
+    defp parse_patch(patch) do
+      {:ok, parsed_diff} = GitDiff.parse_patch(patch)
+      parsed_diff |> IO.inspect(label: "92")
+
+      parsed_diff
     end
   end
 end

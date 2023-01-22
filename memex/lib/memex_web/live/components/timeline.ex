@@ -64,10 +64,7 @@ defmodule MemexWeb.Timeline do
                   :on-click="open-sidebar"
                   :values={type: "generic", id: hit["id"]}
                 >
-                  <p class="truncate">{raw(hit["_formatted"]["website_title"])}</p>
-                  <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {hit["device_name"]}: <a href={hit["website_url"]} target="_blank" class="underline">{raw(hit["_formatted"]["website_url"])}</a>
-                  </div>
+                  <Memex.Importers.Safari.TimeLineItem item={hit} />
                 </a>
                 <a :if={hit["provider"] === "Podcasts"} href="#">
                   <Memex.Importers.ApplePodcasts.TimeLineItem item={hit} />
@@ -76,30 +73,14 @@ defmodule MemexWeb.Timeline do
                   <Memex.Importers.Github.TimeLineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "iMessage"}>
-                  <div class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                    {case hit["message_direction"] do
-                      "sent" -> "Sent to "
-                      "received" -> "Received from "
-                    end}
-                    {raw(hit["_formatted"]["person_name"])}
-                  </div>
-                  {raw(hit["_formatted"]["message_text"])}
+                  <Memex.Importers.AppleMessages.TimeLineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "MoneyMoney"}>
                   <Memex.Importers.MoneyMoney.TimeLineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "terminal"}><Memex.Importers.FishShell.TimeLineItem item={hit} /></div>
                 <div :if={hit["provider"] === "Photos"}>
-                  <img
-                    class="object-cover float-left h-20 w-20 -m-4 rounded-l mr-4"
-                    width="60"
-                    height="60"
-                    src={Routes.photo_path(MemexWeb.Endpoint, :image, hit["photo_file_path"])}
-                  />
-                  <p class="text-xs truncate">{raw(Enum.join(hit["_formatted"]["photo_labels"], ", "))}</p>
-                  <p class="text-xs text-gray-400 dark:text-gray-500">
-                    {raw(hit["_formatted"]["device_name"])}
-                  </p>
+                  <Memex.Importers.ApplePhotos.TimeLineItem item={hit} />
                 </div>
                 <div :if={hit["provider"] === "Twitter"}>
                   <span
@@ -136,26 +117,7 @@ defmodule MemexWeb.Timeline do
                   </a>
                 </div>
                 <div :if={hit["provider"] === "git-notes"}>
-                  <div :for={patch <- parse_patch(hit["commit_diff"])}>
-                    <a
-                      href={"obsidian://open?#{URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)})}"}
-                      target="_blank"
-                      class="text-xs text-gray-400 dark:text-gray-400"
-                    >
-                      {raw(MemexWeb.TimelineView.highlight_line_text(patch.from, hit["_formatted"]["commit_diff"]))}
-                    </a>
-                    <span :for={chunk <- patch.chunks}>
-                      <div
-                        :for={line <- chunk.lines}
-                        class={
-                          "text-sm break-normal",
-                          "line-through text-gray-600": MemexWeb.TimelineView.line_type(line) == "remove"
-                        }
-                      >
-                        <span>{raw(MemexWeb.TimelineView.highlight_line_text(line.text, hit["_formatted"]["commit_diff"]))}</span>
-                      </div>
-                    </span>
-                  </div>
+                  <Memex.Importers.Notes.TimeLineItem item={hit} />
                 </div>
                 <div
                   :if={hit["provider"] === "Arc"}
@@ -272,12 +234,6 @@ defmodule MemexWeb.Timeline do
       />
     </div>
     """
-  end
-
-  defp parse_patch(patch) do
-    {:ok, parsed_diff} = GitDiff.parse_patch(patch)
-
-    parsed_diff
   end
 
   defp shared(type) do

@@ -162,7 +162,19 @@ defmodule Memex.Importers.Github do
     def render(assigns) do
       ~F"""
       <p class="text-xs text-gray-400 dark:text-gray-500">
-        {raw(@item["_formatted"]["verb"])} in {raw(@item["_formatted"]["repo_name"])} {@item["repo_name"]}
+        {raw(@item["_formatted"]["verb"])} in {raw(@item["_formatted"]["repo_name"])}
+        <span
+          :if={@item["issue_url"] && not Enum.member?(["merged", "requested"], @item["verb"])}
+          class="text-xs text-gray-400 dark:text-gray-500"
+        >
+          <img
+            class="rounded-full float-left mr-2"
+            src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: @item["github_user_avatar"])}
+            width="16"
+            height="16"
+          />
+          <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
+        </span>
       </p>
       <p :if={@item["comment_body"]} class="mb-2">
         {raw(@item["_formatted"]["comment_body"])}
@@ -175,18 +187,6 @@ defmodule Memex.Importers.Github do
       <p :if={Enum.member?(["merged", "requested"], @item["verb"])} class="mb-2">
         <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
         <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(@item["_formatted"]["issue_body"], compact_output: true))}</div>
-      </p>
-      <p
-        :if={@item["issue_url"] && not Enum.member?(["merged", "requested"], @item["verb"])}
-        class="text-xs text-gray-400 dark:text-gray-500"
-      >
-        <img
-          class="rounded-full float-left mr-2"
-          src={Routes.photo_path(MemexWeb.Endpoint, :https_proxy, url: @item["github_user_avatar"])}
-          width="16"
-          height="16"
-        />
-        <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
       </p>
 
       <p :if={@item["repo_description"]} class="text-sm text-gray-400 dark:text-gray-400 truncate">
