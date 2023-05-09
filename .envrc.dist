@@ -6,6 +6,9 @@ export GITHUB_PERSONAL_TOKEN=
 
 export POSTGRES_DSN=postgresql://postgres:memex@localhost:65432/memex
 
+# Set a random string, used to encrypt secrets stored in the database
+export SECRETS_ENCRYPTION_KEY= 
+
 # Optional, used to resolve Foursquare categories
 # and places collected by the Arc app.
 export FOURSQUARE_CLIENT_ID=
