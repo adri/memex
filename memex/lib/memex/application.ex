@@ -9,13 +9,13 @@ defmodule Memex.Application do
     children = [
       # Start the Telemetry supervisor
       MemexWeb.Telemetry,
-      {Finch, name: MyFinch},
+      {Finch, name: Memex.Finch},
       {ConCache, [name: :search, ttl_check_interval: false]},
       # Start the PubSub system
       {Phoenix.PubSub, name: Memex.PubSub},
       # Start the Endpoint (http/https)
       MemexWeb.Endpoint,
-      {Memex.Repo, []},
+      Memex.Repo,
       # Start a worker by calling: Memex.Worker.start_link(arg)
       # {Memex.Worker, arg}
       {Memex.Scheduler, []},

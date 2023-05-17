@@ -5,9 +5,8 @@ defmodule Memex.MixProject do
     [
       app: :memex,
       version: "0.1.0",
-      elixir: "~> 1.7",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -38,14 +37,15 @@ defmodule Memex.MixProject do
       {:earmark, "~> 1.4.16"},
       {:cloak_ecto, "~> 1.2.0"},
       {:ecto_sql, "~> 3.4"},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
       {:exqlite, "~> 0.12.0"},
-      {:finch, "~> 0.8.2"},
+      {:finch, "~> 0.13"},
       {:floki, ">= 0.27.0", only: :test},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.20"},
       {:git_diff, "~> 0.6.2"},
       {:hackney, "~> 1.16.0"},
+      {:heroicons, "~> 0.5"},
       {:jason, "~> 1.0"},
       {:money, "~> 1.9"},
       {:month, "~> 2.1"},
@@ -59,6 +59,7 @@ defmodule Memex.MixProject do
       {:postgrex, "~> 0.15.9"},
       {:surface, "~> 0.10"},
       {:surface_formatter, "~> 0.7.5", only: :dev},
+      {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},
       {:tesla, "~> 1.4.0"},
@@ -74,9 +75,12 @@ defmodule Memex.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "cmd npm install --prefix assets"],
+      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": [
         "cmd --cd assets npm run deploy",
+        "tailwind default --minify",
         "esbuild default --minify",
         "phx.digest"
       ]

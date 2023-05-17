@@ -1,20 +1,21 @@
 defmodule MemexWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
-  as controllers, views, channels and so on.
+  as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
       use MemexWeb, :controller
       use MemexWeb, :view
+      use MemexWeb, :html
 
-  The definitions below will be executed for every view,
-  controller, etc, so keep them short and clean, focused
+  The definitions below will be executed for every controller,
+  component, etc, so keep them short and clean, focused
   on imports, uses and aliases.
 
   Do NOT define functions inside the quoted expressions
-  below. Instead, define any helper function in modules
-  and import those modules here.
+  below. Instead, define additional modules and import
+  those modules here.
   """
 
   def static_paths do
@@ -23,7 +24,9 @@ defmodule MemexWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: MemexWeb
+      use Phoenix.Controller,
+        formats: [:html, :json],
+        layouts: [html: MemexWeb.Layouts]
 
       import Plug.Conn
       import MemexWeb.Gettext
@@ -32,37 +35,27 @@ defmodule MemexWeb do
     end
   end
 
-  def view do
-    quote do
-      use Phoenix.View,
-        root: "lib/memex_web/templates",
-        namespace: MemexWeb
+  # def view do
+  #   quote do
+  #     use Phoenix.View,
+  #       root: "lib/memex_web/templates",
+  #       namespace: MemexWeb
 
-      # Import convenience functions from controllers
-      import Phoenix.Controller,
-        only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
+  #     # Import convenience functions from controllers
+  #     import Phoenix.Controller,
+  #       only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
 
-      # Include shared imports and aliases for views
-      unquote(view_helpers())
-    end
-  end
+  #     # Include shared imports and aliases for views
+  #     unquote(view_helpers())
+  #   end
+  # end
 
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {MemexWeb.LayoutView, :live}
+        layout: {MemexWeb.Layouts, :app}
 
-      unquote(view_helpers())
-      unquote(liveview_helpers())
-    end
-  end
-
-  def surface_live_view do
-    quote do
-      use Surface.LiveView,
-        layout: {MemexWeb.LayoutView, :live}
-
-      unquote(view_helpers())
+      unquote(html_helpers())
       unquote(liveview_helpers())
     end
   end
@@ -70,8 +63,17 @@ defmodule MemexWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
+      unquote(html_helpers())
+    end
+  end
 
-      unquote(view_helpers())
+  def surface_live_view do
+    quote do
+      use Surface.LiveView,
+        layout: {MemexWeb.Layouts, :app}
+
+      unquote(html_helpers())
+      unquote(liveview_helpers())
     end
   end
 
@@ -92,22 +94,31 @@ defmodule MemexWeb do
     end
   end
 
-  defp view_helpers do
+  def html do
     quote do
-      # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
+      use Phoenix.Component
+      # Import convenience functions from controllers
+      import Phoenix.Controller,
+        only: [get_csrf_token: 0, view_module: 1, view_template: 1]
 
-      # Import LiveView helpers (live_render, live_component, live_patch, etc)
-      import Phoenix.LiveView.Helpers
-      import Phoenix.Component
+      # Include general helpers for rendering HTML
+      unquote(html_helpers())
+    end
+  end
 
-      # Import basic rendering functionality (render, render_layout, etc)
-      import Phoenix.View
-
-      import MemexWeb.ErrorHelpers
+  defp html_helpers do
+    quote do
+      # HTML escaping functionality
+      import Phoenix.HTML
+      # Core UI components and translation
+      import MemexWeb.CoreComponents
       import MemexWeb.Gettext
+      # Shortcut for generating JS commands
+      alias Phoenix.LiveView.JS
+
       alias MemexWeb.Router.Helpers, as: Routes
 
+      # Routes generation with the ~p sigil
       unquote(verified_routes())
     end
   end

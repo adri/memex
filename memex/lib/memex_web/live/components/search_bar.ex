@@ -6,7 +6,7 @@ defmodule MemexWeb.SearchBar do
   def render(assigns) do
     ~F"""
     <div class="p-5 pt-0 font-san items-center justify-center">
-      <header class="flex block fixed md:ml-4 text-black w-8/12 dark:text-white shadow-lg dark:bg-black bg-white rounded-xl">
+      <header class="block fixed md:ml-4 text-black w-8/12 dark:text-white shadow-lg dark:bg-black bg-white rounded-xl">
         <div class="flex justify-center items-center flex-grow relative">
           <button class="flex items-center justify-center absolute left-0 top-5 rounded-l-xl px-4 text-black dark:text-white">
             <svg
@@ -31,7 +31,7 @@ defmodule MemexWeb.SearchBar do
               autocapitalize="off"
               autocomplete="off"
               autofocus="true"
-              class="transition-colors focus:ring-blue-900 focus:ring-2 z-1 w-full text-black dark:text-white bg-transparent pl-10 pr-2 py-4 rounded-xl"
+              class="transition-colors focus:ring-blue-900 focus:ring-2 z-1 w-full text-black dark:text-white bg-transparent pl-10 pr-2 py-4 rounded-xl border-0"
               id="search-input"
               maxlength="512"
               name="query"
