@@ -21,7 +21,7 @@ Andrew has written many interesting [blog posts](https://hyfen.net/memex/) while
 Source: [Wikipedia](https://en.wikipedia.org/wiki/Memex)
 
 ### How does it look like?
-<img width="876" alt="memex" src="https://user-images.githubusercontent.com/133832/112340685-142cf700-8cc1-11eb-8679-1473a7793170.png">
+<img width="876" alt="memex" src="https://github.com/adri/memex/assets/133832/953dd65f-1948-4e88-9684-2c5a52b9a547">
 
 What it can do:
 
@@ -40,13 +40,9 @@ direnv allow
 # Start services
 ./bin-dev/start.sh
 
-# Setup the index config (once)
-./bin-dev/setup-index.sh
-
-# Import some data
-./bin-dev/import.sh sqlite-to-json/iMessage.sh
-
 open http://localhost:4000
+
+# Click the 'cog' wheel icon on the right to configure
 ```
 
 ### Links
