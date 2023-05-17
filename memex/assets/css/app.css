@@ -3,3 +3,8 @@
 @import "tailwindcss/utilities";
 @import "./rings.css";
 @import "./mapbox.css";
+
+em {
+  background-color: rgba(251, 191, 36, 0.7);
+  font-style: normal;
+}
