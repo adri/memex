@@ -32,7 +32,7 @@ defmodule MemexWeb.Sidebars.ActivityLive do
     <div class="inline-flex items-center space-x-3 mb-2">
       <!-- todo: Icon for activity type -->
       <h2 class="text-xl flex-grow dark:text-white leading-7">
-        {String.capitalize(@doc["activity_type"])}
+        {String.capitalize(@doc["activity_type"] || "")}
         {#unless is_nil(@previous["place_name"] || @previous["place_address"])}from <b>{@previous["place_name"] || @previous["place_address"]}</b>{/unless}
         {#unless is_nil(@next["place_name"])}
           to <b>{@next["place_name"]}</b>{/unless}
