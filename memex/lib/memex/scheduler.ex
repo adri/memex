@@ -1,6 +1,5 @@
 defmodule Memex.Scheduler do
   alias Memex.Importer
-  alias Memex.Importers.GithubImporter
 
   use GenServer
 
@@ -15,7 +14,20 @@ defmodule Memex.Scheduler do
 
   def handle_info(:run, state) do
     run()
+    {:ok, watcher_pid} = register_watcher()
     schedule()
+
+    {:noreply, %{state | watcher_pid: watcher_pid}}
+  end
+
+  def handle_info({:file_event, watcher_pid, {path, events}}, %{watcher_pid: watcher_pid} = state) do
+    IO.inspect({watcher_pid, {path, events}}, label: "55")
+
+    {:noreply, state}
+  end
+
+  def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
+    IO.inspect({watcher_pid, "stop"}, label: "55")
     {:noreply, state}
   end
 
@@ -31,6 +43,10 @@ defmodule Memex.Scheduler do
     #   - if it's :interval, 10, :minutes schedule a job
     #   - (future) if it's :auto, get schedule a job based on history
     |> Enum.map(fn importer -> Importer.import(importer) end)
+  end
+
+  defp register_watcher() do
+    FileSystem.start_link(Importer.get_dirs_to_watch())
   end
 
   defp schedule() do

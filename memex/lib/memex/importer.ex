@@ -108,6 +108,20 @@ defmodule Memex.Importer do
     end
   end
 
+  def get_dirs_to_watch() do
+    configured_importers()
+    |> Enum.map(fn config ->
+      with {:ok, module} <- get_module(config),
+           {:ok, merged_config} <- merge_module_config(module, config),
+           :watcher <- merged_config["schedule"] do
+        merged_config["location"]
+      else
+        _ -> false
+      end
+    end)
+    |> Enum.filter(fn dir -> dir !== false end)
+  end
+
   defp get_module(config) do
     case available_importers()[config.provider] do
       nil ->
