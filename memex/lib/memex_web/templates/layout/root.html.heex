@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <%= csrf_meta_tag() %>
+    <.live_title>
+      <%= assigns[:page_title] || "Memex" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"}/>
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}></script>
+    <link rel="shortcut icon" type="image/png" href={~p"/images/memex.png"} />
+    <link rel="shortcut icon" type="image/png" href={~p"/images/memex.png"} color="darkhex" media="(prefers-color-scheme: dark)" />
+  </head>
+  <body class="dark:bg-gray-800 bg-gray-200">
+    <%= @inner_content %>
+  </body>
+</html>

@@ -25,6 +25,7 @@ defmodule MemexWeb.ConnCase do
       import MemexWeb.ConnCase
 
       alias MemexWeb.Router.Helpers, as: Routes
+      use MemexWeb, :verified_routes
 
       # The default endpoint for testing
       @endpoint MemexWeb.Endpoint

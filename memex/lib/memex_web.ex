@@ -17,6 +17,10 @@ defmodule MemexWeb do
   and import those modules here.
   """
 
+  def static_paths do
+    ~w(assets fonts images favicon.ico robots.txt)
+  end
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: MemexWeb
@@ -24,6 +28,7 @@ defmodule MemexWeb do
       import Plug.Conn
       import MemexWeb.Gettext
       alias MemexWeb.Router.Helpers, as: Routes
+      unquote(verified_routes())
     end
   end
 
@@ -45,7 +50,7 @@ defmodule MemexWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {MemexWeb.LayoutView, "live.html"}
+        layout: {MemexWeb.LayoutView, :live}
 
       unquote(view_helpers())
       unquote(liveview_helpers())
@@ -55,7 +60,7 @@ defmodule MemexWeb do
   def surface_live_view do
     quote do
       use Surface.LiveView,
-        layout: {MemexWeb.LayoutView, "live.html"}
+        layout: {MemexWeb.LayoutView, :live}
 
       unquote(view_helpers())
       unquote(liveview_helpers())
@@ -102,6 +107,17 @@ defmodule MemexWeb do
       import MemexWeb.ErrorHelpers
       import MemexWeb.Gettext
       alias MemexWeb.Router.Helpers, as: Routes
+
+      unquote(verified_routes())
+    end
+  end
+
+  def verified_routes do
+    quote do
+      use Phoenix.VerifiedRoutes,
+        endpoint: MemexWeb.Endpoint,
+        router: MemexWeb.Router,
+        statics: MemexWeb.static_paths()
     end
   end
 

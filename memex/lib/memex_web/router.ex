@@ -1,6 +1,5 @@
 defmodule MemexWeb.Router do
   use MemexWeb, :router
-  import Surface.Catalogue.Router
 
   pipeline :browser do
     plug :accepts, ["html"]

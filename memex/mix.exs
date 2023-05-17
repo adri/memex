@@ -7,7 +7,7 @@ defmodule Memex.MixProject do
       version: "0.1.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -24,22 +24,9 @@ defmodule Memex.MixProject do
     ]
   end
 
-  def catalogues do
-    [
-      # Local catalogue
-      "priv/catalogue",
-      # Dependencies catalogues
-      "deps/surface/priv/catalogue",
-      "deps/surface_bulma/priv/catalogue",
-      # External catalogues
-      Path.expand("../my_componensts/priv/catalogue"),
-      "/Users/johndoe/workspace/other_componensts/priv/catalogue"
-    ]
-  end
-
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(:dev), do: ["lib"] ++ catalogues()
+  defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -65,12 +52,12 @@ defmodule Memex.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
-      {:phoenix_live_view, "~> 0.18.0"},
-      {:phoenix, "~> 1.6.0"},
+      {:phoenix_live_view, "~> 0.18.18"},
+      {:phoenix_view, "~> 2.0"},
+      {:phoenix, "~> 1.7.2"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, "~> 0.15.9"},
-      {:surface, "~> 0.9.0"},
-      {:surface_catalogue, "~> 0.5.0"},
+      {:surface, "~> 0.10"},
       {:surface_formatter, "~> 0.7.5", only: :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},

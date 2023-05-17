@@ -6,8 +6,6 @@ defmodule MemexWeb.IndexController do
     pass: ["text/*"],
     body_reader: {}
 
-  alias Memex.Schema.Document
-  alias Memex.Repo
   alias Memex.Importer
 
   def upsert_documents(conn, %{"index" => _index} = params) do

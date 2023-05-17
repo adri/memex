@@ -7,7 +7,6 @@ defmodule MemexWeb.PageLive do
   alias MemexWeb.SearchResultStats
   alias MemexWeb.SearchBar
   alias MemexWeb.DatesFacet
-  alias MemexWeb.CloseCircles
   alias MemexWeb.SidebarsComponent
   alias MemexWeb.Components.Icons.SettingsIcon
   alias MemexWeb.Components.Badge

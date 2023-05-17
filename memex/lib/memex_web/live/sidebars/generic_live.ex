@@ -4,9 +4,6 @@ defmodule MemexWeb.Sidebars.GenericLive do
   alias Memex.Search.Postgres
   alias Memex.Search.Query
   alias MemexWeb.Timeline
-  alias MemexWeb.Map
-  alias MemexWeb.Timeline.Card
-  alias MemexWeb.TimeDuration
 
   def mount(params, session, socket) do
     {:ok, doc} = Postgres.find(session["id"] || params["id"])
