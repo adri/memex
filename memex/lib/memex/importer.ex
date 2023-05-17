@@ -49,6 +49,23 @@ defmodule Memex.Importer do
     Repo.all(Memex.Schema.ImporterConfig)
   end
 
+  def register_importers() do
+    existing_importers = configured_importers() |> Enum.map(& &1.provider)
+
+    available_importers()
+    |> Enum.reject(fn {id, _importer} -> Enum.member?(existing_importers, id) end)
+    |> Enum.reject(fn {_id, module} -> function_exported?(module, :required_config, 0) end)
+    |> Enum.map(fn {id, importer} ->
+      create_importer(
+        id,
+        importer.provider(),
+        importer.provider(),
+        importer.default_config(),
+        %{}
+      )
+    end)
+  end
+
   def create_importer(name, provider, display_name, encrypted_secrets, config_overwrite) do
     Repo.insert(%Memex.Schema.ImporterConfig{
       id: name,

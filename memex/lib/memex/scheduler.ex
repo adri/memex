@@ -15,6 +15,7 @@ defmodule Memex.Scheduler do
   def handle_info(:run, state) do
     run()
     {:ok, watcher_pid} = register_watcher()
+    Importer.register_importers()
     schedule()
 
     {:noreply, %{state | watcher_pid: watcher_pid}}

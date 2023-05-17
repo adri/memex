@@ -30,6 +30,10 @@ defmodule Memex.Importers.MoneyMoney do
     }
   end
 
+  def required_config() do
+    ["database_password"]
+  end
+
   def fetch(config) do
     %Importer.Sqlite{
       location: config["location"],

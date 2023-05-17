@@ -41,6 +41,10 @@ defmodule Memex.Importers.Github do
     }
   end
 
+  def required_config() do
+    ["user_name", "access_token"]
+  end
+
   def fetch(config) do
     %Importer.JsonEndpoint{
       url: "https://api.github.com/users/#{config["user_name"]}/events?page=#{config["page"]}",

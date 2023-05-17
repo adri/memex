@@ -22,6 +22,10 @@ defmodule Memex.Importers.Notes do
     }
   end
 
+  def required_config() do
+    ["path"]
+  end
+
   def fetch(_config) do
     %Importer.Shell{
       command: """
