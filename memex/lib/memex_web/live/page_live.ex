@@ -36,7 +36,7 @@ defmodule MemexWeb.PageLive do
           <:icon><SettingsIcon /></:icon>
         </Badge>
         <div class="flex items-start">
-          <CloseCircles />
+          <!-- <CloseCircles /> -->
           <!-- <Memex.Importers.Github.HomepageItem /> -->
           <div>
           </div>
