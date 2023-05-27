@@ -21,6 +21,7 @@ defmodule Memex.Importers.Arc do
     field(:place_altitude, :float)
     field(:place_foursquare_venue_id, :string)
     field(:place_foursquare_category_id, :string)
+    field(:activity_type, :string)
     field(:activity_step_count, :integer)
     field(:activity_floors_ascended, :integer)
     field(:activity_floors_descended, :integer)
@@ -51,9 +52,9 @@ defmodule Memex.Importers.Arc do
     }
   end
 
-  def transform(result, _config) do
+  def transform(result, config) do
     result["timelineItems"]
-    |> Enum.map(&parse_item(&1))
+    |> Enum.map(&parse_item(&1, config))
     |> Enum.filter(fn item -> item != %{} end)
   end
 
@@ -80,33 +81,55 @@ defmodule Memex.Importers.Arc do
     }
   end
 
-  defp parse_item(%{"isVisit" => true} = item) do
+  defp parse_item(%{"isVisit" => true, "place" => place} = item, _config) do
     parse_common(item)
     |> Map.merge(%{
       verb: "visited",
-      place_name: item["place"]["name"],
-      place_address: item["place"]["address"],
-      place_latitude: item["place"]["center"]["latitude"],
-      place_longitude: item["place"]["center"]["longitude"],
-      place_altitude: item["altitude"],
-      place_foursquare_venue_id: item["place"]["foursquareVenueId"],
-      place_foursquare_category_id: item["place"]["foursquareCategoryId"]
+      place_altitude: item["altitude"]
     })
+    |> Map.merge(parse_place(place))
   end
 
-  defp parse_item(%{"isVisit" => false, "uncertainActivityType" => false} = item) do
+  defp parse_item(%{"isVisit" => true, "placeId" => placeId} = item, config) do
+    path = "#{config.location}Documents/Backups/Place/#{String.at(placeId, 0)}/#{placeId}.json"
+
+    {:ok, place} =
+      Path.wildcard(path)
+      |> Memex.Connector.json_file(false)
+
     parse_common(item)
     |> Map.merge(%{
-      verb: "moved"
+      verb: "visited",
+      place_altitude: item["altitude"]
+    })
+    |> Map.merge(parse_place(place))
+  end
+
+  defp parse_item(%{"isVisit" => false} = item, _config) do
+    parse_common(item)
+    |> Map.merge(%{
+      verb: "moved",
+      activity_type: item["activityType"]
     })
   end
 
-  defp parse_item(_item), do: %{}
+  defp parse_item(_item, _config), do: %{}
+
+  defp parse_place(place) do
+    %{
+      place_name: place["name"],
+      place_address: place["address"],
+      place_latitude: place["center"]["latitude"] || nil,
+      place_longitude: place["center"]["longitude"] || nil,
+      place_foursquare_venue_id: place["foursquareVenueId"],
+      place_foursquare_category_id: place["foursquareCategoryId"]
+    }
+  end
 
   defmodule TimelineItem do
     use Surface.Component
 
-    prop item, :map
+    prop(item, :map)
 
     def render(assigns) do
       ~F"""
