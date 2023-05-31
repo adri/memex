@@ -21,10 +21,10 @@ defmodule Memex.Importers.AppleMessages do
 
   def default_config() do
     %{
-      location: "#{System.user_home!()}/Library/Messages/chat.db",
-      contacts_db:
+      "location" => "#{System.user_home!()}/Library/Messages/chat.db",
+      "contacts_db" =>
         "#{System.user_home!()}/Library/Application Support/AddressBook/Sources/AAE8D6A5-FEED-47BB-82CF-1A51C6789400/AddressBook-v22.abcddb",
-      schedule: :watcher
+      "schedule" => :watcher
     }
   end
 
@@ -32,13 +32,13 @@ defmodule Memex.Importers.AppleMessages do
     date_correction = "/ 1000000000 + 978307200"
 
     %Importer.Sqlite{
-      location: config.location,
+      location: config["location"],
       connection_options: [
         journal_mode: :wal
       ],
       setup: [
         """
-        ATTACH DATABASE '#{config.contacts_db}' as contacts;
+        ATTACH DATABASE '#{config["contacts_db"]}' as contacts;
         """
       ],
       query: """

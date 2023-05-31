@@ -137,6 +137,7 @@ defmodule Memex.Importer do
       end
     end)
     |> Enum.filter(fn dir -> dir !== false end)
+    |> Enum.filter(fn dir -> not is_nil(dir) end)
   end
 
   defp get_module(config) do

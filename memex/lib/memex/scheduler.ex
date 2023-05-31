@@ -7,18 +7,19 @@ defmodule Memex.Scheduler do
     GenServer.start_link(__MODULE__, %{})
   end
 
-  def init(state) do
+  def init(_args) do
     schedule()
-    {:ok, state}
+    {:ok, watcher_pid} = register_watcher()
+    # Importer.register_importers()
+
+    {:ok, %{watcher_pid: watcher_pid}}
   end
 
   def handle_info(:run, state) do
     run()
-    {:ok, watcher_pid} = register_watcher()
-    Importer.register_importers()
     schedule()
 
-    {:noreply, %{state | watcher_pid: watcher_pid}}
+    {:noreply, state}
   end
 
   def handle_info({:file_event, watcher_pid, {path, events}}, %{watcher_pid: watcher_pid} = state) do
@@ -47,7 +48,12 @@ defmodule Memex.Scheduler do
   end
 
   defp register_watcher() do
-    FileSystem.start_link(Importer.get_dirs_to_watch())
+    IO.inspect("Watching paths")
+    IO.inspect(Importer.get_dirs_to_watch())
+    {:ok, pid} = FileSystem.start_link(dirs: [Importer.get_dirs_to_watch()])
+    FileSystem.subscribe(pid)
+
+    {:ok, pid}
   end
 
   defp schedule() do

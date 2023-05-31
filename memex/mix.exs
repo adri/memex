@@ -40,6 +40,7 @@ defmodule Memex.MixProject do
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:ex_check, "~> 0.13.0", only: [:dev], runtime: false},
       {:exqlite, "~> 0.12.0"},
+      {:file_system, "~> 0.2"},
       {:finch, "~> 0.13"},
       {:floki, ">= 0.27.0", only: :test},
       {:gettext, "~> 0.20"},

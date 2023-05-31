@@ -26,21 +26,21 @@ defmodule Memex.Importers.ApplePhotos do
 
   def default_config() do
     %{
-      location: "#{System.user_home!()}/Pictures/Photos\ Library.photoslibrary",
-      schedule: :watcher
+      "location" => "#{System.user_home!()}/Pictures/Photos\ Library.photoslibrary",
+      "schedule" => :watcher
     }
   end
 
   def fetch(config) do
     %Importer.Sqlite{
-      location: "#{config.location}/database/Photos.sqlite",
+      location: "#{config["location"]}/database/Photos.sqlite",
       connection_options: [
         journal_mode: :wal
       ],
       setup: [
         """
         -- Machine learning metadata information from psi.sqlite
-        ATTACH DATABASE '#{config.location}/database/search/psi.sqlite' as psi;
+        ATTACH DATABASE '#{config["location"]}/database/search/psi.sqlite' as psi;
         """
       ],
       query: """

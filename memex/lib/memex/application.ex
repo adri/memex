@@ -18,8 +18,8 @@ defmodule Memex.Application do
       Memex.Repo,
       # Start a worker by calling: Memex.Worker.start_link(arg)
       # {Memex.Worker, arg}
-      {Memex.Scheduler, []},
-      Memex.Vault
+      Memex.Vault,
+      Memex.Scheduler
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

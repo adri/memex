@@ -30,9 +30,9 @@ defmodule Memex.Importers.ApplePodcasts do
 
   def default_config() do
     %{
-      location:
+      "location" =>
         "#{System.user_home!()}/Library/Group Containers/243LU875E5.groups.com.apple.podcasts/Documents/MTLibrary.sqlite",
-      schedule: :watcher
+      "schedule" => :watcher
     }
   end
 
@@ -40,7 +40,7 @@ defmodule Memex.Importers.ApplePodcasts do
     date_correction = "+ 978307200"
 
     %Importer.Sqlite{
-      location: "#{config.location}",
+      location: "#{config["location"]}",
       connection_options: [
         journal_mode: :wal
       ],

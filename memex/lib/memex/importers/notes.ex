@@ -18,7 +18,7 @@ defmodule Memex.Importers.Notes do
 
   def default_config() do
     %{
-      schedule: :watcher
+      "schedule" => :watcher
     }
   end
 

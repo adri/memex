@@ -34,15 +34,15 @@ defmodule Memex.Importers.Arc do
 
   def default_config() do
     %{
-      location:
+      "location" =>
         "#{System.user_home!()}/Library/Mobile\ Documents/iCloud~com~bigpaua~LearnerCoacher/",
-      schedule: :watcher
+      "schedule" => :watcher
     }
   end
 
   def fetch(config) do
     location =
-      Path.wildcard("#{config.location}/Documents/Export/JSON/Monthly/*.json.gz")
+      Path.wildcard("#{config["location"]}/Documents/Export/JSON/Monthly/*.json.gz")
       |> Enum.sort(:desc)
       |> Enum.at(0)
 
@@ -91,7 +91,7 @@ defmodule Memex.Importers.Arc do
   end
 
   defp parse_item(%{"isVisit" => true, "placeId" => placeId} = item, config) do
-    path = "#{config.location}Documents/Backups/Place/#{String.at(placeId, 0)}/#{placeId}.json"
+    path = "#{config["location"]}Documents/Backups/Place/#{String.at(placeId, 0)}/#{placeId}.json"
 
     {:ok, place} =
       Path.wildcard(path)

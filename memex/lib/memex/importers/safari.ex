@@ -19,14 +19,14 @@ defmodule Memex.Importers.Safari do
 
   def default_config() do
     %{
-      location: "#{System.user_home!()}/Library/Safari/History.db",
-      schedule: :watcher
+      "location" => "#{System.user_home!()}/Library/Safari/History.db",
+      "schedule" => :watcher
     }
   end
 
   def fetch(config) do
     %Importer.Sqlite{
-      location: config.location,
+      location: config["location"],
       connection_options: [
         journal_mode: :wal
       ],
