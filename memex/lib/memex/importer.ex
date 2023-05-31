@@ -101,6 +101,16 @@ defmodule Memex.Importer do
   Fetches, transforms and stores documents from a given importer config.
   """
   def import(config) do
+    {:ok, module} = get_module(config)
+
+    if function_exported?(module, :fetch, 1) do
+      do_import(config)
+    else
+      {:skipped, :fetch_not_supported}
+    end
+  end
+
+  defp do_import(config) do
     {:ok, log} = Repo.insert(%ImporterLog{state: "running", log: "", config_id: config.id})
     broadcast!(log)
 
