@@ -1,7 +1,9 @@
 defmodule Memex.Importers.ApplePodcasts do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -26,9 +28,9 @@ defmodule Memex.Importers.ApplePodcasts do
     field(:podcast_webpage_url, :string)
   end
 
-  def provider(), do: "Podcasts"
+  def provider, do: "Podcasts"
 
-  def default_config() do
+  def default_config do
     %{
       "location" =>
         "#{System.user_home!()}/Library/Group Containers/243LU875E5.groups.com.apple.podcasts/Documents/MTLibrary.sqlite",
@@ -79,6 +81,7 @@ defmodule Memex.Importers.ApplePodcasts do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     alias MemexWeb.Router.Helpers, as: Routes

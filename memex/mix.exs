@@ -60,6 +60,7 @@ defmodule Memex.MixProject do
       {:postgrex, "~> 0.15.9"},
       {:surface, "~> 0.10"},
       {:surface_formatter, "~> 0.7.5", only: :dev},
+      {:styler, "~> 0.7", only: [:dev, :test], runtime: false},
       {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 0.5"},

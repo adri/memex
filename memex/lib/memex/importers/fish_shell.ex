@@ -1,7 +1,9 @@
 defmodule Memex.Importers.FishShell do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -13,9 +15,9 @@ defmodule Memex.Importers.FishShell do
     field :command, :string
   end
 
-  def provider(), do: "terminal"
+  def provider, do: "terminal"
 
-  def default_config() do
+  def default_config do
     %{
       "schedule" => :watcher
     }
@@ -47,6 +49,7 @@ defmodule Memex.Importers.FishShell do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     alias Phoenix.LiveView.JS
@@ -59,7 +62,7 @@ defmodule Memex.Importers.FishShell do
       """
     end
 
-    def open() do
+    def open do
       JS.dispatch("memex:clipcopy")
     end
   end

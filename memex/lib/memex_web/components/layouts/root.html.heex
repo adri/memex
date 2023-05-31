@@ -7,8 +7,15 @@
     <.live_title><%= assigns[:page_title] || "Memex" %></.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <link rel="shortcut icon" type="image/png" href={~p"/images/memex.png"} />
-    <link rel="shortcut icon" type="image/png" href={~p"/images/memex.png"} color="darkhex" media="(prefers-color-scheme: dark)" />
-    <script defer phx-track-static type="module" src={~p"/assets/app.js"}></script>
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href={~p"/images/memex.png"}
+      color="darkhex"
+      media="(prefers-color-scheme: dark)"
+    />
+    <script defer phx-track-static type="module" src={~p"/assets/app.js"}>
+    </script>
   </head>
   <body class="dark:bg-gray-800 bg-gray-200">
     <%= @inner_content %>

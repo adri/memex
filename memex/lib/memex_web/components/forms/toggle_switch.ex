@@ -1,5 +1,7 @@
 defmodule MemexWeb.Components.Forms.ToggleSwitch do
+  @moduledoc false
   use Surface.Component
+
   prop id, :string
   prop click, :event
   prop checked, :boolean, default: false

@@ -20,8 +20,8 @@ defmodule MemexWeb.ChannelCase do
   using do
     quote do
       # Import conveniences for testing with channels
-      import Phoenix.ChannelTest
       import MemexWeb.ChannelCase
+      import Phoenix.ChannelTest
 
       # The default endpoint for testing
       @endpoint MemexWeb.Endpoint

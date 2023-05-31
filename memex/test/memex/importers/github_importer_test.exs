@@ -28,7 +28,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "[Performance] Automatically compile `.env.*` files to `.env.local.php`",
           "id" => 753_951_469,
           "locked" => false,
-          "number" => 22035,
+          "number" => 22_035,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s8GLt",
           "requested_teams" => [],
@@ -54,8 +54,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "this is a example messge",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22035",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/965c063894a0120944015950e443f434dd30f5ee",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/965c063894a0120944015950e443f434dd30f5ee",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T14:29:12Z",
           "created_at" => "2021-10-08T11:24:57Z",
@@ -310,7 +309,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "locked" => false,
           "milestone" => nil,
           "node_id" => "PR_kwDOAGZWp84s8GLt",
-          "number" => 22035,
+          "number" => 22_035,
           "performed_via_github_app" => nil,
           "pull_request" => %{
             "diff_url" => "https://github.com/Org/Repo/pull/22035.diff",
@@ -384,7 +383,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some fix",
           "id" => 754_047_266,
           "locked" => false,
-          "number" => 22038,
+          "number" => 22_038,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s8dki",
           "requested_teams" => [],
@@ -410,8 +409,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "some message",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22038",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/6690b3492355b3e3734dec1802fa8ce0ef14c40f",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/6690b3492355b3e3734dec1802fa8ce0ef14c40f",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T13:58:32Z",
           "created_at" => "2021-10-08T13:34:48Z",
@@ -605,8 +603,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "some message",
           "url" => "https://api.github.com/repos/Org/repo5/pulls/11",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/repo5/statuses/f69beb6305be9da59f8d203dcbb4c3041d2206b1",
+          "statuses_url" => "https://api.github.com/repos/Org/repo5/statuses/f69beb6305be9da59f8d203dcbb4c3041d2206b1",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T13:33:33Z",
           "created_at" => "2021-10-08T13:11:29Z",
@@ -666,8 +663,7 @@ defmodule Memex.Importers.GithubImporterTest do
               "events_url" => "https://api.github.com/users/Org/events{/privacy}"
             }
           },
-          "review_comment_url" =>
-            "https://api.github.com/repos/Org/repo5/pulls/comments{/number}",
+          "review_comment_url" => "https://api.github.com/repos/Org/repo5/pulls/comments{/number}",
           "_links" => %{
             "comments" => %{
               "href" => "https://api.github.com/repos/Org/repo5/issues/11/comments"
@@ -765,8 +761,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "some message",
             "sha" => "26cb9aaacb36ea850ce98feacf3f902274e523ed",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/26cb9aaacb36ea850ce98feacf3f902274e523ed"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/26cb9aaacb36ea850ce98feacf3f902274e523ed"
           }
         ],
         "distinct_size" => 1,
@@ -812,8 +807,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Support bla",
             "sha" => "022b9634ec1483bf77d6e883b8c668c9314cb14b",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/022b9634ec1483bf77d6e883b8c668c9314cb14b"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/022b9634ec1483bf77d6e883b8c668c9314cb14b"
           },
           %{
             "author" => %{
@@ -823,8 +817,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Make bla",
             "sha" => "799477b2fc61e04b854647f66c7d7152affe1e23",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/799477b2fc61e04b854647f66c7d7152affe1e23"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/799477b2fc61e04b854647f66c7d7152affe1e23"
           }
         ],
         "distinct_size" => 2,
@@ -870,8 +863,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Fix name",
             "sha" => "22ee40ccbc4f94fc5cc51fc6c9fe95cbbe2f7b14",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/22ee40ccbc4f94fc5cc51fc6c9fe95cbbe2f7b14"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/22ee40ccbc4f94fc5cc51fc6c9fe95cbbe2f7b14"
           }
         ],
         "distinct_size" => 1,
@@ -917,8 +909,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Enable deployments",
             "sha" => "d2daa6742f081bb4daeb353276a1b580809b1442",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/d2daa6742f081bb4daeb353276a1b580809b1442"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/d2daa6742f081bb4daeb353276a1b580809b1442"
           }
         ],
         "distinct_size" => 1,
@@ -964,8 +955,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Fix mock",
             "sha" => "59364248fecac3c8f0aca1b737d41dccb7113639",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/59364248fecac3c8f0aca1b737d41dccb7113639"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/59364248fecac3c8f0aca1b737d41dccb7113639"
           }
         ],
         "distinct_size" => 1,
@@ -1011,8 +1001,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "So we can deploy repo2.",
             "sha" => "cdca2dc43116b15e5fba0709b79191f34546fb40",
-            "url" =>
-              "https://api.github.com/repos/Org/repo4/commits/cdca2dc43116b15e5fba0709b79191f34546fb40"
+            "url" => "https://api.github.com/repos/Org/repo4/commits/cdca2dc43116b15e5fba0709b79191f34546fb40"
           }
         ],
         "distinct_size" => 1,
@@ -1104,8 +1093,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "So we can deploy repo2.",
           "url" => "https://api.github.com/repos/Org/repo4/pulls/167",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/repo4/statuses/3feaf61c5fedb648af0555f8e5f0e8835c403be0",
+          "statuses_url" => "https://api.github.com/repos/Org/repo4/statuses/3feaf61c5fedb648af0555f8e5f0e8835c403be0",
           "closed_at" => "2021-10-08T12:44:11Z",
           "updated_at" => "2021-10-08T12:44:11Z",
           "created_at" => "2021-10-08T12:40:38Z",
@@ -1216,8 +1204,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "So we can deploy repo2.",
           "url" => "https://api.github.com/repos/Org/repo4/pulls/167",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/repo4/statuses/3feaf61c5fedb648af0555f8e5f0e8835c403be0",
+          "statuses_url" => "https://api.github.com/repos/Org/repo4/statuses/3feaf61c5fedb648af0555f8e5f0e8835c403be0",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T12:40:38Z",
           "created_at" => "2021-10-08T12:40:38Z",
@@ -1333,8 +1320,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixes something",
           "url" => "https://api.github.com/repos/Org/repo3/pulls/587",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/repo3/statuses/a8c27b9d470fb227e81a413ad420dd61a98f6abe",
+          "statuses_url" => "https://api.github.com/repos/Org/repo3/statuses/a8c27b9d470fb227e81a413ad420dd61a98f6abe",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T12:28:42Z",
           "created_at" => "2021-10-08T12:20:42Z",
@@ -1498,8 +1484,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "some text",
           "url" => "https://api.github.com/repos/Org/repo3/pulls/587",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/repo3/statuses/a8c27b9d470fb227e81a413ad420dd61a98f6abe",
+          "statuses_url" => "https://api.github.com/repos/Org/repo3/statuses/a8c27b9d470fb227e81a413ad420dd61a98f6abe",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T12:28:42Z",
           "created_at" => "2021-10-08T12:20:42Z",
@@ -1554,8 +1539,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Don't depend on not existing jobs",
             "sha" => "ed69061e7c7f61aff1c9594d4944f3f0833ad64b",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/ed69061e7c7f61aff1c9594d4944f3f0833ad64b"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/ed69061e7c7f61aff1c9594d4944f3f0833ad64b"
           }
         ],
         "distinct_size" => 1,
@@ -1659,7 +1643,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "locked" => false,
           "milestone" => nil,
           "node_id" => "PR_kwDOAGZWp84s8GLt",
-          "number" => 22035,
+          "number" => 22_035,
           "performed_via_github_app" => nil,
           "pull_request" => %{
             "diff_url" => "https://github.com/Org/Repo/pull/22035.diff",
@@ -1710,8 +1694,7 @@ defmodule Memex.Importers.GithubImporterTest do
             "distinct" => true,
             "message" => "Deploy",
             "sha" => "26f431f67778339d11eef9cd492c7d05d5e626ab",
-            "url" =>
-              "https://api.github.com/repos/Org/repo2/commits/26f431f67778339d11eef9cd492c7d05d5e626ab"
+            "url" => "https://api.github.com/repos/Org/repo2/commits/26f431f67778339d11eef9cd492c7d05d5e626ab"
           }
         ],
         "distinct_size" => 1,
@@ -1787,7 +1770,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some title",
           "id" => 753_883_893,
           "locked" => false,
-          "number" => 22033,
+          "number" => 22_033,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s71r1",
           "requested_teams" => [],
@@ -1809,8 +1792,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixed config",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22033",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
           "closed_at" => "2021-10-08T10:24:22Z",
           "updated_at" => "2021-10-08T10:25:22Z",
           "created_at" => "2021-10-08T09:49:36Z",
@@ -1820,8 +1802,7 @@ defmodule Memex.Importers.GithubImporterTest do
               "avatar_url" => "https://avatars.githubusercontent.com/u/1238070?v=4",
               "events_url" => "https://api.github.com/users/SavageTiger/events{/privacy}",
               "followers_url" => "https://api.github.com/users/SavageTiger/followers",
-              "following_url" =>
-                "https://api.github.com/users/SavageTiger/following{/other_user}",
+              "following_url" => "https://api.github.com/users/SavageTiger/following{/other_user}",
               "gists_url" => "https://api.github.com/users/SavageTiger/gists{/gist_id}"
             }
           ],
@@ -1865,7 +1846,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some title",
           "id" => 753_883_893,
           "locked" => false,
-          "number" => 22033,
+          "number" => 22_033,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s71r1",
           "requested_teams" => [],
@@ -1887,8 +1868,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixed config",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22033",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
           "closed_at" => "2021-10-08T10:24:22Z",
           "updated_at" => "2021-10-08T10:25:22Z",
           "created_at" => "2021-10-08T09:49:36Z",
@@ -1898,8 +1878,7 @@ defmodule Memex.Importers.GithubImporterTest do
               "avatar_url" => "https://avatars.githubusercontent.com/u/1238070?v=4",
               "events_url" => "https://api.github.com/users/SavageTiger/events{/privacy}",
               "followers_url" => "https://api.github.com/users/SavageTiger/followers",
-              "following_url" =>
-                "https://api.github.com/users/SavageTiger/following{/other_user}",
+              "following_url" => "https://api.github.com/users/SavageTiger/following{/other_user}",
               "gists_url" => "https://api.github.com/users/SavageTiger/gists{/gist_id}"
             }
           ],
@@ -1974,7 +1953,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Performance fix",
           "id" => 705_417_020,
           "locked" => false,
-          "number" => 21678,
+          "number" => 21_678,
           "active_lock_reason" => nil,
           "node_id" => "MDExOlB1bGxSZXF1ZXN0NzA1NDE3MDIw",
           "requested_teams" => [],
@@ -1995,8 +1974,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Some message",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/21678",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/3917238c162063e110e694ae5eaeef7887654da7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/3917238c162063e110e694ae5eaeef7887654da7",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T10:06:46Z",
           "created_at" => "2021-08-06T11:39:42Z",
@@ -2083,7 +2061,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some title",
           "id" => 753_883_893,
           "locked" => false,
-          "number" => 22033,
+          "number" => 22_033,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s71r1",
           "requested_teams" => [],
@@ -2103,8 +2081,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixed config",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22033",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T10:03:36Z",
           "created_at" => "2021-10-08T09:49:36Z",
@@ -2214,7 +2191,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some title",
           "id" => 753_883_893,
           "locked" => false,
-          "number" => 22033,
+          "number" => 22_033,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s71r1",
           "requested_teams" => [],
@@ -2232,8 +2209,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixed config",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22033",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T10:03:16Z",
           "created_at" => "2021-10-08T09:49:36Z",
@@ -2279,7 +2255,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "title" => "Some title",
           "id" => 753_883_893,
           "locked" => false,
-          "number" => 22033,
+          "number" => 22_033,
           "active_lock_reason" => nil,
           "node_id" => "PR_kwDOAGZWp84s71r1",
           "requested_teams" => [],
@@ -2297,8 +2273,7 @@ defmodule Memex.Importers.GithubImporterTest do
           },
           "body" => "Fixed config",
           "url" => "https://api.github.com/repos/Org/Repo/pulls/22033",
-          "statuses_url" =>
-            "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
+          "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/79bbabc1512033f1bff8790c712d69996f2377a7",
           "closed_at" => nil,
           "updated_at" => "2021-10-08T10:03:16Z",
           "created_at" => "2021-10-08T09:49:36Z",
@@ -2369,7 +2344,7 @@ defmodule Memex.Importers.GithubImporterTest do
     },
     "payload" => %{
       "action" => "opened",
-      "number" => 22060,
+      "number" => 22_060,
       "pull_request" => %{
         "additions" => 1,
         "title" => "Fix things",
@@ -2377,7 +2352,7 @@ defmodule Memex.Importers.GithubImporterTest do
         "id" => 755_914_775,
         "merged_by" => nil,
         "locked" => false,
-        "number" => 22060,
+        "number" => 22_060,
         "active_lock_reason" => nil,
         "node_id" => "PR_kwDOAGZWp84tDlgX",
         "requested_teams" => [],
@@ -2405,8 +2380,7 @@ defmodule Memex.Importers.GithubImporterTest do
         },
         "body" => "Some description",
         "url" => "https://api.github.com/repos/Org/Repo/pulls/22060",
-        "statuses_url" =>
-          "https://api.github.com/repos/Org/Repo/statuses/7b0bd8b8dbd1e9f787522fe9525c8d8b7d0f2489",
+        "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/7b0bd8b8dbd1e9f787522fe9525c8d8b7d0f2489",
         "closed_at" => nil,
         "updated_at" => "2021-10-12T07:57:17Z",
         "created_at" => "2021-10-12T07:57:17Z",
@@ -2509,7 +2483,7 @@ defmodule Memex.Importers.GithubImporterTest do
     },
     "payload" => %{
       "action" => "closed",
-      "number" => 22060,
+      "number" => 22_060,
       "pull_request" => %{
         "additions" => 1,
         "title" => "Fix things",
@@ -2536,7 +2510,7 @@ defmodule Memex.Importers.GithubImporterTest do
           "url" => "https://api.github.com/users/userbla"
         },
         "locked" => false,
-        "number" => 22060,
+        "number" => 22_060,
         "active_lock_reason" => nil,
         "node_id" => "PR_kwDOAGZWp84tDlgX",
         "requested_teams" => [],
@@ -2564,8 +2538,7 @@ defmodule Memex.Importers.GithubImporterTest do
         },
         "body" => "Some description",
         "url" => "https://api.github.com/repos/Org/Repo/pulls/22060",
-        "statuses_url" =>
-          "https://api.github.com/repos/Org/Repo/statuses/fffdb37ec08c22f408f8f90b4075fe6d29fa1981",
+        "statuses_url" => "https://api.github.com/repos/Org/Repo/statuses/fffdb37ec08c22f408f8f90b4075fe6d29fa1981",
         "closed_at" => "2021-10-12T08:00:04Z",
         "updated_at" => "2021-10-12T08:00:04Z",
         "created_at" => "2021-10-12T07:57:17Z",
@@ -2632,8 +2605,7 @@ defmodule Memex.Importers.GithubImporterTest do
   end
 
   test "Parses opening a a pull request" do
-    items =
-      GithubImporter.parse([@pull_request_event_open], %{"ignore_repos" => ["userbla/notes"]})
+    items = GithubImporter.parse([@pull_request_event_open], %{"ignore_repos" => ["userbla/notes"]})
 
     item =
       Enum.find_value(items, fn [body: item] ->
@@ -2647,8 +2619,7 @@ defmodule Memex.Importers.GithubImporterTest do
   end
 
   test "Parses merging a a pull request" do
-    items =
-      GithubImporter.parse([@pull_request_event_merged], %{"ignore_repos" => ["userbla/notes"]})
+    items = GithubImporter.parse([@pull_request_event_merged], %{"ignore_repos" => ["userbla/notes"]})
 
     item =
       Enum.find_value(items, fn [body: item] ->

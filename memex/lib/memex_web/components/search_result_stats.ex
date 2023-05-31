@@ -1,4 +1,5 @@
 defmodule MemexWeb.SearchResultStats do
+  @moduledoc false
   use Surface.Component
 
   prop(total_hits, :number)

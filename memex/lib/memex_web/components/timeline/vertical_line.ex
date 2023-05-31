@@ -1,4 +1,5 @@
 defmodule MemexWeb.Timeline.VerticalLine do
+  @moduledoc false
   use Surface.Component
 
   prop(class, :string, default: "")

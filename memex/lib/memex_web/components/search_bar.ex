@@ -1,4 +1,5 @@
 defmodule MemexWeb.SearchBar do
+  @moduledoc false
   use Surface.Component
 
   prop(query, :string)

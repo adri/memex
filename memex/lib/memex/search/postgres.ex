@@ -1,10 +1,12 @@
 defmodule Memex.Search.Postgres do
-  alias Memex.Schema.Document
-  alias Memex.Repo
-  alias Memex.Search.Query
+  @moduledoc false
   import Ecto.Query
 
-  def query(query = %Query{}) do
+  alias Memex.Repo
+  alias Memex.Schema.Document
+  alias Memex.Search.Query
+
+  def query(%Query{} = query) do
     from(d in Document)
     |> add_search(query)
     |> add_select(query)
@@ -63,8 +65,7 @@ defmodule Memex.Search.Postgres do
     Repo.all(q)
   end
 
-  defp prepare_filters(%Query{select: [facet: "month"]} = query),
-    do: Map.delete(query.filters, "month")
+  defp prepare_filters(%Query{select: [facet: "month"]} = query), do: Map.delete(query.filters, "month")
 
   defp prepare_filters(%Query{} = query), do: query.filters
 
@@ -162,7 +163,8 @@ defmodule Memex.Search.Postgres do
   end
 
   defp format_results(results, %Query{select: [facet: "month"]} = _query) do
-    Map.merge(Map.new(month_range_cached()), Map.new(results))
+    Map.new(month_range_cached())
+    |> Map.merge(Map.new(results))
     |> Enum.sort(&(&1 > &2))
   end
 
@@ -181,32 +183,24 @@ defmodule Memex.Search.Postgres do
   end
 
   defp format_hit_value(value, words) when is_binary(value) do
-    encoded =
-      words
-      |> Enum.map(&Regex.escape/1)
-      |> Enum.join("|")
+    encoded = Enum.map_join(words, "|", &Regex.escape/1)
 
     String.replace(value, ~r/(#{encoded})/i, "<em>\\1</em>")
   end
 
-  defp format_hit_value(value, words) when is_list(value),
-    do: Enum.map(value, &format_hit_value(&1, words))
+  defp format_hit_value(value, words) when is_list(value), do: Enum.map(value, &format_hit_value(&1, words))
 
   defp format_hit_value(value, _words), do: value
 
-  defp month_range_cached() do
+  defp month_range_cached do
     ConCache.get_or_store(:search, "month_range", &month_range/0)
   end
 
-  defp month_range() do
-    earliest =
-      from(d in Document, order_by: [asc: d.created_at], limit: 1)
-      |> Repo.one()
+  defp month_range do
+    earliest = Repo.one(from(d in Document, order_by: [asc: d.created_at], limit: 1))
 
-    Month.Range.new!(
-      Month.new!(earliest.created_at),
-      Month.utc_now!()
-    ).months
-    |> Enum.map(fn m -> {Month.to_string(m), 0} end)
+    Enum.map(Month.Range.new!(Month.new!(earliest.created_at), Month.utc_now!()).months, fn m ->
+      {Month.to_string(m), 0}
+    end)
   end
 end

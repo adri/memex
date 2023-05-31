@@ -1,7 +1,9 @@
 defmodule Memex.Importers.ApplePhotos do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -22,9 +24,9 @@ defmodule Memex.Importers.ApplePhotos do
     field(:device_name, :string)
   end
 
-  def provider(), do: "Photos"
+  def provider, do: "Photos"
 
-  def default_config() do
+  def default_config do
     %{
       "location" => "#{System.user_home!()}/Pictures/Photos\ Library.photoslibrary",
       "schedule" => :watcher
@@ -124,8 +126,7 @@ defmodule Memex.Importers.ApplePhotos do
   end
 
   def transform(result, _config) do
-    result
-    |> Enum.map(fn item ->
+    Enum.map(result, fn item ->
       %{
         item
         | "place_name" => Enum.reject(item["place_name"] || [], fn x -> x in ["", nil] end),
@@ -137,6 +138,7 @@ defmodule Memex.Importers.ApplePhotos do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     alias MemexWeb.Router.Helpers, as: Routes

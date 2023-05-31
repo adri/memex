@@ -1,12 +1,13 @@
 defmodule MemexWeb.Timeline do
+  @moduledoc false
   use Surface.Component
 
+  alias MemexWeb.Router.Helpers, as: Routes
   alias MemexWeb.Timeline.Card
+  alias MemexWeb.Timeline.DateBorder
   alias MemexWeb.Timeline.ProviderIcon
   alias MemexWeb.Timeline.Time
   alias MemexWeb.Timeline.VerticalLine
-  alias MemexWeb.Timeline.DateBorder
-  alias MemexWeb.Router.Helpers, as: Routes
 
   prop query, :string, default: ""
   prop page, :number, default: 1
@@ -267,8 +268,7 @@ defmodule MemexWeb.Timeline do
   defp unique_query_id(query), do: Base.encode16(query)
 
   defp timeline_classes(items, hit, index) do
-    previous_results_between =
-      MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
+    previous_results_between = MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
 
     results_between = MemexWeb.TimelineView.count_results_between(items, hit["timestamp_unix"])
 
@@ -288,8 +288,7 @@ defmodule MemexWeb.Timeline do
   end
 
   defp previous_timeline_classes(items, hit, index) do
-    previous_results_between =
-      MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
+    previous_results_between = MemexWeb.TimelineView.count_results_between(items, previous_timestamp(items, index))
 
     results_between = MemexWeb.TimelineView.count_results_between(items, hit["timestamp_unix"])
 

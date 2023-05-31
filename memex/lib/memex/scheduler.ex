@@ -1,7 +1,8 @@
 defmodule Memex.Scheduler do
-  alias Memex.Importer
-
+  @moduledoc false
   use GenServer
+
+  alias Memex.Importer
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, %{})
@@ -33,10 +34,10 @@ defmodule Memex.Scheduler do
     {:noreply, state}
   end
 
-  defp run() do
+  defp run do
     IO.inspect("Running importer", label: "scheduler")
 
-    Importer.configured_importers()
+    Enum.map(Importer.configured_importers(), fn importer -> Importer.import(importer) end)
     # todo:
     # - loop all importers
     # - loop all documents of an importer
@@ -44,10 +45,9 @@ defmodule Memex.Scheduler do
     #   - if it's :watcher, start a watcher that runs the import
     #   - if it's :interval, 10, :minutes schedule a job
     #   - (future) if it's :auto, get schedule a job based on history
-    |> Enum.map(fn importer -> Importer.import(importer) end)
   end
 
-  defp register_watcher() do
+  defp register_watcher do
     IO.inspect("Watching paths")
     IO.inspect(Importer.get_dirs_to_watch())
     {:ok, pid} = FileSystem.start_link(dirs: [Importer.get_dirs_to_watch()])
@@ -56,7 +56,7 @@ defmodule Memex.Scheduler do
     {:ok, pid}
   end
 
-  defp schedule() do
+  defp schedule do
     Process.send_after(self(), :run, 1 * 60 * 60 * 1000)
   end
 end

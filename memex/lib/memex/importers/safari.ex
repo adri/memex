@@ -1,7 +1,9 @@
 defmodule Memex.Importers.Safari do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -15,9 +17,9 @@ defmodule Memex.Importers.Safari do
     field :device_name, :string
   end
 
-  def provider(), do: "Safari"
+  def provider, do: "Safari"
 
-  def default_config() do
+  def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Safari/History.db",
       "schedule" => :watcher
@@ -59,6 +61,7 @@ defmodule Memex.Importers.Safari do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     prop item, :map, required: true

@@ -1,7 +1,9 @@
 defmodule Memex.Importers.Notes do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -14,15 +16,15 @@ defmodule Memex.Importers.Notes do
     field :commit_diff, :string
   end
 
-  def provider(), do: "git-notes"
+  def provider, do: "git-notes"
 
-  def default_config() do
+  def default_config do
     %{
       "schedule" => :watcher
     }
   end
 
-  def required_config() do
+  def required_config do
     ["path"]
   end
 
@@ -62,6 +64,7 @@ defmodule Memex.Importers.Notes do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     prop item, :map, required: true
@@ -93,8 +96,7 @@ defmodule Memex.Importers.Notes do
 
     defp parse_patch(patch) do
       {:ok, parsed_diff} = GitDiff.parse_patch(patch)
-      parsed_diff |> IO.inspect(label: "92")
-
+      IO.inspect(parsed_diff, label: "92")
       parsed_diff
     end
   end

@@ -1,4 +1,5 @@
 defmodule MemexWeb.TimeDuration do
+  @moduledoc false
   use Surface.Component
 
   prop start_time, :datetime, required: true

@@ -20,12 +20,13 @@ defmodule MemexWeb.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
+      use MemexWeb, :verified_routes
+
       import MemexWeb.ConnCase
+      import Phoenix.ConnTest
+      import Plug.Conn
 
       alias MemexWeb.Router.Helpers, as: Routes
-      use MemexWeb, :verified_routes
 
       # The default endpoint for testing
       @endpoint MemexWeb.Endpoint

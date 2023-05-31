@@ -1,4 +1,5 @@
 defmodule Memex.Schema.ImporterConfig do
+  @moduledoc false
   use Ecto.Schema
 
   @primary_key {:id, :string, autogenerate: false}

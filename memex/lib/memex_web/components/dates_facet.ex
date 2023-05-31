@@ -1,4 +1,5 @@
 defmodule MemexWeb.DatesFacet do
+  @moduledoc false
   use Surface.Component
 
   prop(dates, :list)
@@ -42,7 +43,8 @@ defmodule MemexWeb.DatesFacet do
   end
 
   defp max_count(dates) do
-    Enum.max_by(dates, fn {_date, count} -> count end, fn -> {"", 0} end)
+    dates
+    |> Enum.max_by(fn {_date, count} -> count end, fn -> {"", 0} end)
     |> elem(1)
   end
 end

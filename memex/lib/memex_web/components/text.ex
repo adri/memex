@@ -1,6 +1,9 @@
 defmodule MemexWeb.Components.Text do
+  @moduledoc false
   defmodule H1 do
+    @moduledoc false
     use Surface.Component
+
     slot default
 
     def render(assigns) do
@@ -11,7 +14,9 @@ defmodule MemexWeb.Components.Text do
   end
 
   defmodule H2 do
+    @moduledoc false
     use Surface.Component
+
     slot default
 
     def render(assigns) do
@@ -22,7 +27,9 @@ defmodule MemexWeb.Components.Text do
   end
 
   defmodule SubtTitle do
+    @moduledoc false
     use Surface.Component
+
     slot default
 
     def render(assigns) do

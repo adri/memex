@@ -28,9 +28,11 @@ defmodule MemexWeb do
         formats: [:html, :json],
         layouts: [html: MemexWeb.Layouts]
 
-      import Plug.Conn
       import MemexWeb.Gettext
+      import Plug.Conn
+
       alias MemexWeb.Router.Helpers, as: Routes
+
       unquote(verified_routes())
     end
   end
@@ -48,6 +50,7 @@ defmodule MemexWeb do
   def live_component do
     quote do
       use Phoenix.LiveComponent
+
       unquote(html_helpers())
     end
   end
@@ -66,15 +69,16 @@ defmodule MemexWeb do
     quote do
       use Phoenix.Router
 
-      import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import Plug.Conn
     end
   end
 
   def channel do
     quote do
       use Phoenix.Channel
+
       import MemexWeb.Gettext
     end
   end
@@ -94,14 +98,14 @@ defmodule MemexWeb do
   defp html_helpers do
     quote do
       # HTML escaping functionality
-      import Phoenix.HTML
       # Core UI components and translation
       import MemexWeb.CoreComponents
       import MemexWeb.Gettext
-      # Shortcut for generating JS commands
-      alias Phoenix.LiveView.JS
+      import Phoenix.HTML
 
+      # Shortcut for generating JS commands
       alias MemexWeb.Router.Helpers, as: Routes
+      alias Phoenix.LiveView.JS
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
@@ -138,8 +142,7 @@ defmodule MemexWeb do
         pid = self()
         child_pid = spawn(fn -> send(pid, {:async_assign, callback.()}) end)
 
-        socket
-        |> assign("#{key}_pid", child_pid)
+        assign(socket, "#{key}_pid", child_pid)
       end
 
       defp assign_async_loading?(socket, key) do

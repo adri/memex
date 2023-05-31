@@ -1,12 +1,12 @@
 defmodule Memex.Vault do
+  @moduledoc false
   use Cloak.Vault, otp_app: :memex
 
   @impl GenServer
   def init(config) do
     config =
       Keyword.put(config, :ciphers,
-        default:
-          {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("SECRETS_ENCRYPTION_KEY")}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("SECRETS_ENCRYPTION_KEY")}
       )
 
     {:ok, config}

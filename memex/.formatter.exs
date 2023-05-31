@@ -5,6 +5,7 @@
   subdirectories: ["priv/*/migrations"],
   plugins: [
     Surface.Formatter.Plugin,
-    Phoenix.LiveView.HTMLFormatter
+    Phoenix.LiveView.HTMLFormatter,
+    Styler
   ]
 ]

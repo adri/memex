@@ -29,9 +29,10 @@ defmodule Memex.Search.Query do
   end
 
   defp maybe_quote(value) do
-    case String.contains?(value, " ") do
-      true -> "\"#{value}\""
-      false -> value
+    if String.contains?(value, " ") do
+      "\"#{value}\""
+    else
+      value
     end
   end
 
@@ -55,9 +56,6 @@ defmodule Memex.Search.Query do
   defp parse_filters([]), do: %{}
 
   defp parse_filters(filters) do
-    filters
-    |> Enum.reduce(%{}, fn [_, key, value], acc ->
-      Map.put(acc, key, String.trim(value, "\""))
-    end)
+    Enum.reduce(filters, %{}, fn [_, key, value], acc -> Map.put(acc, key, String.trim(value, "\"")) end)
   end
 end

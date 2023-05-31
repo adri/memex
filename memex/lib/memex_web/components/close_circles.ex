@@ -1,4 +1,5 @@
 defmodule MemexWeb.CloseCircles do
+  @moduledoc false
   use Surface.Component
 
   def render(assigns) do

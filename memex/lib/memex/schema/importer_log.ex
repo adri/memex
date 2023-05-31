@@ -1,9 +1,13 @@
 defmodule Memex.Schema.ImporterLog do
+  @moduledoc false
   use Ecto.Schema
-  alias Memex.Repo
+
   import Ecto.Query
 
+  alias Memex.Repo
+
   defmodule Memex.Schema.ImporterLog.Query do
+    @moduledoc false
     defstruct select: :hits_with_highlights,
               filters: %{},
               aggregates: %{},
@@ -22,7 +26,7 @@ defmodule Memex.Schema.ImporterLog do
     timestamps()
   end
 
-  def aggregate(query = %Memex.Schema.ImporterLog.Query{}) do
+  def aggregate(%Memex.Schema.ImporterLog.Query{} = query) do
     from(il in __MODULE__)
     |> add_filters(query.filters)
     |> add_aggregates(query.aggregates)
@@ -59,18 +63,18 @@ defmodule Memex.Schema.ImporterLog do
     end)
   end
 
-  def count_by_config() do
+  def count_by_config do
     from(
       il in __MODULE__,
       group_by: il.config_id,
       select: {il.config_id, count(il.id)}
     )
     |> Repo.all()
-    |> Enum.into(%{})
+    |> Map.new()
   end
 
   # last import date and state for each config
-  def last_imports() do
+  def last_imports do
     from(
       il in __MODULE__,
       distinct: il.config_id,
@@ -85,6 +89,6 @@ defmodule Memex.Schema.ImporterLog do
       order_by: [desc: il.inserted_at]
     )
     |> Repo.all()
-    |> Enum.into(%{})
+    |> Map.new()
   end
 end

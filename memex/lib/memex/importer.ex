@@ -1,21 +1,26 @@
 defmodule Memex.Importer do
-  @max_records_per_batch 20000
-  @pubsub Memex.PubSub
+  @moduledoc false
+  import Memex.Connector
 
   alias Memex.Repo
   alias Memex.Schema.Document
   alias Memex.Schema.ImporterLog
-  import Memex.Connector
+
+  @max_records_per_batch 20_000
+  @pubsub Memex.PubSub
 
   defmodule Sqlite do
+    @moduledoc false
     defstruct [:location, :query, setup: [], connection_options: []]
   end
 
   defmodule Command do
+    @moduledoc false
     defstruct [:command, :arguments]
   end
 
   defmodule Shell do
+    @moduledoc false
     defstruct [:command]
   end
 
@@ -24,14 +29,15 @@ defmodule Memex.Importer do
   end
 
   defmodule JsonFile do
+    @moduledoc false
     defstruct [:location, :compressed]
   end
 
   def parse_body(""), do: {:error, :no_data}
   def parse_body([]), do: {:error, :no_data}
-  def parse_body(list), do: {:ok, list |> Enum.map(&[body: &1])}
+  def parse_body(list), do: {:ok, Enum.map(list, &[body: &1])}
 
-  def available_importers() do
+  def available_importers do
     with {:ok, list} <- :application.get_key(:memex, :modules) do
       list
       |> Enum.filter(&(&1 |> Module.split() |> Enum.take(2) == ~w|Memex Importers|))
@@ -39,18 +45,17 @@ defmodule Memex.Importer do
         {:module, module} = Code.ensure_loaded(module)
         module
       end)
-      |> Enum.filter(&(&1 |> function_exported?(:provider, 0)))
-      |> Enum.map(fn module -> {module.provider(), module} end)
-      |> Enum.into(%{})
+      |> Enum.filter(&function_exported?(&1, :provider, 0))
+      |> Map.new(fn module -> {module.provider(), module} end)
     end
   end
 
-  def configured_importers() do
+  def configured_importers do
     Repo.all(Memex.Schema.ImporterConfig)
   end
 
-  def register_importers() do
-    existing_importers = configured_importers() |> Enum.map(& &1.provider)
+  def register_importers do
+    existing_importers = Enum.map(configured_importers(), & &1.provider)
 
     available_importers()
     |> Enum.reject(fn {id, _importer} -> Enum.member?(existing_importers, id) end)
@@ -76,7 +81,7 @@ defmodule Memex.Importer do
     })
   end
 
-  def subscribe() do
+  def subscribe do
     Phoenix.PubSub.subscribe(@pubsub, topic())
   end
 
@@ -84,7 +89,7 @@ defmodule Memex.Importer do
     Phoenix.PubSub.broadcast!(@pubsub, topic(), {__MODULE__, msg})
   end
 
-  defp topic(), do: "importer:*"
+  defp topic, do: "importer:*"
 
   def insert(list) do
     with {:ok, documents} <- parse_body(list) do
@@ -125,7 +130,7 @@ defmodule Memex.Importer do
     end
   end
 
-  def get_dirs_to_watch() do
+  def get_dirs_to_watch do
     configured_importers()
     |> Enum.map(fn config ->
       with {:ok, module} <- get_module(config),
@@ -211,18 +216,14 @@ defmodule Memex.Importer do
         result
       end
 
-    documents =
-      result
-      |> Enum.map(fn item -> Ecto.Changeset.cast(struct(module), item, fields) end)
+    documents = Enum.map(result, fn item -> Ecto.Changeset.cast(struct(module), item, fields) end)
 
     valid =
       documents
       |> Enum.filter(fn document -> document.valid? end)
       |> Enum.map(fn document -> document.changes end)
 
-    invalid =
-      documents
-      |> Enum.filter(fn document -> not document.valid? end)
+    invalid = Enum.filter(documents, fn document -> not document.valid? end)
 
     {:ok, valid, invalid}
   end

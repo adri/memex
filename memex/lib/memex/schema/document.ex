@@ -1,7 +1,9 @@
 defmodule Memex.Schema.Document do
+  @moduledoc false
   use Ecto.Schema
-  alias Memex.Schema.Relation
+
   alias Memex.Schema.ImporterLog
+  alias Memex.Schema.Relation
 
   @primary_key {:id, :string, autogenerate: false}
 

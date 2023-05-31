@@ -2,13 +2,14 @@ defmodule Memex.Importers.Github do
   @moduledoc """
   [Github Event Documentation](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types)
   """
+  use Ecto.Schema
+
+  alias Memex.Importer
+
   @provider "GitHub"
   @defaults %{"provider" => @provider}
   @ignore_item %{}
 
-  alias Memex.Importer
-
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -30,9 +31,9 @@ defmodule Memex.Importers.Github do
     field :github_user_avatar, :string
   end
 
-  def provider(), do: @provider
+  def provider, do: @provider
 
-  def default_config() do
+  def default_config do
     %{
       "user_name" => "",
       "page" => 1,
@@ -41,7 +42,7 @@ defmodule Memex.Importers.Github do
     }
   end
 
-  def required_config() do
+  def required_config do
     ["user_name", "access_token"]
   end
 
@@ -51,8 +52,7 @@ defmodule Memex.Importers.Github do
       headers: [
         {"Accept", "application/vnd.github.v3+json"},
         {"User-Agent", "curl/7.64.1"},
-        {"Authorization",
-         "Basic #{Base.encode64("#{config["user_name"]}:#{config["access_token"]}")}"}
+        {"Authorization", "Basic #{Base.encode64("#{config["user_name"]}:#{config["access_token"]}")}"}
       ]
     }
   end
@@ -114,35 +114,20 @@ defmodule Memex.Importers.Github do
   end
 
   defp parse_issue(%{"payload" => %{"issue" => issue}}),
-    do: %{
-      "issue_title" => issue["title"],
-      "issue_body" => issue["body"],
-      "issue_url" => issue["html_url"]
-    }
+    do: %{"issue_title" => issue["title"], "issue_body" => issue["body"], "issue_url" => issue["html_url"]}
 
   defp parse_issue(%{"payload" => %{"pull_request" => issue}}),
-    do: %{
-      "issue_title" => issue["title"],
-      "issue_body" => issue["body"],
-      "issue_url" => issue["html_url"]
-    }
+    do: %{"issue_title" => issue["title"], "issue_body" => issue["body"], "issue_url" => issue["html_url"]}
 
   defp parse_issue(_item), do: %{}
 
   defp parse_review(%{"payload" => %{"review" => review}}),
-    do: %{
-      "review_body" => review["body"],
-      "review_state" => review["state"],
-      "review_url" => review["html_url"]
-    }
+    do: %{"review_body" => review["body"], "review_state" => review["state"], "review_url" => review["html_url"]}
 
   defp parse_review(_item), do: %{}
 
   defp parse_comment(%{"payload" => %{"comment" => comment}}),
-    do: %{
-      "comment_body" => comment["body"],
-      "comment_url" => comment["html_url"]
-    }
+    do: %{"comment_body" => comment["body"], "comment_url" => comment["html_url"]}
 
   defp parse_comment(_item), do: %{}
 
@@ -151,14 +136,12 @@ defmodule Memex.Importers.Github do
   defp parse_user(%{"payload" => %{"user" => user}}), do: map_user(user)
   defp parse_user(_item), do: %{}
 
-  defp map_user(user),
-    do: %{
-      "github_user_name" => user["login"],
-      "github_user_avatar" => user["avatar_url"]
-    }
+  defp map_user(user), do: %{"github_user_name" => user["login"], "github_user_avatar" => user["avatar_url"]}
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
+
     alias MemexWeb.Router.Helpers, as: Routes
 
     prop item, :map
@@ -206,6 +189,7 @@ defmodule Memex.Importers.Github do
   end
 
   defmodule HomepageItem do
+    @moduledoc false
     use Surface.Component
 
     def render(assigns) do

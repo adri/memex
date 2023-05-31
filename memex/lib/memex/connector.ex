@@ -1,4 +1,5 @@
 defmodule Memex.Connector do
+  @moduledoc false
   alias Exqlite.Basic, as: Sqlite3
   alias Exqlite.Connection
 

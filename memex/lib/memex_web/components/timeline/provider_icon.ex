@@ -1,4 +1,5 @@
 defmodule MemexWeb.Timeline.ProviderIcon do
+  @moduledoc false
   use Surface.Component
 
   prop(provider, :string)

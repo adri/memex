@@ -1,7 +1,9 @@
 defmodule Memex.Importers.Arc do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field(:provider, :string)
@@ -30,19 +32,19 @@ defmodule Memex.Importers.Arc do
     field(:activity_active_energy_burned, :float)
   end
 
-  def provider(), do: "Arc"
+  def provider, do: "Arc"
 
-  def default_config() do
+  def default_config do
     %{
-      "location" =>
-        "#{System.user_home!()}/Library/Mobile\ Documents/iCloud~com~bigpaua~LearnerCoacher/",
+      "location" => "#{System.user_home!()}/Library/Mobile\ Documents/iCloud~com~bigpaua~LearnerCoacher/",
       "schedule" => :watcher
     }
   end
 
   def fetch(config) do
     location =
-      Path.wildcard("#{config["location"]}/Documents/Export/JSON/Monthly/*.json.gz")
+      "#{config["location"]}/Documents/Export/JSON/Monthly/*.json.gz"
+      |> Path.wildcard()
       |> Enum.sort(:desc)
       |> Enum.at(0)
 
@@ -82,7 +84,8 @@ defmodule Memex.Importers.Arc do
   end
 
   defp parse_item(%{"isVisit" => true, "place" => place} = item, _config) do
-    parse_common(item)
+    item
+    |> parse_common()
     |> Map.merge(%{
       verb: "visited",
       place_altitude: item["altitude"]
@@ -94,10 +97,12 @@ defmodule Memex.Importers.Arc do
     path = "#{config["location"]}Documents/Backups/Place/#{String.at(placeId, 0)}/#{placeId}.json"
 
     {:ok, place} =
-      Path.wildcard(path)
+      path
+      |> Path.wildcard()
       |> Memex.Connector.json_file(false)
 
-    parse_common(item)
+    item
+    |> parse_common()
     |> Map.merge(%{
       verb: "visited",
       place_altitude: item["altitude"]
@@ -106,7 +111,8 @@ defmodule Memex.Importers.Arc do
   end
 
   defp parse_item(%{"isVisit" => false} = item, _config) do
-    parse_common(item)
+    item
+    |> parse_common()
     |> Map.merge(%{
       verb: "moved",
       activity_type: item["activityType"]
@@ -127,6 +133,7 @@ defmodule Memex.Importers.Arc do
   end
 
   defmodule TimelineItem do
+    @moduledoc false
     use Surface.Component
 
     prop(item, :map)

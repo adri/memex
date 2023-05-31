@@ -1,7 +1,9 @@
 defmodule Memex.Importers.AppleMessages do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -17,9 +19,9 @@ defmodule Memex.Importers.AppleMessages do
     field :person_id, :string
   end
 
-  def provider(), do: "iMessage"
+  def provider, do: "iMessage"
 
-  def default_config() do
+  def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Messages/chat.db",
       "contacts_db" =>
@@ -80,6 +82,7 @@ defmodule Memex.Importers.AppleMessages do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     prop item, :map, required: true

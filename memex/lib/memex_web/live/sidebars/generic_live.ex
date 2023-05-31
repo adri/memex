@@ -1,4 +1,5 @@
 defmodule MemexWeb.Sidebars.GenericLive do
+  @moduledoc false
   use MemexWeb, :surface_live_view
 
   alias Memex.Search.Postgres
@@ -17,8 +18,7 @@ defmodule MemexWeb.Sidebars.GenericLive do
 
     {
       :ok,
-      socket
-      |> assign(doc: doc, within: within)
+      assign(socket, doc: doc, within: within)
       #  |> async_query(:items, [], %Query{
       #    limit: 20,
       #    filters: %{"created_at_betweeenc" => doc["timestamp_utc"]},

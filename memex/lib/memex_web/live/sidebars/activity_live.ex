@@ -1,12 +1,13 @@
 defmodule MemexWeb.Sidebars.ActivityLive do
+  @moduledoc false
   use MemexWeb, :surface_live_view
 
   alias Memex.Search.Postgres
   alias Memex.Search.Query
-  alias MemexWeb.Timeline
   alias MemexWeb.Map
-  alias MemexWeb.Timeline.Card
   alias MemexWeb.TimeDuration
+  alias MemexWeb.Timeline
+  alias MemexWeb.Timeline.Card
 
   def mount(params, session, socket) do
     {:ok, doc} = Postgres.find(session["id"] || params["id"])

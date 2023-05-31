@@ -1,5 +1,7 @@
 defmodule MemexWeb.Map do
+  @moduledoc false
   use Surface.Component
+
   alias MemexWeb.Router.Helpers, as: Routes
 
   prop geojson_path, :string, required: true
@@ -45,8 +47,7 @@ defmodule MemexWeb.Map do
           "style" => %{
             "width" => "40px",
             "height" => "40px",
-            "backgroundImage" =>
-              "url(#{Routes.photo_path(MemexWeb.Endpoint, :image, item["photo_file_path"])})",
+            "backgroundImage" => "url(#{Routes.photo_path(MemexWeb.Endpoint, :image, item["photo_file_path"])})",
             "backgroundSize" => "100%",
             "borderColor" => "white",
             "borderWidth" => "2px",

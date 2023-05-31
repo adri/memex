@@ -1,4 +1,5 @@
 defmodule MemexWeb.Timeline.DateBorder do
+  @moduledoc false
   use Surface.Component
 
   prop(date, :datetime, required: true)

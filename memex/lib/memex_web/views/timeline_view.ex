@@ -12,7 +12,8 @@ defmodule MemexWeb.TimelineView do
   end
 
   def days_between(timestamp1, timestamp2) do
-    Date.diff(date_from_timestamp(timestamp2), date_from_timestamp(timestamp1))
+    date_from_timestamp(timestamp2)
+    |> Date.diff(date_from_timestamp(timestamp1))
     |> max(0)
   end
 
@@ -21,19 +22,15 @@ defmodule MemexWeb.TimelineView do
   end
 
   def timestamp_start_between(results, time_range) do
-    results
-    |> Enum.filter(fn hit ->
+    Enum.filter(results, fn hit ->
       hit["timestamp_start_unix"] && Enum.member?(time_range, hit["timestamp_start_unix"])
     end)
   end
 
   def count_results_between(results, timestamp) do
-    results
-    |> Enum.filter(fn hit ->
-      hit["timestamp_start_unix"] &&
-        Enum.member?(hit["timestamp_start_unix"]..hit["timestamp_unix"], timestamp)
+    Enum.count(results, fn hit ->
+      hit["timestamp_start_unix"] && Enum.member?(hit["timestamp_start_unix"]..hit["timestamp_unix"], timestamp)
     end)
-    |> Enum.count()
   end
 
   def timeline_classes(results, hit, index) do
@@ -81,11 +78,11 @@ defmodule MemexWeb.TimelineView do
         "#{div(diff, 60)} minutes"
 
       diff >= 3600 && diff < 7200 ->
-        min = rem(diff, 3600) |> div(60)
+        min = diff |> rem(3600) |> div(60)
         "a 1 hour and #{min} minutes"
 
       diff >= 7200 ->
-        min = rem(diff, 3600) |> div(60)
+        min = diff |> rem(3600) |> div(60)
         "#{div(diff, 3600)} hours and #{min} minutes"
     end
   end
@@ -128,17 +125,19 @@ defmodule MemexWeb.TimelineView do
   end
 
   def date_from_timestamp(timestamp) do
-    cond do
-      is_integer(timestamp) ->
-        timestamp
+    cond_result =
+      cond do
+        is_integer(timestamp) ->
+          timestamp
 
-      is_float(timestamp) ->
-        round(timestamp)
+        is_float(timestamp) ->
+          round(timestamp)
 
-      true ->
-        String.to_integer(timestamp)
-    end
-    |> DateTime.from_unix!()
+        true ->
+          String.to_integer(timestamp)
+      end
+
+    DateTime.from_unix!(cond_result)
   end
 
   def file_header(patch, status) do
@@ -214,7 +213,6 @@ defmodule MemexWeb.TimelineView do
   def number_to_currency(number, currency) do
     {:ok, money} = Money.parse(number, currency)
 
-    money
-    |> Money.to_string(symbol: true)
+    Money.to_string(money, symbol: true)
   end
 end

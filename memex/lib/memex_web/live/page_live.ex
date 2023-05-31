@@ -1,15 +1,16 @@
 defmodule MemexWeb.PageLive do
+  @moduledoc false
   use MemexWeb, :surface_live_view
 
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
-  alias MemexWeb.Timeline
-  alias MemexWeb.SearchResultStats
-  alias MemexWeb.SearchBar
-  alias MemexWeb.DatesFacet
-  alias MemexWeb.SidebarsComponent
-  alias MemexWeb.Components.Icons.SettingsIcon
   alias MemexWeb.Components.Badge
+  alias MemexWeb.Components.Icons.SettingsIcon
+  alias MemexWeb.DatesFacet
+  alias MemexWeb.SearchBar
+  alias MemexWeb.SearchResultStats
+  alias MemexWeb.SidebarsComponent
+  alias MemexWeb.Timeline
 
   data query, :string, default: ""
   data items, :list, default: []
@@ -63,7 +64,7 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("search", %{"query" => ""}, socket) do
-    {:noreply, socket |> assign(query: "", page: 1, selected_index: 0, items: [])}
+    {:noreply, assign(socket, query: "", page: 1, selected_index: 0, items: [])}
   end
 
   def handle_event("search", %{"query" => query}, socket) do
@@ -90,19 +91,19 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("key-pressed", %{"key" => "ArrowDown"}, %{assigns: assigns} = socket) do
-    {:noreply,
-     socket |> assign(selected_index: min(assigns.selected_index + 1, length(assigns.items)))}
+    {:noreply, assign(socket, selected_index: min(assigns.selected_index + 1, length(assigns.items)))}
   end
 
   def handle_event("key-pressed", %{"key" => "ArrowUp"}, %{assigns: assigns} = socket) do
-    {:noreply, socket |> assign(selected_index: max(assigns.selected_index - 1, 0))}
+    {:noreply, assign(socket, selected_index: max(assigns.selected_index - 1, 0))}
   end
 
   def handle_event("key-pressed", _, socket), do: {:noreply, socket}
 
   def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
     query =
-      Query.from_string(string)
+      string
+      |> Query.from_string()
       |> Query.remove_filter("time")
       |> Query.add_filter(data["key"], data["value"])
       |> Query.to_string()
@@ -112,7 +113,8 @@ defmodule MemexWeb.PageLive do
 
   def handle_event("filter-reset", data, socket) do
     query =
-      Query.from_string("")
+      ""
+      |> Query.from_string()
       |> Query.add_filter(data["key"], data["value"])
       |> Query.to_string()
 
@@ -121,12 +123,12 @@ defmodule MemexWeb.PageLive do
 
   @impl true
   def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
-    {:noreply, socket |> assign(sidebars: Sidebars.open(sidebars, data))}
+    {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
   end
 
   @impl true
   def handle_event("close-last-sidebar", _key, %{assigns: %{sidebars: sidebars}} = socket) do
-    {:noreply, socket |> assign(sidebars: Sidebars.close_last(sidebars))}
+    {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
   defp search(%{assigns: %{page: page, query: string}} = socket) do

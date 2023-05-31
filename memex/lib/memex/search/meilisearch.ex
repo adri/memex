@@ -1,10 +1,11 @@
 defmodule Memex.Search.Meilisearch do
+  @moduledoc false
   alias Memex.Search.Query
 
   @date_facet "month"
   @results_per_page 20
 
-  def search(query = %Query{}, page, _surroundings, client \\ new()) do
+  def search(%Query{} = query, page, _surroundings, client \\ new()) do
     index_name = System.get_env("INDEX_NAME")
     {:ok, settings} = get_index_settings(index_name, client)
     params = query_to_params(query, page, settings)
@@ -46,13 +47,16 @@ defmodule Memex.Search.Meilisearch do
   end
 
   defp query_to_params(query, page, settings) do
-    %{
-      "q" => Query.to_string(query),
-      "limit" => @results_per_page * page,
-      "facetsDistribution" => ["date_month"],
-      "attributesToHighlight" => ["*"]
-    }
-    |> handle_filters(query.filters, settings)
+    handle_filters(
+      %{
+        "q" => Query.to_string(query),
+        "limit" => @results_per_page * page,
+        "facetsDistribution" => ["date_month"],
+        "attributesToHighlight" => ["*"]
+      },
+      query.filters,
+      settings
+    )
   end
 
   defp handle_filters(params, filters, _settings) when filters == %{}, do: params
@@ -73,10 +77,7 @@ defmodule Memex.Search.Meilisearch do
 
   defp add_filters_to_params(params, filters) do
     Map.merge(params, %{
-      "filters" =>
-        filters
-        |> Enum.map(fn {key, value} -> "#{key}=#{value}" end)
-        |> Enum.join(" AND ")
+      "filters" => Enum.map_join(filters, " AND ", fn {key, value} -> "#{key}=#{value}" end)
     })
   end
 
@@ -84,9 +85,7 @@ defmodule Memex.Search.Meilisearch do
 
   defp add_facet_filters_to_params(params, facet_filters) do
     Map.merge(params, %{
-      "facetFilters" =>
-        facet_filters
-        |> Enum.map(fn {key, value} -> "#{key}:#{value}" end)
+      "facetFilters" => Enum.map(facet_filters, fn {key, value} -> "#{key}:#{value}" end)
     })
   end
 
@@ -102,7 +101,7 @@ defmodule Memex.Search.Meilisearch do
     {:ok, %{"attributesForFaceting" => ["date_month"]}}
   end
 
-  defp new() do
+  defp new do
     url = System.get_env("MEILISEARCH_HOST")
 
     middleware = [

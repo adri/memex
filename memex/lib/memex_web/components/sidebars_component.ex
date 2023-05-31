@@ -1,4 +1,5 @@
 defmodule MemexWeb.SidebarsComponent do
+  @moduledoc false
   use Surface.Component
 
   prop(sidebars, :list, required: true)

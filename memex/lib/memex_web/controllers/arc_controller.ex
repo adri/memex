@@ -4,7 +4,8 @@ defmodule MemexWeb.ArcController do
   @arc_export_path "/Users/adrimbp/Library/Mobile\ Documents/iCloud~com~bigpaua~LearnerCoacher/Documents/Export/"
 
   def geopoint(conn, %{"date" => date, "id" => timeline_item_id} = _params) do
-    find_timeline_item(date, timeline_item_id)
+    date
+    |> find_timeline_item(timeline_item_id)
     |> case do
       {:ok, item} ->
         conn
@@ -12,8 +13,7 @@ defmodule MemexWeb.ArcController do
         |> json(item)
 
       {:error, _error} ->
-        conn
-        |> send_resp(404, "Not found")
+        send_resp(conn, 404, "Not found")
     end
   end
 
@@ -29,17 +29,16 @@ defmodule MemexWeb.ArcController do
         |> send_resp(200, content)
 
       {:error, _error} ->
-        conn
-        |> send_resp(404, "Not found")
+        send_resp(conn, 404, "Not found")
     end
   end
 
   def geojson(conn, %{"date" => date, "id" => timeline_item_id} = _params) do
-    find_timeline_item(date, timeline_item_id)
+    date
+    |> find_timeline_item(timeline_item_id)
     |> case do
       {:ok, item} ->
-        conn
-        |> json(%{
+        json(conn, %{
           "type" => "Feature",
           "properties" => %{},
           "geometry" => %{
@@ -47,15 +46,12 @@ defmodule MemexWeb.ArcController do
             "coordinates" =>
               item["samples"]
               |> Enum.filter(fn sample -> not is_nil(sample["location"]["longitude"]) end)
-              |> Enum.map(fn sample ->
-                [sample["location"]["longitude"], sample["location"]["latitude"]]
-              end)
+              |> Enum.map(fn sample -> [sample["location"]["longitude"], sample["location"]["latitude"]] end)
           }
         })
 
       {:error, _error} ->
-        conn
-        |> send_resp(404, "Not found")
+        send_resp(conn, 404, "Not found")
     end
   end
 
@@ -68,9 +64,7 @@ defmodule MemexWeb.ArcController do
     |> Jason.decode()
     |> case do
       {:ok, content} ->
-        item =
-          content["timelineItems"]
-          |> Enum.find(fn item -> item["itemId"] == timeline_item_id end)
+        item = Enum.find(content["timelineItems"], fn item -> item["itemId"] == timeline_item_id end)
 
         {:ok, item}
 

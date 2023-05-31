@@ -1,12 +1,14 @@
 defmodule MemexWeb.Sidebars.SettingsLive do
+  @moduledoc false
   use MemexWeb, :surface_live_view
-  alias Memex.Search.Query
-  alias MemexWeb.Components.Badge
+
   alias Memex.Importer
   alias Memex.Schema.ImporterLog
+  alias Memex.Search.Query
   alias Memex.Search.Sidebars
-  alias MemexWeb.Components.Text
+  alias MemexWeb.Components.Badge
   alias MemexWeb.Components.Icon
+  alias MemexWeb.Components.Text
   alias MemexWeb.Timeline.Card
 
   def mount(_params, _session, socket) do
@@ -14,7 +16,7 @@ defmodule MemexWeb.Sidebars.SettingsLive do
       Importer.subscribe()
     end
 
-    {:ok, socket |> fetch_data()}
+    {:ok, fetch_data(socket)}
   end
 
   def fetch_data(socket) do
@@ -24,15 +26,10 @@ defmodule MemexWeb.Sidebars.SettingsLive do
       Enum.reduce(importers, socket, fn importer, socket ->
         query = Query.from_string("provider:#{importer.provider}")
 
-        socket
-        |> async_query("total_hits_#{importer.id}", nil, %{query | select: :total_hits})
+        async_query(socket, "total_hits_#{importer.id}", nil, %{query | select: :total_hits})
       end)
 
-    socket
-    |> assign(
-      importers: importers,
-      logs: ImporterLog.last_imports()
-    )
+    assign(socket, importers: importers, logs: ImporterLog.last_imports())
   end
 
   @impl true

@@ -1,4 +1,5 @@
 defmodule MemexWeb.Components.Badge do
+  @moduledoc false
   use Surface.Component
 
   prop click, :event

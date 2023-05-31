@@ -1,4 +1,5 @@
 defmodule MemexWeb.Timeline.Card do
+  @moduledoc false
   use Surface.Component
 
   prop class, :css_class

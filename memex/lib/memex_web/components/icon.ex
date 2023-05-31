@@ -1,5 +1,7 @@
 defmodule MemexWeb.Components.Icon do
+  @moduledoc false
   defmodule Plus do
+    @moduledoc false
     use Surface.Component
 
     def render(assigns) do
@@ -16,6 +18,7 @@ defmodule MemexWeb.Components.Icon do
   end
 
   defmodule Settings do
+    @moduledoc false
     use Surface.Component
 
     def render(assigns) do

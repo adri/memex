@@ -1,7 +1,9 @@
 defmodule Memex.Importers.MoneyMoney do
+  @moduledoc false
+  use Ecto.Schema
+
   alias Memex.Importer
 
-  use Ecto.Schema
   @primary_key false
   schema "document" do
     field :provider, :string
@@ -19,9 +21,9 @@ defmodule Memex.Importers.MoneyMoney do
     field :transaction_purpose, :string
   end
 
-  def provider(), do: "MoneyMoney"
+  def provider, do: "MoneyMoney"
 
-  def default_config() do
+  def default_config do
     %{
       "location" => "/Users/adrimbp/workspace/learn_memex/meilisearch/memex/MoneyMoney.sqlite",
       "database_password" => "set_your_password_here",
@@ -30,7 +32,7 @@ defmodule Memex.Importers.MoneyMoney do
     }
   end
 
-  def required_config() do
+  def required_config do
     ["database_password"]
   end
 
@@ -98,6 +100,7 @@ defmodule Memex.Importers.MoneyMoney do
   end
 
   defmodule TimeLineItem do
+    @moduledoc false
     use Surface.Component
 
     prop item, :map, required: true
