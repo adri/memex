@@ -20,10 +20,10 @@ defmodule MemexWeb.PageLive do
   data total_hits, :number, default: 0
   data sidebars, :list, default: Sidebars.init()
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     Sidebars.subscribe()
 
-    {:ok, socket}
+    {:ok, assign(socket, debug: Map.has_key?(params, "debug"))}
   end
 
   @impl true
@@ -50,6 +50,7 @@ defmodule MemexWeb.PageLive do
             items={@items}
             selected_index={@selected_index}
             page={@page}
+            debug={@debug}
             class="ml-12 md:ml-20"
             enable_load_more
           />

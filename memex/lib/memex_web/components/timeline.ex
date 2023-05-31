@@ -13,6 +13,7 @@ defmodule MemexWeb.Timeline do
   prop page, :number, default: 1
   prop selected_index, :number, default: 0
   prop items, :list, required: true
+  prop debug, :boolean, default: false
   prop enable_load_more, :boolean, default: false
   prop class, :css_class, default: "ml-12"
 
@@ -59,6 +60,7 @@ defmodule MemexWeb.Timeline do
             <ProviderIcon provider={hit["provider"]} />
             <Card class="ml-2" selected={index === @selected_index}>
               <:content>
+                <code :if={@debug} class="whitespace-pre-wrap">{Jason.encode!(hit, pretty: true)}</code>
                 <a
                   :if={hit["provider"] === "Safari"}
                   href="#"
