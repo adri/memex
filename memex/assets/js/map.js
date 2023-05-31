@@ -1,6 +1,7 @@
 export const Map = {
   async mounted() {
-    this.mapboxgl = await import("mapbox-gl");
+    const mapboxgl = await import("mapbox-gl");
+    this.mapboxgl = mapboxgl.default;
     const response = await fetch(this.el.dataset.url, { method: "GET" });
     const geojson = await response.json();
     this.map = new this.mapboxgl.Map({
