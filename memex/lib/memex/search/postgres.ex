@@ -163,7 +163,8 @@ defmodule Memex.Search.Postgres do
   end
 
   defp format_results(results, %Query{select: [facet: "month"]} = _query) do
-    Map.new(month_range_cached())
+    month_range_cached()
+    |> Map.new()
     |> Map.merge(Map.new(results))
     |> Enum.sort(&(&1 > &2))
   end
@@ -174,23 +175,25 @@ defmodule Memex.Search.Postgres do
   defp format_hit(hit, %Query{query: ""} = _query), do: hit
 
   defp format_hit(hit, %Query{query: query} = _query) do
-    words =
+    words_to_highlight =
       query
       |> String.replace("\"", "")
       |> String.split(~r/\s+/, trim: true)
 
-    for {k, v} <- hit, into: %{}, do: {k, format_hit_value(v, words)}
+    for {key, value} <- hit, into: %{}, do: {key, highlight(value, words_to_highlight)}
   end
 
-  defp format_hit_value(value, words) when is_binary(value) do
-    encoded = Enum.map_join(words, "|", &Regex.escape/1)
+  defp highlight(text, words_to_highlight) when is_binary(text) do
+    encoded = Enum.map_join(words_to_highlight, "|", &Regex.escape/1)
 
-    String.replace(value, ~r/(#{encoded})/i, "<em>\\1</em>")
+    String.replace(text, ~r/(#{encoded})/i, "<em>\\1</em>")
   end
 
-  defp format_hit_value(value, words) when is_list(value), do: Enum.map(value, &format_hit_value(&1, words))
+  defp highlight(list, words_to_highlight) when is_list(list) do
+    Enum.map(list, &highlight(&1, words_to_highlight))
+  end
 
-  defp format_hit_value(value, _words), do: value
+  defp highlight(other, _words), do: other
 
   defp month_range_cached do
     ConCache.get_or_store(:search, "month_range", &month_range/0)
