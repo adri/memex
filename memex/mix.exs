@@ -34,6 +34,7 @@ defmodule Memex.MixProject do
   defp deps do
     [
       {:con_cache, "~> 0.13"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:earmark, "~> 1.4.16"},
       {:cloak_ecto, "~> 1.2.0"},
       {:ecto_sql, "~> 3.4"},
