@@ -4,8 +4,8 @@ defmodule Memex.Repo.Migrations.CreateImporterLog do
   def change do
     create table(:importer_log, primary_key: false) do
       add(:id, :uuid, primary_key: true)
-      add(:state, :string, null: false)
-      add(:log, :text, null: false)
+      add(:state, :string)
+      add(:log, :text)
       add(:config_id, references(:importer_config, type: :string))
       timestamps()
     end

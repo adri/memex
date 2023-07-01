@@ -6,10 +6,10 @@ defmodule Memex.Schema.ImporterConfig do
   @foreign_key_type :string
 
   schema "importer_config" do
-    field(:provider, :string, null: false)
-    field(:display_name, :string, null: false)
-    field(:encrypted_secrets, Memex.Schema.Encrypted.Map, null: false)
-    field(:config_overwrite, :map, null: false)
+    field(:provider, :string)
+    field(:display_name, :string)
+    field(:encrypted_secrets, Memex.Schema.Encrypted.Map)
+    field(:config_overwrite, :map)
     timestamps()
   end
 end

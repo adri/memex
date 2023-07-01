@@ -20,8 +20,8 @@ defmodule Memex.Schema.ImporterLog do
 
   schema "importer_log" do
     # processing, success or error
-    field(:state, :string, null: false)
-    field(:log, :string, null: false)
+    field(:state, :string)
+    field(:log, :string)
     belongs_to(:config, Memex.Schema.ImporterConfig, type: :string)
     timestamps()
   end

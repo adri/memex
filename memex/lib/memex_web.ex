@@ -137,19 +137,24 @@ defmodule MemexWeb do
       end
 
       defp assign_async(socket, key, callback) do
-        cancel_current_assign(socket.assigns["#{key}_pid"])
+        # convert string to atom
+        cancel_current_assign(socket.assigns[async_pid_key(key)])
 
         pid = self()
         child_pid = spawn(fn -> send(pid, {:async_assign, callback.()}) end)
 
-        assign(socket, "#{key}_pid", child_pid)
+        assign(socket, async_pid_key(key), child_pid)
       end
 
       defp assign_async_loading?(socket, key) do
-        socket.assigns["#{key}_pid"] != nil
+        socket.assigns[async_pid_key(key)] != nil
       end
 
       defp cancel_current_assign(pid), do: pid && Process.exit(pid, :kill)
+
+      defp async_pid_key(key) do
+        String.to_atom("#{key}_pid")
+      end
 
       @impl true
       def handle_info({:async_assign, {key, result}}, socket) do
