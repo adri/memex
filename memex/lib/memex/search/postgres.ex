@@ -160,6 +160,7 @@ defmodule Memex.Search.Postgres do
     |> Enum.map(&put_in(&1, ["hit", "_formatted"], format_hit(&1["hit"], query)))
     |> Enum.map(&put_in(&1, ["hit", "_relations"], &1["relations"]))
     |> Enum.map(&get_in(&1, ["hit"]))
+    |> Memex.Importer.enrich()
   end
 
   defp format_results(results, %Query{select: [facet: "month"]} = _query) do

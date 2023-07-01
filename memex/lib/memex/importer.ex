@@ -25,6 +25,7 @@ defmodule Memex.Importer do
   end
 
   defmodule JsonEndpoint do
+    @moduledoc false
     defstruct [:url, :headers]
   end
 
@@ -138,6 +139,26 @@ defmodule Memex.Importer do
 
         {:error, error, reason}
     end
+  end
+
+  def enrich(items) do
+    # pass items to each configured_importer by calling the enrich function. Return the enriched items.
+    enrich(items, configured_importers())
+  end
+
+  def enrich(items, [] = _config), do: items
+
+  def enrich(items, [config | tail]) do
+    items =
+      with {:ok, module} <- get_module(config),
+           {:ok, merged_config} <- merge_module_config(module, config),
+           true <- function_exported?(module, :enrich, 2) do
+        module.enrich(items, merged_config)
+      else
+        _ -> items
+      end
+
+    enrich(items, tail)
   end
 
   def get_dirs_to_watch do
