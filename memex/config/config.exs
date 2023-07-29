@@ -9,6 +9,7 @@ import Config
 
 # Configures the endpoint
 config :memex, MemexWeb.Endpoint,
+  adapter: Bandit.PhoenixAdapter,
   url: [host: "localhost"],
   http: [ip: {0, 0, 0, 0}],
   secret_key_base: "BP29B2R/vGyAzIXMvxN0W8Qs/Ok1UjxP7/mDqoAL872Ima1bZMKhZ09ZYQqlTn96",
