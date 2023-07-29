@@ -3,6 +3,7 @@
 @import "tailwindcss/utilities";
 @import "./rings.css";
 @import "./mapbox.css";
+@import "./codemirror.css";
 
 em {
   background-color: rgba(251, 191, 36, 0.7);

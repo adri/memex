@@ -5,12 +5,13 @@ import { InfiniteScroll } from "./infinite_scroll";
 import { ForceInputValue } from "./force_input_value";
 import { Sidebar } from "./sidebar";
 import { Map } from "./map";
+import { Editor } from "./editor";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: { InfiniteScroll, ForceInputValue, Sidebar, Map },
+  hooks: { InfiniteScroll, ForceInputValue, Sidebar, Map, Editor },
   params: { _csrf_token: csrfToken },
 });
 

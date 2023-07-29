@@ -24,26 +24,31 @@ defmodule MemexWeb.SearchBar do
             id="search-form"
             phx-change="search"
             phx-submit="search"
-            phx-window-keydown="key-pressed"
             role="search"
             novalidate=""
           >
-            <input
+            <div
+              id="editor"
+              phx-update="ignore"
+              class="transition-colors h-14 focus:ring-blue-900 focus:ring-2 z-1 w-full text-black dark:text-white bg-transparent pl-10 pr-2 py-4 border-0"
+            />
+            <textarea
+              rows="1"
               autocapitalize="off"
               autocomplete="off"
               autofocus="true"
-              class="transition-colors focus:ring-blue-900 focus:ring-2 z-1 w-full text-black dark:text-white bg-transparent pl-10 pr-2 py-4 rounded-xl border-0"
+              class="hidden"
               id="search-input"
               maxlength="512"
               name="query"
               phx-debounce="10"
-              phx-hook="ForceInputValue"
+              phx-hook="Editor"
               placeholder="Search..."
               spellcheck="false"
               type="search"
-              value={@query}
-            />
+            >{@query}</textarea>
           </form>
+
           <span class="absolute right-5 hidden sm:block text-gray-500 text-sm leading-5 py-0.5 px-1.5 border border-gray-700 rounded-md"><span class="sr-only">Press
             </span><kbd class="font-sans"><abbr title="Command" class="no-underline">⌘</abbr></kbd><span class="sr-only">
               and

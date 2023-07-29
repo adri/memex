@@ -1,0 +1,30 @@
+.ͼ1.cm-focused {
+  /* Codemirror shows a focus ring by default, disable it. */
+  @apply outline-none;
+}
+
+.ͼ1.cm-content {
+  @apply p-0 pt-2;
+}
+
+.ͼ2 .cm-content {
+  @apply caret-black dark:caret-white p-0;
+}
+
+.ͼ1 .cm-line {
+  @apply font-sans text-black text-base dark:text-white;
+}
+
+/* Style codemirror autocomplete with darkmode */
+.ͼ2 .cm-tooltip {
+  @apply bg-white dark:bg-black text-black dark:text-white
+  border-0 rounded-md overflow-hidden shadow-lg font-sans text-base;
+}
+
+.ͼ2 .cm-tooltip-autocomplete ul li {
+  @apply font-sans;
+}
+
+.ͼ2 .cm-tooltip-autocomplete ul li[aria-selected] {
+  @apply bg-gray-300 text-black dark:bg-gray-700 dark:text-white;
+}
