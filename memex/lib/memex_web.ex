@@ -130,7 +130,7 @@ defmodule MemexWeb do
       end
 
       defp assign_default_if_not_set(socket, key, default) do
-        case socket.assigns[key] do
+        case socket.assigns[String.to_atom("#{key}")] do
           nil -> assign(socket, key, default)
           _ -> socket
         end
@@ -158,7 +158,7 @@ defmodule MemexWeb do
 
       @impl true
       def handle_info({:async_assign, {key, result}}, socket) do
-        {:noreply, assign(socket, key, result)}
+        {:noreply, assign(socket, String.to_atom("#{key}"), result)}
       end
     end
   end

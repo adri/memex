@@ -12,7 +12,8 @@ defmodule MemexWeb.TimelineView do
   end
 
   def days_between(timestamp1, timestamp2) do
-    date_from_timestamp(timestamp2)
+    timestamp2
+    |> date_from_timestamp()
     |> Date.diff(date_from_timestamp(timestamp1))
     |> max(0)
   end

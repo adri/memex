@@ -49,7 +49,6 @@ defmodule Memex.MixProject do
       {:hackney, "~> 1.16.0"},
       {:heroicons, "~> 0.5.3"},
       {:jason, "~> 1.0"},
-      {:livebook, git: "https://github.com/livebook-dev/livebook.git", app: false},
       {:money, "~> 1.9"},
       {:month, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},

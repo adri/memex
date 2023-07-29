@@ -12,13 +12,13 @@ defmodule MemexWeb.PageLive do
   alias MemexWeb.SidebarsComponent
   alias MemexWeb.Timeline
 
-  data query, :string, default: ""
-  data items, :list, default: []
-  data page, :number, default: 1
-  data selected_index, :number, default: 0
-  data dates, :list, default: []
-  data total_hits, :number, default: 0
-  data sidebars, :list, default: Sidebars.init()
+  data(query, :string, default: "")
+  data(items, :list, default: [])
+  data(page, :number, default: 1)
+  data(selected_index, :number, default: 0)
+  data(dates, :list, default: [])
+  data(total_hits, :number, default: 0)
+  data(sidebars, :list, default: Sidebars.init())
 
   def mount(params, _session, socket) do
     Sidebars.subscribe()
@@ -32,7 +32,7 @@ defmodule MemexWeb.PageLive do
     <div class="mx-auto mt-3">
       <SearchBar query={@query} />
       <div :if={@query == ""}>
-        <Badge class="absolute right-2 top-6" click="open-sidebar" values={type: "settings"}>
+        <Badge class="absolute right-2 top-12" click="open-sidebar" values={type: "settings"}>
           <:icon><SettingsIcon /></:icon>
         </Badge>
         <div class="flex items-start">
@@ -42,6 +42,7 @@ defmodule MemexWeb.PageLive do
           </div>
         </div>
       </div>
+
       <div class="flex items-start">
         <div :if={@query != ""} class="w-4/5 mt-8">
           <SearchResultStats total_hits={@total_hits} />
