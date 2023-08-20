@@ -4,7 +4,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@codemirror/lang-css": "^6.2.0",
+    "@codemirror/lang-css": "^6.2.1",
     "@codemirror/language": "6.8.0",
     "@lezer/highlight": "^1.0.0",
     "@lezer/lr": "^1.0.0",
