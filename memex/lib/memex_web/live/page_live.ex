@@ -13,7 +13,9 @@ defmodule MemexWeb.PageLive do
   alias MemexWeb.SidebarsComponent
   alias MemexWeb.Timeline
 
+  # todo: remove
   data(query, :string, default: "")
+  data(filters, :list, default: [])
   data(items, :list, default: [])
   data(page, :number, default: 1)
   data(selected_index, :number, default: 0)
@@ -67,26 +69,23 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("search", %{"query" => ""}, socket) do
-    {:noreply, assign(socket, query: "", page: 1, selected_index: 0, items: [])}
+    {:noreply, assign(socket, query: "", filters: [], page: 1, selected_index: 0, items: [])}
   end
 
   def handle_event("search", %{"query" => query, "filters" => filters}, socket) do
     {:noreply, socket |> assign(query: query, filters: filters, selected_index: 0, page: 1) |> search()}
   end
 
-  def handle_event("completion", %{"sources" => _sources, "key" => _key, "value" => _value}, socket) do
-    options = [
-      %{"label" => "near", "type" => "keyword"},
-      %{"label" => "provider:", "type" => "keyword"},
-      %{"label" => "verb:", "type" => "keyword"},
-      %{"label" => "hello", "type" => "variable", info: "(World)"},
-      %{
-        "label" => "magic",
-        "type" => "text",
-        "apply" => "⠁⭒*.✩.*⭒⠁",
-        "detail" => "macro"
-      }
-    ]
+  def handle_event("completion", %{"sources" => sources, "key" => key, "value" => value}, socket) do
+    options =
+      key
+      |> Memex.Schema.Catalog.search(value, sources)
+      |> Enum.map(fn %{"type" => type, "value" => value} ->
+        %{
+          "type" => type,
+          "label" => value
+        }
+      end)
 
     {:reply, %{"options" => options}, socket}
   end
@@ -151,12 +150,8 @@ defmodule MemexWeb.PageLive do
     {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
-  defp search(%{assigns: %{page: page, query: string, filters: filters}} = socket) do
-    query =
-      case filters do
-        nil -> LegacyQuery.from_string(string)
-        _ -> Query.from_filters(filters)
-      end
+  defp search(%{assigns: %{page: page, filters: filters}} = socket) do
+    query = Query.from_filters(filters)
 
     socket
     |> async_query(:items, [], %{

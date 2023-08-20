@@ -19,6 +19,7 @@ import {
   closeBrackets,
   closeBracketsKeymap,
   completionStatus,
+  acceptCompletion,
 } from "@codemirror/autocomplete";
 import { Search, parseStateToFilters } from "./search_language";
 import * as terms from "./search_language/syntax.terms.js";
@@ -31,10 +32,52 @@ const singleLine = EditorState.transactionFilter.of((transaction) =>
   transaction.newDoc.lines > 1 ? [] : transaction
 );
 
-// activity_heart_rate_average<100.2 z
-// color: var(--color-accent-fg);
-// background-color: var(--color-accent-subtle);
-// border-radius: var(--borderRadius-small, 3px);
+// Nice query language:
+// - https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering
+// - Qdrant: https://qdrant.tech/documentation/concepts/filtering/#geo
+//   { filter: { must: [{ key: "", match: { value: "" } }] }, must_not: ..., should: ...}
+
+// const query = [
+//   { type: "provider", operator: "=", value: "Messages" }, // Auto convert "provider:Messages", "provider IN (Messages, Emails)"
+//   { type: "provider", operator: "exists" }, // auto convert "provider exists"
+//   { type: "provider", operator: "is_empty" }, // auto convert "provider is empty"
+//   { type: "date", operator: ">=", value: "2022-03-01T00:00:00Z" }, // auto convert "date > 1 month ago"
+//   { type: "_allSearchableFields", operator: "prefix", value: "Els" }, // auto convert "Els"
+//   // auto convert '"Els Philipp" or "Els Remijnse"'
+//   {
+//     type: "or", operator: "", value: [ // ⚠️ no operator?
+//       { type: "_allSearchableFields", operator: "=", value: "Els Philipp" },
+//       { type: "_allSearchableFields", operator: "=", value: "Els Remijnse" },
+//     ]
+//   },
+//   // auto convert "Els near Amsterdam" or "Els near Amsterdam within 20km". "near + [city] + within [distance]"
+//   {
+//     type: "_geoRadius",
+//     operator: "radius",
+//     value: {
+//       type: "geopoint",
+//       latitude: 32.1212312,
+//       longitude: 4.0123123,
+//       distance: "20km",
+//     },
+//   },
+//   {
+//     type: "_geoRadius",
+//     operator: "radius",
+//     value: {
+//       type: "geopoint",
+//       latitude: 32.1212312,
+//       longitude: 4.0123123,
+//       distance: "20km",
+//     },
+//   },
+//   {
+//     type: "",
+//     operator: "",
+//     value:,
+//   },
+// ];
+
 const myHighlightStyle = HighlightStyle.define([
   {
     tag: tags.string,
@@ -70,11 +113,13 @@ export const Editor = {
           ]),
           Search(),
           autocompletion({
-            // selectOnOpen: true,
-            // activateOnTyping: true,
+            icons: false,
+            selectOnOpen: true,
+            activateOnTyping: true,
             closeOnBlur: false,
             maxRenderedOptions: 3,
           }),
+          keymap.of([{ key: "Tab", run: acceptCompletion }]), // needed because otherwise tab doesn't autocomplete
           Search().language.data.of({
             autocomplete: (context) => this.autocomplete(context),
           }),
@@ -96,63 +141,17 @@ export const Editor = {
       event.preventDefault();
 
       if (
-        ["ArrowUp", "ArrowDown", "Enter"].includes(event.code) &&
-        completionStatus(view.state) != "active"
+        ["ArrowUp", "ArrowDown"].includes(event.code) &&
+        completionStatus(view.state) == null
       ) {
         console.log("key-pressed", { key: event.code });
         this.pushEvent("key-pressed", { key: event.code });
         return;
       }
 
-      // Nice query language:
-      // - https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering
-      // - Qdrant: https://qdrant.tech/documentation/concepts/filtering/#geo
-      //   { filter: { must: [{ key: "", match: { value: "" } }] }, must_not: ..., should: ...}
-
-      // const query = [
-      //   { type: "provider", operator: "=", value: "Messages" }, // Auto convert "provider:Messages", "provider IN (Messages, Emails)"
-      //   { type: "provider", operator: "exists" }, // auto convert "provider exists"
-      //   { type: "provider", operator: "is_empty" }, // auto convert "provider is empty"
-      //   { type: "date", operator: ">=", value: "2022-03-01T00:00:00Z" }, // auto convert "date > 1 month ago"
-      //   { type: "_allSearchableFields", operator: "prefix", value: "Els" }, // auto convert "Els"
-      //   // auto convert '"Els Philipp" or "Els Remijnse"'
-      //   {
-      //     type: "or", operator: "", value: [ // ⚠️ no operator?
-      //       { type: "_allSearchableFields", operator: "=", value: "Els Philipp" },
-      //       { type: "_allSearchableFields", operator: "=", value: "Els Remijnse" },
-      //     ]
-      //   },
-      //   // auto convert "Els near Amsterdam" or "Els near Amsterdam within 20km". "near + [city] + within [distance]"
-      //   {
-      //     type: "_geoRadius",
-      //     operator: "radius",
-      //     value: {
-      //       type: "geopoint",
-      //       latitude: 32.1212312,
-      //       longitude: 4.0123123,
-      //       distance: "20km",
-      //     },
-      //   },
-      //   {
-      //     type: "_geoRadius",
-      //     operator: "radius",
-      //     value: {
-      //       type: "geopoint",
-      //       latitude: 32.1212312,
-      //       longitude: 4.0123123,
-      //       distance: "20km",
-      //     },
-      //   },
-      //   {
-      //     type: "",
-      //     operator: "",
-      //     value:,
-      //   },
-      // ];
-
       const query = view.state.doc.toString();
       const filters = parseStateToFilters(query, syntaxTree(view.state));
-      console.log({ filters });
+      console.log({ query, filters });
 
       this.pushEvent("search", { query, filters });
     });
@@ -161,7 +160,7 @@ export const Editor = {
   },
   autocomplete(context) {
     const token = context.tokenBefore(["FilterExpression", "Identifier"]);
-    console.log({ token });
+    if (!token || token.from == token.to) return null;
 
     const completion = {
       sources: ["keyword", "search", "field_keys", "field_values"],
@@ -176,47 +175,22 @@ export const Editor = {
     //   })
     // })
 
-    // context.state;
-    if (token.type.id == terms.FilterExpression) {
-      completion.sources = ["field_values"];
-      completion.key = token.firstChild;
-      completion.value = token.firstChild?.nextSibling().nextSibling.value;
-    }
+    // if (token.type.id == terms.FilterExpression) {
+    //   completion.sources = ["field_values"];
+    //   completion.key = token.firstChild;
+    //   completion.value = token.firstChild?.nextSibling().nextSibling.value;
+    // }
 
-    // console.log({ completion });
-    // if (token.from == token.to) return null;
-    // const that = this;
+    console.log({ completion });
 
-    return new Promise(
-      (resolve) => {
-        this.pushEvent("completion", completion, (reply, ref) => {
-          resolve({
-            from: token.from,
-            options: reply.options,
-          });
+    return new Promise((resolve) => {
+      this.pushEvent("completion", completion, (reply, ref) => {
+        resolve({
+          from: token.from,
+          options: reply.options,
         });
-      },
-
-      (err) => {
-        console.log({ err });
-      }
-    );
-
-    return {
-      from: token.from,
-      options: [
-        { label: "near", type: "keyword" },
-        { label: "provider:", type: "keyword" },
-        { label: "verb:", type: "keyword" },
-        { label: "hello", type: "variable", info: "(World)" },
-        {
-          label: "magic",
-          type: "text",
-          apply: "⠁⭒*.✩.*⭒⠁",
-          detail: "macro",
-        },
-      ],
-    };
+      });
+    });
   },
   unmounted() {
     this.view.destroy();
