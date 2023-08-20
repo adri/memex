@@ -2,6 +2,7 @@ defmodule MemexWeb.PageLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
+  alias Memex.Search.LegacyQuery
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
   alias MemexWeb.Components.Badge
@@ -69,8 +70,25 @@ defmodule MemexWeb.PageLive do
     {:noreply, assign(socket, query: "", page: 1, selected_index: 0, items: [])}
   end
 
-  def handle_event("search", %{"query" => query}, socket) do
-    {:noreply, socket |> assign(query: query, selected_index: 0, page: 1) |> search()}
+  def handle_event("search", %{"query" => query, "filters" => filters}, socket) do
+    {:noreply, socket |> assign(query: query, filters: filters, selected_index: 0, page: 1) |> search()}
+  end
+
+  def handle_event("completion", %{"sources" => _sources, "key" => _key, "value" => _value}, socket) do
+    options = [
+      %{"label" => "near", "type" => "keyword"},
+      %{"label" => "provider:", "type" => "keyword"},
+      %{"label" => "verb:", "type" => "keyword"},
+      %{"label" => "hello", "type" => "variable", info: "(World)"},
+      %{
+        "label" => "magic",
+        "type" => "text",
+        "apply" => "⠁⭒*.✩.*⭒⠁",
+        "detail" => "macro"
+      }
+    ]
+
+    {:reply, %{"options" => options}, socket}
   end
 
   def handle_event("load-more", _, %{assigns: assigns} = socket) do
@@ -105,10 +123,10 @@ defmodule MemexWeb.PageLive do
   def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
     query =
       string
-      |> Query.from_string()
-      |> Query.remove_filter("time")
-      |> Query.add_filter(data["key"], data["value"])
-      |> Query.to_string()
+      |> LegacyQuery.from_string()
+      |> LegacyQuery.remove_filter("time")
+      |> LegacyQuery.add_filter(data["key"], data["value"])
+      |> LegacyQuery.to_string()
 
     {:noreply, socket |> assign(query: query, page: 1) |> search()}
   end
@@ -116,9 +134,9 @@ defmodule MemexWeb.PageLive do
   def handle_event("filter-reset", data, socket) do
     query =
       ""
-      |> Query.from_string()
-      |> Query.add_filter(data["key"], data["value"])
-      |> Query.to_string()
+      |> LegacyQuery.from_string()
+      |> LegacyQuery.add_filter(data["key"], data["value"])
+      |> LegacyQuery.to_string()
 
     {:noreply, socket |> assign(query: query, page: 1) |> search()}
   end
@@ -133,8 +151,12 @@ defmodule MemexWeb.PageLive do
     {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
-  defp search(%{assigns: %{page: page, query: string}} = socket) do
-    query = Query.from_string(string)
+  defp search(%{assigns: %{page: page, query: string, filters: filters}} = socket) do
+    query =
+      case filters do
+        nil -> LegacyQuery.from_string(string)
+        _ -> Query.from_filters(filters)
+      end
 
     socket
     |> async_query(:items, [], %{

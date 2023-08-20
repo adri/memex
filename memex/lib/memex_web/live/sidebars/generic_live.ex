@@ -2,8 +2,8 @@ defmodule MemexWeb.Sidebars.GenericLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
+  alias Memex.Search.LegacyQuery, as: Query
   alias Memex.Search.Postgres
-  alias Memex.Search.Query
   alias MemexWeb.Timeline
 
   def mount(params, session, socket) do

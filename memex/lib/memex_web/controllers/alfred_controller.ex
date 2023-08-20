@@ -1,8 +1,8 @@
 defmodule MemexWeb.AlfredController do
   use MemexWeb, :controller
 
+  alias Memex.Search.LegacyQuery, as: Query
   alias Memex.Search.Postgres, as: Search
-  alias Memex.Search.Query
 
   def search(conn, params) do
     query = %{Query.from_string(params["q"] || "") | limit: 20}

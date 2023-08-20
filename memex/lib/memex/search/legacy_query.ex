@@ -1,4 +1,4 @@
-defmodule Memex.Search.Query do
+defmodule Memex.Search.LegacyQuery do
   @moduledoc """
   Options for select:
   - `:hits_with_highlights`: Return hits with highlights (formatted as HTML)
@@ -6,13 +6,15 @@ defmodule Memex.Search.Query do
   - `facet: "month"`: Return facet counts for each month
   """
   defstruct select: :hits_with_highlights,
-            filters: [],
+            query: "",
+            filters: %{},
             page: 1,
             limit: nil,
             order_by: []
 
-  # def add_filter(query, type, key, value), do: put_in(query.filters[key], value)
-  # def remove_filter(query, key), do: elem(pop_in(query.filters[key]), 1)
+  def add_filter(query, key, value), do: put_in(query.filters[key], value)
+
+  def remove_filter(query, key), do: elem(pop_in(query.filters[key]), 1)
 
   def select(query, select), do: put_in(query.select, select)
 
@@ -34,9 +36,26 @@ defmodule Memex.Search.Query do
     end
   end
 
-  def from_filters(filters) do
+  def from_string(string) do
+    filters = Regex.scan(~r/(\w+):("[^"]*"|[^\s]+)/, string)
+
     %__MODULE__{
-      filters: filters
+      query: parse_query(string, filters),
+      filters: parse_filters(filters)
     }
+  end
+
+  defp parse_query(string, []), do: String.trim(string)
+
+  defp parse_query(string, filters) do
+    string
+    |> String.replace(Enum.map(filters, fn [filter, _, _] -> filter end), "")
+    |> String.trim()
+  end
+
+  defp parse_filters([]), do: %{}
+
+  defp parse_filters(filters) do
+    Enum.reduce(filters, %{}, fn [_, key, value], acc -> Map.put(acc, key, String.trim(value, "\"")) end)
   end
 end

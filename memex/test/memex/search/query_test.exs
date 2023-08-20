@@ -1,7 +1,7 @@
-defmodule Memex.Search.QueryTest do
+defmodule Memex.Search.LegacyQueryTest do
   use ExUnit.Case, async: true
 
-  alias Memex.Search.Query
+  alias Memex.Search.LegacyQuery, as: Query
 
   describe "date filter" do
     test "add filters" do

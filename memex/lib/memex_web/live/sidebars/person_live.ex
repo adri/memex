@@ -2,7 +2,7 @@ defmodule MemexWeb.Sidebars.PersonLive do
   @moduledoc false
   use MemexWeb, :live_view
 
-  alias Memex.Search.Query
+  alias Memex.Search.LegacyQuery, as: Query
 
   @impl true
   def mount(params, session, socket) do

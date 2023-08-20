@@ -4,9 +4,8 @@ defmodule Memex.Search.Postgres do
 
   alias Memex.Repo
   alias Memex.Schema.Document
-  alias Memex.Search.Query
 
-  def query(%Query{} = query) do
+  def query(%{} = query) do
     from(d in Document)
     |> add_search(query)
     |> add_select(query)
@@ -25,52 +24,84 @@ defmodule Memex.Search.Postgres do
     end
   end
 
-  defp add_search(q, %Query{query: ""} = _query), do: q
+  defp add_search(q, %{query: ""} = _query), do: q
 
-  defp add_search(q, %Query{} = query) do
+  defp add_search(q, %{query: query} = _query) do
     from(q in q, where: fragment("? @@ to_tsquery('simple', ?)", q.search, ^to_tsquery(query)))
   end
 
-  defp add_select(q, %Query{select: :hits_with_highlights} = _query) do
+  defp add_search(q, %{} = _query), do: q
+
+  defp add_select(q, %{select: :hits_with_highlights} = _query) do
     from(q in q, select: q)
   end
 
-  defp add_select(q, %Query{select: [facet: "month"]} = _query) do
+  defp add_select(q, %{select: [facet: "month"]} = _query) do
     from(q in q,
       select: {fragment("to_char(date_trunc('month', created_at), 'yyyy-mm')"), count(q.id)},
       group_by: fragment("date_trunc('month', created_at)")
     )
   end
 
-  defp add_select(q, %Query{select: [facet: "provider"]} = _query) do
+  defp add_select(q, %{select: [facet: "provider"]} = _query) do
     from(q in q,
       select: {fragment("? -> 'provider'", q.body), count(q.id)},
       group_by: fragment("? -> 'provider'", q.body)
     )
   end
 
-  defp add_select(q, %Query{select: :total_hits} = _query) do
+  defp add_select(q, %{select: :total_hits} = _query) do
     from(q in q, select: count(q.id))
   end
 
-  defp add_select(q, %Query{} = _query) do
+  defp add_select(q, %{} = _query) do
     from(q in q, select: q.body)
   end
 
-  defp run(q, %Query{select: :total_hits} = _query) do
+  defp run(q, %{select: :total_hits} = _query) do
     Repo.one!(q)
   end
 
-  defp run(q, %Query{} = _query) do
+  defp run(q, %{} = _query) do
     Repo.all(q)
   end
 
-  defp prepare_filters(%Query{select: [facet: "month"]} = query), do: Map.delete(query.filters, "month")
+  # defp prepare_filters(%{select: [facet: "month"]} = query), do: Map.delete(query.filters, "month")
 
-  defp prepare_filters(%Query{} = query), do: query.filters
+  defp prepare_filters(%{} = query), do: query.filters
 
   defp add_filters(q, filters) do
     Enum.reduce(filters, q, fn
+      %{"type" => "Prefix", "value" => value}, q ->
+        from(q in q, where: fragment("? @@ to_tsquery('simple', ?)", q.search, ^(value <> ":*")))
+
+      %{"type" => "NotPrefix", "value" => value}, q ->
+        from(q in q, where: fragment("not ? @@ to_tsquery('simple', ?)", q.search, ^(value <> ":*")))
+
+      %{"type" => "Exact", "value" => value}, q ->
+        from(q in q, where: fragment("? @@ to_tsquery('simple', ?)", q.search, ^("'" <> value <> "'")))
+
+      %{"type" => "NotExact", "value" => value}, q ->
+        from(q in q, where: fragment("not ? @@ to_tsquery('simple', ?)", q.search, ^("'" <> value <> "'")))
+
+      %{"type" => "Equals", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \= ?::jsonb", q.body, ^key, ^value))
+
+      %{"type" => "NotEquals", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \!\= ?::jsonb", q.body, ^key, ^value))
+
+      %{"type" => "GreaterThan", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \> ?", q.body, ^key, ^value))
+
+      %{"type" => "GreaterThanEquals", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \>= ?", q.body, ^key, ^value))
+
+      %{"type" => "LessThan", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \< ?", q.body, ^key, ^value))
+
+      %{"type" => "LessThanEquals", "key" => key, "value" => value}, q ->
+        from(q in q, where: fragment("? -> ? \<= ?", q.body, ^key, ^value))
+
       {"month", month}, q ->
         from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^month))
 
@@ -121,7 +152,7 @@ defmodule Memex.Search.Postgres do
     end)
   end
 
-  defp add_relations(q, %Query{select: :hits_with_highlights} = _query) do
+  defp add_relations(q, %{select: :hits_with_highlights} = _query) do
     from(o in subquery(q),
       left_join: r in assoc(o, :relations),
       left_join: rd in assoc(r, :source),
@@ -137,14 +168,14 @@ defmodule Memex.Search.Postgres do
     )
   end
 
-  defp add_relations(q, %Query{} = _query), do: q
+  defp add_relations(q, %{} = _query), do: q
 
-  def add_limit(q, %Query{limit: nil} = _query), do: q
-  def add_limit(q, %Query{limit: limit} = _query), do: from(q in q, limit: ^limit)
+  def add_limit(q, %{limit: nil} = _query), do: q
+  def add_limit(q, %{limit: limit} = _query), do: from(q in q, limit: ^limit)
 
-  def to_tsquery(%Query{} = query) do
+  def to_tsquery(query) do
     terms =
-      query.query
+      query
       |> String.trim()
       |> String.split(~r/\s+/, trim: true)
       |> Enum.map(&(&1 <> ":*"))
@@ -155,26 +186,26 @@ defmodule Memex.Search.Postgres do
     |> String.trim()
   end
 
-  defp format_results(results, %Query{select: :hits_with_highlights} = query) do
+  defp format_results(results, %{select: :hits_with_highlights} = query) do
     results
     |> Enum.map(&put_in(&1, ["hit", "_formatted"], format_hit(&1["hit"], query)))
     |> Enum.map(&put_in(&1, ["hit", "_relations"], &1["relations"]))
     |> Enum.map(&get_in(&1, ["hit"]))
   end
 
-  defp format_results(results, %Query{select: [facet: "month"]} = _query) do
+  defp format_results(results, %{select: [facet: "month"]} = _query) do
     month_range_cached()
     |> Map.new()
     |> Map.merge(Map.new(results))
     |> Enum.sort(&(&1 > &2))
   end
 
-  defp format_results(results, %Query{} = _query), do: results
+  defp format_results(results, %{} = _query), do: results
 
   # Surround all values in the map that match the words in the query with <em></em>
-  defp format_hit(hit, %Query{query: ""} = _query), do: hit
+  defp format_hit(hit, %{query: ""} = _query), do: hit
 
-  defp format_hit(hit, %Query{query: query} = _query) do
+  defp format_hit(hit, %{query: query} = _query) do
     words_to_highlight =
       query
       |> String.replace("\"", "")
@@ -182,6 +213,24 @@ defmodule Memex.Search.Postgres do
 
     for {key, value} <- hit, into: %{}, do: {key, highlight(value, words_to_highlight)}
   end
+
+  defp format_hit(hit, %{filters: filters} = _query) do
+    words_to_highlight =
+      filters
+      |> Enum.filter(fn
+        %{"type" => "Exact"} -> true
+        %{"type" => "Prefix"} -> true
+        %{"type" => "Equals"} -> true
+        _ -> false
+      end)
+      |> Enum.map(fn %{"value" => word} -> word end)
+
+    for {key, value} <- hit, into: %{}, do: {key, highlight(value, words_to_highlight)}
+  end
+
+  defp format_hit(hit, %{} = _query), do: hit
+
+  defp highlight(other, []), do: other
 
   defp highlight(text, words_to_highlight) when is_binary(text) do
     encoded = Enum.map_join(words_to_highlight, "|", &Regex.escape/1)

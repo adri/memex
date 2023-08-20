@@ -2,8 +2,8 @@ defmodule MemexWeb.Sidebars.ActivityLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
+  alias Memex.Search.LegacyQuery, as: Query
   alias Memex.Search.Postgres
-  alias Memex.Search.Query
   alias MemexWeb.Map
   alias MemexWeb.TimeDuration
   alias MemexWeb.Timeline

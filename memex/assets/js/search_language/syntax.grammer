@@ -1,0 +1,46 @@
+@precedence {
+  compare @left,
+  equality @left,
+  and @left,
+  or @left
+}
+
+@top Search { expression+ }
+
+expression { (Prefix | NotPrefix | Exact | NotExact | FilterExpression | BooleanExpression) }
+
+Exact { QuotedString }
+NotExact { not QuotedString }
+Prefix { Identifier }
+NotPrefix { not Identifier }
+
+FilterExpression {
+  FilterKey !compare op<GreaterThan, ">"> Number |
+  FilterKey !compare op<GreaterThanEquals, ">="> Number |
+  FilterKey !compare op<LessThan, "<"> Number |
+  FilterKey !compare op<LessThanEquals, "<="> Number |
+  FilterKey !equality op<Equals, ":" | "=" > FilterValue |
+  FilterKey !equality op<NotEquals, ":!" | "!=" > FilterValue
+}
+
+BooleanExpression {
+  expression !and (op<Logic, "&&"> | Logic { kw<"and"> }) expression |
+  expression !or (op<Logic, "||"> | Logic { kw<"or"> }) expression
+}
+
+kw<term> { @specialize[@name={term}]<Identifier, term> }
+
+FilterKey { Identifier }
+FilterValue { Identifier | QuotedString }
+
+@skip { space }
+
+@tokens {
+  space { @whitespace+ }
+  Identifier { $[a-zA-Z0-9_]+ }
+  not { "!" | "-" }
+  Number { $[0-9]+ | $[0-9]+ "." $[0-9]+ }
+  QuotedString {  "\"" (![\\"\n] | "\\" (![\n] | "\n"))+ "\"" }
+
+  op[@name={name}]<name, body> {body}
+}

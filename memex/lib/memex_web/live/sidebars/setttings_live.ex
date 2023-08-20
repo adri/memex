@@ -4,7 +4,7 @@ defmodule MemexWeb.Sidebars.SettingsLive do
 
   alias Memex.Importer
   alias Memex.Schema.ImporterLog
-  alias Memex.Search.Query
+  alias Memex.Search.LegacyQuery, as: Query
   alias Memex.Search.Sidebars
   alias MemexWeb.Components.Badge
   alias MemexWeb.Components.Icon

@@ -6,6 +6,5 @@
 @import "./codemirror.css";
 
 em {
-  background-color: rgba(251, 191, 36, 0.7);
-  font-style: normal;
+  @apply dark:bg-yellow-300/70 bg-yellow-300/70 rounded-sm not-italic;
 }
