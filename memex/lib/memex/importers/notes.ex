@@ -95,9 +95,10 @@ defmodule Memex.Importers.Notes do
     end
 
     defp parse_patch(patch) do
-      {:ok, parsed_diff} = GitDiff.parse_patch(patch)
-      IO.inspect(parsed_diff, label: "92")
-      parsed_diff
+      case GitDiff.parse_patch(String.trim(patch)) do
+        {:ok, parsed_diff} -> parsed_diff
+        {:error, _} -> []
+      end
     end
   end
 end
