@@ -15,10 +15,10 @@ describe("Search parser", () => {
   });
 
   test("prefix search", () => {
-    expect(search("d")).toEqual([{ type: "prefix", value: "d" }]);
+    expect(search("d")).toEqual([{ type: "Prefix", value: "d" }]);
     expect(search("d e")).toEqual([
-      { type: "prefix", value: "d" },
-      { type: "prefix", value: "e" },
+      { type: "Prefix", value: "d" },
+      { type: "Prefix", value: "e" },
     ]);
   });
 
@@ -41,10 +41,10 @@ describe("Search parser", () => {
   test("mixed", () => {
     expect(search("d:1 e")).toEqual([
       { type: "Equals", key: "d", value: "1" },
-      { type: "prefix", value: "e" },
+      { type: "Prefix", value: "e" },
     ]);
     expect(search("e d:1")).toEqual([
-      { type: "prefix", value: "e" },
+      { type: "Prefix", value: "e" },
       { type: "Equals", key: "d", value: "1" },
     ]);
   });
