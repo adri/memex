@@ -152,44 +152,48 @@ export const Editor = {
       this.search();
     });
 
-    this.el.form.addEventListener("removeFilter", (event) => {
-      const text = this.view.state.doc.toString();
-      const pattern = new RegExp(`\\s*${event.detail.key}:".*"`);
-      const match = pattern.exec(text);
-      if (match == null) {
-        return;
-      }
-
-      this.view.dispatch({
-        changes: {
-          from: match.index,
-          to: match.index + match[0].length,
-          insert: "",
-        },
-      });
-    });
-
-    this.el.form.addEventListener("addFilter", (event) => {
-      const text = this.view.state.doc.toString();
-      const filter = `${event.detail.key}:"${event.detail.value}"`;
-
-      this.view.dispatch({
-        changes: { from: 0, to: text.length, insert: `${text} ${filter}` },
-      });
-    });
-
-    this.el.form.addEventListener("resetFilters", (event) => {
-      const text = this.view.state.doc.toString();
-      this.view.dispatch({
-        changes: { from: 0, to: text.length, insert: "" },
-      });
-    });
-
-    this.el.form.addEventListener("search", (event) => {
-      this.search();
-    });
+    this.el.form.addEventListener("addFilter", (event) =>
+      this.addFilter(event)
+    );
+    this.el.form.addEventListener("removeFilter", (event) =>
+      this.removeFilter(event)
+    );
+    this.el.form.addEventListener("resetFilters", (event) =>
+      this.resetFilters(event)
+    );
+    this.el.form.addEventListener("search", (event) => this.search(event));
 
     view.focus();
+  },
+  addFilter(event) {
+    const text = this.view.state.doc.toString();
+    const filter = `${event.detail.key}:"${event.detail.value}"`;
+
+    this.view.dispatch({
+      changes: { from: 0, to: text.length, insert: `${text} ${filter}` },
+    });
+  },
+  removeFilter(event) {
+    const text = this.view.state.doc.toString();
+    const pattern = new RegExp(`\\s*${event.detail.key}:".*"`);
+    const match = pattern.exec(text);
+    if (match == null) {
+      return;
+    }
+
+    this.view.dispatch({
+      changes: {
+        from: match.index,
+        to: match.index + match[0].length,
+        insert: "",
+      },
+    });
+  },
+  resetFilters() {
+    const text = this.view.state.doc.toString();
+    this.view.dispatch({
+      changes: { from: 0, to: text.length, insert: "" },
+    });
   },
   search() {
     const query = this.view.state.doc.toString();
