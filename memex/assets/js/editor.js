@@ -141,7 +141,7 @@ export const Editor = {
       event.preventDefault();
 
       if (
-        ["ArrowUp", "ArrowDown"].includes(event.code) &&
+        ["ArrowUp", "ArrowDown", "Enter"].includes(event.code) &&
         completionStatus(view.state) == null
       ) {
         console.log("key-pressed", { key: event.code });
@@ -149,14 +149,42 @@ export const Editor = {
         return;
       }
 
-      const query = view.state.doc.toString();
-      const filters = parseStateToFilters(query, syntaxTree(view.state));
-      console.log({ query, filters });
+      this.search();
+    });
 
-      this.pushEvent("search", { query, filters });
+    this.el.form.addEventListener("addFilter", (event) => {
+      let text = this.view.state.doc.toString();
+      const changes = [];
+      const pattern = new RegExp(`${event.detail.key}:".*"`);
+      const match = pattern.exec(text);
+      const filter = `${event.detail.key}:"${event.detail.value}"`;
+
+      if (match) {
+        changes.push({
+          from: match.index,
+          to: match.index + match[0].length,
+          insert: filter,
+        });
+      } else {
+        changes.push({
+          from: 0,
+          to: text.length,
+          insert: `${text} ${filter}`,
+        });
+      }
+
+      this.view.dispatch({ changes });
+      this.search();
     });
 
     view.focus();
+  },
+  search() {
+    const query = this.view.state.doc.toString();
+    const filters = parseStateToFilters(query, syntaxTree(this.view.state));
+    console.log({ query, filters });
+
+    this.pushEvent("search", { query, filters });
   },
   autocomplete(context) {
     const token = context.tokenBefore(["FilterExpression", "Identifier"]);

@@ -119,27 +119,6 @@ defmodule MemexWeb.PageLive do
 
   def handle_event("key-pressed", _, socket), do: {:noreply, socket}
 
-  def handle_event("filter-date", data, %{assigns: %{query: string}} = socket) do
-    query =
-      string
-      |> LegacyQuery.from_string()
-      |> LegacyQuery.remove_filter("time")
-      |> LegacyQuery.add_filter(data["key"], data["value"])
-      |> LegacyQuery.to_string()
-
-    {:noreply, socket |> assign(query: query, page: 1) |> search()}
-  end
-
-  def handle_event("filter-reset", data, socket) do
-    query =
-      ""
-      |> LegacyQuery.from_string()
-      |> LegacyQuery.add_filter(data["key"], data["value"])
-      |> LegacyQuery.to_string()
-
-    {:noreply, socket |> assign(query: query, page: 1) |> search()}
-  end
-
   @impl true
   def handle_event("open-sidebar", data, %{assigns: %{sidebars: sidebars}} = socket) do
     {:noreply, assign(socket, sidebars: Sidebars.open(sidebars, data))}
@@ -160,7 +139,7 @@ defmodule MemexWeb.PageLive do
         order_by: ["created_at_desc"],
         limit: 10 * page
     })
-    |> async_query(:dates, [], %{query | select: [facet: "month"]})
+    |> async_query(:dates, [], %{Query.remove_filter(query, "month") | select: [facet: "month"]})
     |> async_query(:total_hits, nil, %{query | select: :total_hits})
   end
 

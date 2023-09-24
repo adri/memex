@@ -2,6 +2,8 @@ defmodule MemexWeb.DatesFacet do
   @moduledoc false
   use Surface.Component
 
+  alias Phoenix.LiveView.JS
+
   prop(dates, :list)
   prop(max_count, :number)
   prop(loading, :boolean, default: false)
@@ -15,9 +17,7 @@ defmodule MemexWeb.DatesFacet do
         :for={{date, count} <- @dates}
         class="group text-xs hover:bg-gray-100 hover:dark:bg-gray-600"
         id={"facet-#{date}"}
-        phx-click="filter-date"
-        phx-value-key="month"
-        phx-value-value={date}
+        phx-click={JS.dispatch("addFilter", to: "#search-input", detail: %{key: "month", value: date})}
       >
         <span
           class="absolute opacity-0 group-hover:opacity-100 text-gray-500 dark:text-gray-100 leading-3"

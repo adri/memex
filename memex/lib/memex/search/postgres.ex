@@ -84,6 +84,9 @@ defmodule Memex.Search.Postgres do
       %{"type" => "NotExact", "value" => value}, q ->
         from(q in q, where: fragment("not ? @@ to_tsquery('simple', ?)", q.search, ^("'" <> value <> "'")))
 
+      %{"type" => "Equals", "key" => "month", "value" => month}, q ->
+        from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^month))
+
       %{"type" => "Equals", "key" => key, "value" => value}, q ->
         from(q in q, where: fragment("? -> ? \= ?::jsonb", q.body, ^key, ^value))
 
@@ -101,9 +104,6 @@ defmodule Memex.Search.Postgres do
 
       %{"type" => "LessThanEquals", "key" => key, "value" => value}, q ->
         from(q in q, where: fragment("? -> ? \<= ?", q.body, ^key, ^value))
-
-      {"month", month}, q ->
-        from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^month))
 
       {"date", date}, q ->
         from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm-dd') = ?", q, ^date))

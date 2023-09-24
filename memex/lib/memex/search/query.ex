@@ -11,8 +11,19 @@ defmodule Memex.Search.Query do
             limit: nil,
             order_by: []
 
-  # def add_filter(query, type, key, value), do: put_in(query.filters[key], value)
-  # def remove_filter(query, key), do: elem(pop_in(query.filters[key]), 1)
+  def remove_filter(query, key) do
+    put_in(
+      query.filters,
+      Enum.filter(query.filters, fn
+        %{"key" => k} -> k != key
+        _ -> true
+      end)
+    )
+  end
+
+  def add_filter(query, type, key, value) do
+    put_in(query.filters, query.filters ++ [%{"type" => type, "key" => key, "value" => value}])
+  end
 
   def select(query, select), do: put_in(query.select, select)
 
