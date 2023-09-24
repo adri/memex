@@ -87,6 +87,15 @@ defmodule Memex.Search.Postgres do
       %{"type" => "Equals", "key" => "month", "value" => month}, q ->
         from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm') = ?", q, ^month))
 
+      %{"type" => "Equals", "key" => "time", "value" => time}, q ->
+        case DateTime.from_iso8601(time) do
+          {:ok, parsed, _} ->
+            from(q in q, where: fragment("?.created_at <= ?", q, ^parsed))
+
+          {:error, _error} ->
+            q
+        end
+
       %{"type" => "Equals", "key" => key, "value" => value}, q ->
         from(q in q, where: fragment("? -> ? \= ?::jsonb", q.body, ^key, ^value))
 
@@ -107,15 +116,6 @@ defmodule Memex.Search.Postgres do
 
       {"date", date}, q ->
         from(q in q, where: fragment("to_char(?.created_at, 'yyyy-mm-dd') = ?", q, ^date))
-
-      {"time", time}, q ->
-        case DateTime.from_iso8601(time) do
-          {:ok, parsed, _} ->
-            from(q in q, where: fragment("?.created_at <= ?", q, ^parsed))
-
-          {:error, _error} ->
-            q
-        end
 
       {"person_name", name}, q ->
         from(q in q,

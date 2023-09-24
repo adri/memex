@@ -152,28 +152,40 @@ export const Editor = {
       this.search();
     });
 
-    this.el.form.addEventListener("addFilter", (event) => {
-      let text = this.view.state.doc.toString();
-      const changes = [];
-      const pattern = new RegExp(`${event.detail.key}:".*"`);
+    this.el.form.addEventListener("removeFilter", (event) => {
+      const text = this.view.state.doc.toString();
+      const pattern = new RegExp(`\\s*${event.detail.key}:".*"`);
       const match = pattern.exec(text);
-      const filter = `${event.detail.key}:"${event.detail.value}"`;
-
-      if (match) {
-        changes.push({
-          from: match.index,
-          to: match.index + match[0].length,
-          insert: filter,
-        });
-      } else {
-        changes.push({
-          from: 0,
-          to: text.length,
-          insert: `${text} ${filter}`,
-        });
+      if (match == null) {
+        return;
       }
 
-      this.view.dispatch({ changes });
+      this.view.dispatch({
+        changes: {
+          from: match.index,
+          to: match.index + match[0].length,
+          insert: "",
+        },
+      });
+    });
+
+    this.el.form.addEventListener("addFilter", (event) => {
+      const text = this.view.state.doc.toString();
+      const filter = `${event.detail.key}:"${event.detail.value}"`;
+
+      this.view.dispatch({
+        changes: { from: 0, to: text.length, insert: `${text} ${filter}` },
+      });
+    });
+
+    this.el.form.addEventListener("resetFilters", (event) => {
+      const text = this.view.state.doc.toString();
+      this.view.dispatch({
+        changes: { from: 0, to: text.length, insert: "" },
+      });
+    });
+
+    this.el.form.addEventListener("search", (event) => {
       this.search();
     });
 

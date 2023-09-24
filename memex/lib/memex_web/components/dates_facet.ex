@@ -4,6 +4,8 @@ defmodule MemexWeb.DatesFacet do
 
   alias Phoenix.LiveView.JS
 
+  @target "#search-input"
+
   prop(dates, :list)
   prop(max_count, :number)
   prop(loading, :boolean, default: false)
@@ -17,7 +19,7 @@ defmodule MemexWeb.DatesFacet do
         :for={{date, count} <- @dates}
         class="group text-xs hover:bg-gray-100 hover:dark:bg-gray-600"
         id={"facet-#{date}"}
-        phx-click={JS.dispatch("addFilter", to: "#search-input", detail: %{key: "month", value: date})}
+        phx-click={filter_by_date(date)}
       >
         <span
           class="absolute opacity-0 group-hover:opacity-100 text-gray-500 dark:text-gray-100 leading-3"
@@ -36,6 +38,14 @@ defmodule MemexWeb.DatesFacet do
       </div>
     </div>
     """
+  end
+
+  defp filter_by_date(date) do
+    %JS{}
+    |> JS.dispatch("removeFilter", to: @target, detail: %{key: "time"})
+    |> JS.dispatch("removeFilter", to: @target, detail: %{key: "month"})
+    |> JS.dispatch("addFilter", to: @target, detail: %{key: "month", value: date})
+    |> JS.dispatch("search", to: @target)
   end
 
   defp update(assigns) do
