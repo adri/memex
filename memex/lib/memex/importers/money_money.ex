@@ -25,7 +25,7 @@ defmodule Memex.Importers.MoneyMoney do
 
   def default_config do
     %{
-      "location" => "/Users/adrimbp/workspace/learn_memex/meilisearch/memex/MoneyMoney.sqlite",
+      "location" => "#{System.user_home!()}/Library/Containers/com.moneymoney-app.retail/Data/Library/Application\ Support/MoneyMoney/Database/MoneyMoney.sqlite",
       "database_password" => "set_your_password_here",
       "bank_timezone" => "Europe/Amsterdam",
       "schedule" => :watcher
@@ -42,7 +42,7 @@ defmodule Memex.Importers.MoneyMoney do
       connection_options: [
         custom_pragmas: [
           key: config["database_password"],
-          cipher_compatibility: 3
+          cipher_compatibility: 4
         ]
       ],
       setup: [],
