@@ -59,7 +59,7 @@ defmodule MemexWeb.Sidebars.SettingsLive do
         </:content>
         <:right>
           <button :if={assigns["total_hits_#{importer.id}"]}>
-            {MemexWeb.TimelineView.number_short(assigns["total_hits_#{importer.id}"])} docs
+            {MemexWeb.TimelineView.number_short(assigns[String.to_atom("total_hits_#{importer.id}")])} docs
           </button>
           <Badge click="import" values={id: importer.id}>
             <:icon><Icon.Plus /></:icon>

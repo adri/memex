@@ -131,7 +131,7 @@ defmodule MemexWeb do
 
       defp assign_default_if_not_set(socket, key, default) do
         case socket.assigns[String.to_atom("#{key}")] do
-          nil -> assign(socket, key, default)
+          nil -> assign(socket, String.to_atom("#{key}"), default)
           _ -> socket
         end
       end
