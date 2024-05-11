@@ -35,7 +35,7 @@ defmodule MemexWeb.PageLive do
     <div class="mx-auto mt-3">
       <SearchBar query={@query} />
       <div :if={@query == ""}>
-        <Badge class="absolute right-2 top-12" click="open-sidebar" values={type: "settings"}>
+        <Badge class="absolute right-2 top-6" click="open-sidebar" values={type: "settings"}>
           <:icon><SettingsIcon /></:icon>
         </Badge>
         <div class="flex items-start">
