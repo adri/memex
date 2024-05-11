@@ -71,6 +71,9 @@ defmodule Memex.Importers.Notes do
 
     def render(assigns) do
       ~F"""
+      <div class="truncate" :if={Enum.empty?(parse_patch(@item["commit_diff"]))}>
+        {Jason.encode!(@item, pretty: true)}
+      </div>
       <div :for={patch <- parse_patch(@item["commit_diff"])}>
         <a
           href={"obsidian://open?#{URI.encode_query(%{"vault" => "Wiki_Synced", "file" => MemexWeb.TimelineView.nl2br(patch.from)})}"}
@@ -97,7 +100,9 @@ defmodule Memex.Importers.Notes do
     defp parse_patch(patch) do
       case GitDiff.parse_patch(String.trim(patch)) do
         {:ok, parsed_diff} -> parsed_diff
-        {:error, _} -> []
+        {:error, error} ->
+          error |> IO.inspect()
+          []
       end
     end
   end
