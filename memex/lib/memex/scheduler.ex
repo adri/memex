@@ -24,19 +24,14 @@ defmodule Memex.Scheduler do
   end
 
   def handle_info({:file_event, watcher_pid, {path, events}}, %{watcher_pid: watcher_pid} = state) do
-    IO.inspect({watcher_pid, {path, events}}, label: "55")
-
     {:noreply, state}
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
-    IO.inspect({watcher_pid, "stop"}, label: "55")
     {:noreply, state}
   end
 
   defp run do
-    IO.inspect("Running importer", label: "scheduler")
-
     Enum.map(Importer.configured_importers(), fn importer -> Importer.import(importer) end)
     # todo:
     # - loop all importers
@@ -48,8 +43,6 @@ defmodule Memex.Scheduler do
   end
 
   defp register_watcher do
-    IO.inspect("Watching paths")
-    IO.inspect(Importer.get_dirs_to_watch())
     {:ok, pid} = FileSystem.start_link(dirs: [Importer.get_dirs_to_watch()])
     FileSystem.subscribe(pid)
 
