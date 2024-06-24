@@ -13,7 +13,7 @@
     "mapbox-gl": "2.15.0"
   },
   "devDependencies": {
-    "@lezer/generator": "^1.0.0",
+    "@lezer/generator": "^1.7.1",
     "autoprefixer": "^10.4.16",
     "esbuild": "^0.19.2",
     "esbuild-jest": "^0.5.0",
