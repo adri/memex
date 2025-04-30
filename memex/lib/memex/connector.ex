@@ -60,4 +60,10 @@ defmodule Memex.Connector do
     |> Enum.into("")
     |> Jason.decode()
   end
+
+  def copy_to_temp_location(path) do
+    temp_path = Path.join(System.tmp_dir!(), Path.basename(path))
+    File.cp!(path, temp_path)
+    temp_path
+  end
 end
