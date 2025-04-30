@@ -8,7 +8,7 @@ defmodule Memex.Connector do
       connection_options
       |> Keyword.merge(
         database: path,
-        mode: :readonly
+        mode: :readwrite
       )
       |> Keyword.filter(fn {_k, v} -> not is_nil(v) end)
 
