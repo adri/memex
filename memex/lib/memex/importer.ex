@@ -11,7 +11,7 @@ defmodule Memex.Importer do
 
   defmodule Sqlite do
     @moduledoc false
-    defstruct [:location, :query, setup: [], connection_options: []]
+    defstruct [:location, :query, setup: [], connection_options: [], copy_to_temp: false]
   end
 
   defmodule Command do
@@ -187,9 +187,21 @@ defmodule Memex.Importer do
         location: location,
         query: query,
         setup: setup,
-        connection_options: connection_options
+        connection_options: connection_options,
+        copy_to_temp: copy_to_temp
       } ->
-        sqlite_json(location, query, [], setup, connection_options)
+        db_file =
+          if copy_to_temp do
+            create_temp_copy(location)
+          else
+            location
+          end
+
+        try do
+          sqlite_json(db_file, query, [], setup, connection_options)
+        after
+          if copy_to_temp, do: File.rm(db_file)
+        end
 
       %Command{command: command, arguments: args} ->
         cmd(command, args)
@@ -207,6 +219,16 @@ defmodule Memex.Importer do
       _ ->
         {:error, :unkown_fetch_type}
     end
+  end
+
+  defp create_temp_copy(original_file) do
+    tmp_dir = System.tmp_dir!()
+    random_suffix = :crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)
+    tmp_file = Path.join(tmp_dir, "memex_sqlite_#{random_suffix}.db")
+
+    File.cp!(original_file, tmp_file)
+
+    tmp_file
   end
 
   defp transform(module, result, config) do
