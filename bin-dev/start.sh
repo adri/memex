@@ -2,7 +2,7 @@
 set -e
 
 # Start Postgres
-docker compose up -d
+docker-compose up -d
 dockerize -wait-retry-interval 5s -wait tcp://127.0.0.1:65432 -timeout 5m &> /dev/null
 
 # Start Elixir frontend
