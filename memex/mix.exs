@@ -58,7 +58,6 @@ defmodule Memex.MixProject do
       {:phoenix_live_view, "~> 0.19.3"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix, "~> 1.7.5"},
-      {:plug_cowboy, "~> 2.0"},
       {:postgrex, "~> 0.17.1"},
       {:surface, "~> 0.10"},
       {:surface_formatter, "~> 0.7.5", only: :dev},
