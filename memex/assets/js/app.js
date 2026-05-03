@@ -6,12 +6,13 @@ import { ForceInputValue } from "./force_input_value";
 import { Sidebar } from "./sidebar";
 import { Map } from "./map";
 import { Editor } from "./editor";
+import { ChartHook } from "./chart";
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: { InfiniteScroll, ForceInputValue, Sidebar, Map, Editor },
+  hooks: { InfiniteScroll, ForceInputValue, Sidebar, Map, Editor, ChartHook },
   params: { _csrf_token: csrfToken },
 });
 
