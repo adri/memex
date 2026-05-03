@@ -36,7 +36,7 @@ defmodule Memex.Importers.AppleMessages do
     %Importer.Sqlite{
       location: config["location"],
       connection_options: [
-        journal_mode: :wal
+        journal_mode: :wal,
       ],
       setup: [
         """

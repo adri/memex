@@ -37,7 +37,9 @@ defmodule Memex.Importers.ApplePhotos do
     %Importer.Sqlite{
       location: "#{config["location"]}/database/Photos.sqlite",
       connection_options: [
-        journal_mode: :wal
+        journal_mode: :wal,
+        mode: "ro",
+        immutable: 1
       ],
       setup: [
         """
@@ -120,7 +122,7 @@ defmodule Memex.Importers.ApplePhotos do
       LEFT JOIN metadata ON ZASSET.ZUUID=metadata.uuid
       GROUP BY ZASSET.Z_PK
       ORDER BY ZASSET.Z_PK DESC
-      LIMIT 200
+      LIMIT 10000
       """
     }
   end
