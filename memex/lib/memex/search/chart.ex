@@ -11,14 +11,16 @@ defmodule Memex.Search.Chart do
   alias Memex.Repo
   alias Memex.Schema.Document
 
-  @chart_keys ~w(chart x y from range)
+  # Keys consumed by the chart spec itself. Everything else (`provider`,
+  # `verb`, free-text terms, …) is left in `spec.filters` and applied as a
+  # normal where-clause against `documents.body`.
+  @chart_keys ~w(chart x y range)
 
   defmodule Spec do
     @moduledoc false
     defstruct type: "line",
               x: :day,
               y: :count,
-              from: nil,
               filters: [],
               range_days: 7
   end
@@ -35,7 +37,6 @@ defmodule Memex.Search.Chart do
       %{"key" => "chart", "value" => v}, acc -> %{acc | type: parse_type(v)}
       %{"key" => "x", "value" => v}, acc -> %{acc | x: parse_bucket(v)}
       %{"key" => "y", "value" => v}, acc -> %{acc | y: parse_y(v)}
-      %{"key" => "from", "value" => v}, acc -> %{acc | from: v}
       %{"key" => "range", "value" => v}, acc -> %{acc | range_days: parse_range(v)}
       filter, acc -> %{acc | filters: acc.filters ++ [filter]}
     end)
@@ -76,7 +77,6 @@ defmodule Memex.Search.Chart do
   defp bucket_counts(spec, start_at, end_at) do
     Document
     |> where([d], d.created_at >= ^start_at and d.created_at < ^end_at)
-    |> apply_from(spec.from)
     |> apply_filters(spec.filters)
     |> bucket_group(spec.x)
     |> Repo.all()
@@ -110,17 +110,13 @@ defmodule Memex.Search.Chart do
     )
   end
 
-  defp apply_from(q, nil), do: q
-
-  defp apply_from(q, from) do
-    provider = from |> String.split(".") |> List.first() |> normalise_provider()
-    where(q, [d], fragment("? ->> 'provider' = ?", d.body, ^provider))
-  end
-
   defp apply_filters(q, filters) do
     Enum.reduce(filters, q, fn
       %{"type" => "Equals", "key" => key, "value" => value}, q ->
-        where(q, [d], fragment("? -> ? = ?::jsonb", d.body, ^key, ^json_value(value)))
+        # Postgrex's JSONB encoder takes the raw value and JSON-encodes
+        # it once. Doing our own Jason.encode! here would double-encode
+        # strings (`"\"terminal\""`) and never match.
+        where(q, [d], fragment("? -> ? = ?::jsonb", d.body, ^key, ^value))
 
       %{"type" => "Prefix", "value" => value}, q ->
         where(q, [d], fragment("? @@ to_tsquery('simple', ?)", d.search, ^(value <> ":*")))
@@ -199,45 +195,34 @@ defmodule Memex.Search.Chart do
 
   defp daily_average(_, _), do: 0.0
 
-  defp unit_label(%Spec{from: nil}), do: "documents"
-
-  defp unit_label(%Spec{from: from}) do
-    from |> String.split(".") |> List.last() |> humanize_unit()
+  defp unit_label(spec) do
+    case provider_filter(spec) do
+      nil -> "documents"
+      p -> humanize_unit(p)
+    end
   end
 
-  defp build_title(%Spec{from: nil} = spec), do: "Documents #{cadence(spec.x)}"
+  defp build_title(spec) do
+    case provider_filter(spec) do
+      nil -> "Documents #{cadence(spec.x)}"
+      p -> "#{humanize_segment(p)} #{cadence(spec.x)}"
+    end
+  end
 
-  defp build_title(%Spec{from: from} = spec) do
-    "#{humanize(from)} #{cadence(spec.x)}"
+  defp provider_filter(%Spec{filters: filters}) do
+    Enum.find_value(filters, fn
+      %{"type" => "Equals", "key" => "provider", "value" => v} -> v
+      _ -> nil
+    end)
   end
 
   defp cadence(:day), do: "per day"
   defp cadence(:week), do: "per week"
   defp cadence(:month), do: "per month"
 
-  defp humanize(from) do
-    from
-    |> String.split(".")
-    |> Enum.map_join(" ", &humanize_segment/1)
-  end
-
-  defp humanize_segment("github"), do: "GitHub"
   defp humanize_segment(s), do: s |> String.replace("_", " ") |> String.capitalize()
 
   defp humanize_unit(s), do: s |> String.replace("_", " ")
-
-  defp normalise_provider("github"), do: "GitHub"
-  defp normalise_provider("safari"), do: "Safari"
-  defp normalise_provider("twitter"), do: "Twitter"
-  defp normalise_provider("photos"), do: "Photos"
-  defp normalise_provider("podcasts"), do: "Podcasts"
-  defp normalise_provider("imessage"), do: "iMessage"
-  defp normalise_provider("messages"), do: "iMessage"
-  defp normalise_provider("moneymoney"), do: "MoneyMoney"
-  defp normalise_provider("arc"), do: "Arc"
-  defp normalise_provider("notes"), do: "git-notes"
-  defp normalise_provider("terminal"), do: "terminal"
-  defp normalise_provider(other), do: String.capitalize(other)
 
   defp parse_type("bar"), do: "bar"
   defp parse_type("table"), do: "table"
@@ -267,13 +252,4 @@ defmodule Memex.Search.Chart do
     end
   end
 
-  defp json_value("true"), do: "true"
-  defp json_value("false"), do: "false"
-
-  defp json_value(value) do
-    case Integer.parse(value) do
-      {_, ""} -> value
-      _ -> Jason.encode!(value)
-    end
-  end
 end

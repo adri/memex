@@ -59,7 +59,7 @@ defmodule MemexWeb.PageLive do
       </div>
 
       <div class="flex items-start">
-        <div :if={@query != "" and @chart != nil} class="w-full mt-8 px-4">
+        <div :if={@query != "" and @chart != nil} class="w-full mt-20 pl-9 pr-9">
           <Chart data={@chart} />
         </div>
         <div :if={@query != "" and @chart == nil} class="w-4/5 mt-8">
