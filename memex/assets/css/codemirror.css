@@ -15,16 +15,109 @@
   @apply font-sans text-black text-base dark:text-white;
 }
 
-/* Style codemirror autocomplete with darkmode */
+/* ---------- Autocomplete dropdown ---------- */
+
 .ͼ2 .cm-tooltip {
-  @apply bg-white dark:bg-black text-black dark:text-white
-  border-0 rounded-md overflow-hidden shadow-lg font-sans text-base;
+  @apply bg-white dark:bg-gray-900 text-black dark:text-white border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden shadow-2xl font-sans text-base;
+  /* The chart card sits in normal flow with a high stacking context;
+     the autocomplete tooltip needs to float above everything on the page. */
+  z-index: 60;
 }
 
-.ͼ2 .cm-tooltip-autocomplete ul li {
-  @apply font-sans;
+.ͼ2 .cm-tooltip-autocomplete {
+  margin-top: 8px;
 }
 
-.ͼ2 .cm-tooltip-autocomplete ul li[aria-selected] {
-  @apply bg-gray-300 text-black dark:bg-gray-700 dark:text-white;
+.ͼ2 .cm-tooltip-autocomplete > ul {
+  @apply py-2;
+  min-width: 360px;
+  max-width: 480px;
+  font-family: inherit;
+}
+
+/* Matching CodeMirror's `.ͼ1 .cm-tooltip.cm-tooltip-autocomplete > ul > li`
+ * specificity (3 classes + 2 elements) isn't enough — its theme styles are
+ * injected at runtime, after our static stylesheet, so source order wins
+ * a tie. Anchor on both `ͼ1` and `ͼ2` (both always present together) to
+ * bump specificity above CodeMirror's defaults. */
+.ͼ1.ͼ2 .cm-tooltip.cm-tooltip-autocomplete > ul > li,
+.ͼ2 .ͼ1 .cm-tooltip.cm-tooltip-autocomplete > ul > li {
+  @apply font-sans flex items-center gap-3 cursor-pointer;
+  padding: 0.5rem 0.875rem;
+  line-height: 1.25rem;
+}
+
+.ͼ1.ͼ2 .cm-tooltip-autocomplete ul li[aria-selected],
+.ͼ2 .ͼ1 .cm-tooltip-autocomplete ul li[aria-selected] {
+  @apply bg-gray-100 text-black dark:bg-gray-800 dark:text-white;
+}
+
+.ͼ2 .cm-completionLabel {
+  @apply flex-1 truncate text-sm;
+}
+
+.ͼ2 .cm-completionDetail {
+  @apply text-xs font-mono not-italic ml-auto pl-3 text-gray-400 dark:text-gray-600;
+}
+
+.ͼ2 .cm-completionMatchedText {
+  @apply text-black dark:text-white no-underline font-semibold;
+}
+
+/* ---------- Icons ---------- */
+/* Replace CodeMirror's default tiny letter icons with proper SVGs.
+ * Custom completion `type` strings map to `.cm-completionIcon-<type>`. */
+
+.ͼ2 .cm-completionIcon {
+  @apply flex-shrink-0 w-5 h-5 opacity-70;
+  font-size: 0; /* hide default character content */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 1.1rem 1.1rem;
+}
+
+.ͼ2 .cm-completionIcon::after {
+  content: "";
+}
+
+/* Heroicons (outline) inlined as data: URIs.  Stroke is %23525252 (gray-600);
+   the dark-mode rule below inverts the SVG so it shows light on dark. */
+
+.ͼ2 .cm-completionIcon-chart {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-axis {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M3 3v18h18M7 17l4-6 3 4 5-7'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-calendar {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-source {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 015.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-verb {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-field {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z'/></svg>");
+}
+
+.ͼ2 .cm-completionIcon-value {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.8' stroke='%23525252'><path stroke-linecap='round' stroke-linejoin='round' d='M9 12.75 11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'/></svg>");
+}
+
+/* Dark mode: invert the gray-600 stroke to a light tone. */
+.dark .ͼ2 .cm-completionIcon-chart,
+.dark .ͼ2 .cm-completionIcon-axis,
+.dark .ͼ2 .cm-completionIcon-calendar,
+.dark .ͼ2 .cm-completionIcon-source,
+.dark .ͼ2 .cm-completionIcon-verb,
+.dark .ͼ2 .cm-completionIcon-field,
+.dark .ͼ2 .cm-completionIcon-value {
+  filter: invert(0.85);
 }

@@ -3,8 +3,8 @@ import {
   EditorView,
   placeholder,
   highlightSpecialChars,
+  tooltips,
 } from "@codemirror/view";
-import { CompletionContext } from "@codemirror/autocomplete";
 import {
   defaultHighlightStyle,
   syntaxHighlighting,
@@ -22,61 +22,14 @@ import {
   acceptCompletion,
 } from "@codemirror/autocomplete";
 import { Search, parseStateToFilters } from "./search_language";
-import * as terms from "./search_language/syntax.terms.js";
+import { buildCompletions } from "./search_language/completion";
 import { tags } from "@lezer/highlight";
-import { inlineSuggestion } from "codemirror-extension-inline-suggestion";
 
 // Enforces that the input won't split over multiple lines (basically prevents
 // Enter from inserting a new line)
 const singleLine = EditorState.transactionFilter.of((transaction) =>
   transaction.newDoc.lines > 1 ? [] : transaction
 );
-
-// Nice query language:
-// - https://www.meilisearch.com/docs/learn/fine_tuning_results/filtering
-// - Qdrant: https://qdrant.tech/documentation/concepts/filtering/#geo
-//   { filter: { must: [{ key: "", match: { value: "" } }] }, must_not: ..., should: ...}
-
-// const query = [
-//   { type: "provider", operator: "=", value: "Messages" }, // Auto convert "provider:Messages", "provider IN (Messages, Emails)"
-//   { type: "provider", operator: "exists" }, // auto convert "provider exists"
-//   { type: "provider", operator: "is_empty" }, // auto convert "provider is empty"
-//   { type: "date", operator: ">=", value: "2022-03-01T00:00:00Z" }, // auto convert "date > 1 month ago"
-//   { type: "_allSearchableFields", operator: "prefix", value: "Els" }, // auto convert "Els"
-//   // auto convert '"Els Philipp" or "Els Remijnse"'
-//   {
-//     type: "or", operator: "", value: [ // ⚠️ no operator?
-//       { type: "_allSearchableFields", operator: "=", value: "Els Philipp" },
-//       { type: "_allSearchableFields", operator: "=", value: "Els Remijnse" },
-//     ]
-//   },
-//   // auto convert "Els near Amsterdam" or "Els near Amsterdam within 20km". "near + [city] + within [distance]"
-//   {
-//     type: "_geoRadius",
-//     operator: "radius",
-//     value: {
-//       type: "geopoint",
-//       latitude: 32.1212312,
-//       longitude: 4.0123123,
-//       distance: "20km",
-//     },
-//   },
-//   {
-//     type: "_geoRadius",
-//     operator: "radius",
-//     value: {
-//       type: "geopoint",
-//       latitude: 32.1212312,
-//       longitude: 4.0123123,
-//       distance: "20km",
-//     },
-//   },
-//   {
-//     type: "",
-//     operator: "",
-//     value:,
-//   },
-// ];
 
 const myHighlightStyle = HighlightStyle.define([
   {
@@ -96,6 +49,8 @@ const myHighlightStyle = HighlightStyle.define([
 
 export const Editor = {
   mounted() {
+    this.catalog = null;
+
     const view = new EditorView({
       state: EditorState.create({
         doc: this.el.value ?? "",
@@ -112,23 +67,20 @@ export const Editor = {
             ...completionKeymap,
           ]),
           Search(),
+          // Render the autocomplete tooltip into <body> so it escapes the
+          // search bar's fixed stacking context and reliably overlays any
+          // in-page content below (chart card, timeline, etc.).
+          tooltips({ parent: document.body }),
           autocompletion({
-            icons: false,
+            icons: true,
             selectOnOpen: true,
             activateOnTyping: true,
             closeOnBlur: false,
-            maxRenderedOptions: 3,
+            maxRenderedOptions: 8,
           }),
-          keymap.of([{ key: "Tab", run: acceptCompletion }]), // needed because otherwise tab doesn't autocomplete
+          keymap.of([{ key: "Tab", run: acceptCompletion }]),
           Search().language.data.of({
-            autocomplete: (context) => this.autocomplete(context),
-          }),
-          inlineSuggestion({
-            fetchFn: async (state) => {
-              console.log({ state });
-              return "";
-            },
-            delay: 0,
+            autocomplete: (context) => buildCompletions(context, this.catalog),
           }),
         ],
       }),
@@ -136,7 +88,10 @@ export const Editor = {
     });
     this.view = view;
 
-    // Synchronise the form's textarea with the editor on change
+    this.handleEvent("search:catalog", (catalog) => {
+      this.catalog = catalog;
+    });
+
     this.el.form.addEventListener("keyup", (event) => {
       event.preventDefault();
 
@@ -144,7 +99,6 @@ export const Editor = {
         ["ArrowUp", "ArrowDown", "Enter"].includes(event.code) &&
         completionStatus(view.state) == null
       ) {
-        console.log("key-pressed", { key: event.code });
         this.pushEvent("key-pressed", { key: event.code });
         return;
       }
@@ -198,43 +152,8 @@ export const Editor = {
   search() {
     const query = this.view.state.doc.toString();
     const filters = parseStateToFilters(query, syntaxTree(this.view.state));
-    console.log({ query, filters });
 
     this.pushEvent("search", { query, filters });
-  },
-  autocomplete(context) {
-    const token = context.tokenBefore(["FilterExpression", "Identifier"]);
-    if (!token || token.from == token.to) return null;
-
-    const completion = {
-      sources: ["keyword", "search", "field_keys", "field_values"],
-      key: null,
-      value: token?.text,
-    };
-
-    // Future to determine if this has been interrupted
-    // const interruptedFuture = new Promise<'failed'>((resolve) => {
-    //   context.addEventListener('abort', () => {
-    //       resolve('failed')
-    //   })
-    // })
-
-    // if (token.type.id == terms.FilterExpression) {
-    //   completion.sources = ["field_values"];
-    //   completion.key = token.firstChild;
-    //   completion.value = token.firstChild?.nextSibling().nextSibling.value;
-    // }
-
-    console.log({ completion });
-
-    return new Promise((resolve) => {
-      this.pushEvent("completion", completion, (reply, ref) => {
-        resolve({
-          from: token.from,
-          options: reply.options,
-        });
-      });
-    });
   },
   unmounted() {
     this.view.destroy();
