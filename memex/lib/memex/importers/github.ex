@@ -173,7 +173,7 @@ defmodule Memex.Importers.Github do
       </p>
       <p :if={Enum.member?(["merged", "requested"], @item["verb"])} class="mb-2">
         <a href={@item["issue_url"]} target="_blank">{raw(@item["_formatted"]["issue_title"])}</a>
-        <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(@item["_formatted"]["issue_body"], compact_output: true))}</div>
+        <div class="text-sm text-gray-400 dark:text-gray-500">{raw(Earmark.as_html!(@item["_formatted"]["issue_body"] || "", compact_output: true))}</div>
       </p>
 
       <p :if={@item["repo_description"]} class="text-sm text-gray-400 dark:text-gray-400 truncate">
