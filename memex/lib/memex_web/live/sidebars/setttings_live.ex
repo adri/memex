@@ -4,7 +4,7 @@ defmodule MemexWeb.Sidebars.SettingsLive do
 
   alias Memex.Importer
   alias Memex.Schema.ImporterLog
-  alias Memex.Search.LegacyQuery, as: Query
+  alias Memex.Search.Query
   alias Memex.Search.Sidebars
   alias MemexWeb.Components.Badge
   alias MemexWeb.Components.Icon
@@ -24,7 +24,7 @@ defmodule MemexWeb.Sidebars.SettingsLive do
 
     socket =
       Enum.reduce(importers, socket, fn importer, socket ->
-        query = Query.from_string("provider:#{importer.provider}")
+        query = Query.from_filters([%{"type" => "Equals", "key" => "provider", "value" => importer.provider}])
 
         async_query(socket, "total_hits_#{importer.id}", nil, %{query | select: :total_hits})
       end)

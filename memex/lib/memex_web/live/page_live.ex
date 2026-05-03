@@ -2,7 +2,6 @@ defmodule MemexWeb.PageLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
-  alias Memex.Search.LegacyQuery
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
   alias MemexWeb.Components.Badge
