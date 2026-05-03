@@ -9,3 +9,4 @@ auth.json
 twitter.db
 github.db
 erl_crash.dump
+.claude/settings.local.json
