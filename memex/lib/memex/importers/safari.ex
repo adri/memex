@@ -29,6 +29,7 @@ defmodule Memex.Importers.Safari do
   def fetch(config) do
     %Importer.Sqlite{
       location: config["location"],
+      copy_to_temp: true,
       connection_options: [
         journal_mode: :wal
       ],
