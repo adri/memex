@@ -8,3 +8,4 @@ auth.json
 .envrc
 twitter.db
 github.db
+erl_crash.dump
