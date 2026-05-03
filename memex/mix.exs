@@ -33,7 +33,7 @@ defmodule Memex.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:bandit, "~> 1.0-pre"},
+      {:bandit, "~> 1.5"},
       {:con_cache, "~> 0.13"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:earmark, "~> 1.4.29"},
