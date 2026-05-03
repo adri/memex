@@ -2,8 +2,10 @@ defmodule MemexWeb.PageLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
+  alias Memex.Search.Chart, as: ChartQuery
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
+  alias MemexWeb.Chart
   alias MemexWeb.Components.Badge
   alias MemexWeb.Components.Icons.SettingsIcon
   alias MemexWeb.DatesFacet
@@ -20,6 +22,7 @@ defmodule MemexWeb.PageLive do
   data(selected_index, :number, default: 0)
   data(dates, :list, default: [])
   data(total_hits, :number, default: 0)
+  data(chart, :map, default: nil)
   data(sidebars, :list, default: Sidebars.init())
 
   def mount(params, _session, socket) do
@@ -46,7 +49,10 @@ defmodule MemexWeb.PageLive do
       </div>
 
       <div class="flex items-start">
-        <div :if={@query != ""} class="w-4/5 mt-8">
+        <div :if={@query != "" and @chart != nil} class="w-full mt-8 px-4">
+          <Chart data={@chart} />
+        </div>
+        <div :if={@query != "" and @chart == nil} class="w-4/5 mt-8">
           <SearchResultStats total_hits={@total_hits} />
           <Timeline
             query={@query}
@@ -58,7 +64,7 @@ defmodule MemexWeb.PageLive do
             enable_load_more
           />
         </div>
-        <div :if={@query != ""} class="w-1/5 overflow-hidden pl-5 text-white">
+        <div :if={@query != "" and @chart == nil} class="w-1/5 overflow-hidden pl-5 text-white">
           <DatesFacet dates={@dates} loading={false} />
         </div>
         <SidebarsComponent sidebars={@sidebars} socket={assigns.socket} />
@@ -68,11 +74,22 @@ defmodule MemexWeb.PageLive do
   end
 
   def handle_event("search", %{"query" => ""}, socket) do
-    {:noreply, assign(socket, query: "", filters: [], page: 1, selected_index: 0, items: [])}
+    {:noreply,
+     assign(socket,
+       query: "",
+       filters: [],
+       page: 1,
+       selected_index: 0,
+       items: [],
+       chart: nil
+     )}
   end
 
   def handle_event("search", %{"query" => query, "filters" => filters}, socket) do
-    {:noreply, socket |> assign(query: query, filters: filters, selected_index: 0, page: 1) |> search()}
+    {:noreply,
+     socket
+     |> assign(query: query, filters: filters, selected_index: 0, page: 1)
+     |> search()}
   end
 
   def handle_event("completion", %{"sources" => sources, "key" => key, "value" => value}, socket) do
@@ -128,10 +145,24 @@ defmodule MemexWeb.PageLive do
     {:noreply, assign(socket, sidebars: Sidebars.close_last(sidebars))}
   end
 
-  defp search(%{assigns: %{page: page, filters: filters}} = socket) do
+  defp search(%{assigns: %{filters: filters}} = socket) do
+    if ChartQuery.chart?(filters) do
+      chart_search(socket)
+    else
+      timeline_search(socket)
+    end
+  end
+
+  defp chart_search(%{assigns: %{filters: filters}} = socket) do
+    chart_data = filters |> ChartQuery.build_spec() |> ChartQuery.query()
+    assign(socket, chart: chart_data, items: [], dates: [], total_hits: 0)
+  end
+
+  defp timeline_search(%{assigns: %{page: page, filters: filters}} = socket) do
     query = Query.from_filters(filters)
 
     socket
+    |> assign(chart: nil)
     |> async_query(:items, [], %{
       query
       | select: :hits_with_highlights,
