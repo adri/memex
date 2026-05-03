@@ -17,6 +17,12 @@ defmodule Memex.Importers.FishShell do
 
   def provider, do: "terminal"
 
+  def field_metadata do
+    %{
+      command: %{name: "Command", description: "Shell command"}
+    }
+  end
+
   def default_config do
     %{
       "schedule" => :watcher

@@ -23,6 +23,18 @@ defmodule Memex.Importers.MoneyMoney do
 
   def provider, do: "MoneyMoney"
 
+  def field_metadata do
+    %{
+      transaction_account_name: %{name: "Account", description: "Bank account name", dynamic: true},
+      transaction_category: %{name: "Category", description: "Transaction category", dynamic: true},
+      transaction_amount: %{name: "Amount", description: "Transaction amount"},
+      transaction_currency: %{name: "Currency", description: "Transaction currency", dynamic: true},
+      transaction_recipient: %{name: "Recipient", description: "Transaction recipient", dynamic: true},
+      transaction_reference: %{name: "Reference", description: "Transaction reference"},
+      transaction_purpose: %{name: "Purpose", description: "Transaction purpose"}
+    }
+  end
+
   def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Containers/com.moneymoney-app.retail/Data/Library/Application\ Support/MoneyMoney/Database/MoneyMoney.sqlite",

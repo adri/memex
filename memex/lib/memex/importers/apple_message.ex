@@ -21,6 +21,16 @@ defmodule Memex.Importers.AppleMessages do
 
   def provider, do: "iMessage"
 
+  def field_metadata do
+    %{
+      message_direction: %{name: "Direction", description: "Sent or received", dynamic: true},
+      message_service: %{name: "Service", description: "iMessage or SMS", dynamic: true},
+      message_text: %{name: "Message", description: "Message body text"},
+      person_name: %{name: "Person", description: "Contact name", dynamic: true},
+      person_id: %{name: "Person ID", description: "Contact identifier"}
+    }
+  end
+
   def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Messages/chat.db",

@@ -18,6 +18,13 @@ defmodule Memex.Importers.Notes do
 
   def provider, do: "git-notes"
 
+  def field_metadata do
+    %{
+      commit_sha: %{name: "Commit SHA", description: "Commit SHA"},
+      commit_diff: %{name: "Diff", description: "Commit diff body"}
+    }
+  end
+
   def default_config do
     %{
       "schedule" => :watcher

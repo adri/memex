@@ -26,6 +26,19 @@ defmodule Memex.Importers.ApplePhotos do
 
   def provider, do: "Photos"
 
+  def field_metadata do
+    %{
+      photo_file_path: %{name: "File path", description: "Photo file path"},
+      photo_file_name: %{name: "File name", description: "Photo file name"},
+      photo_kind: %{name: "Kind", description: "Photo kind (image, video, ...)", dynamic: true},
+      photo_labels: %{name: "Labels", description: "Detected labels in the photo"},
+      place_name: %{name: "Place", description: "Place name", dynamic: true},
+      person_id: %{name: "Person ID", description: "Person identifier"},
+      person_name: %{name: "Person", description: "Person name", dynamic: true},
+      device_name: %{name: "Device", description: "Camera or device", dynamic: true}
+    }
+  end
+
   def default_config do
     %{
       "location" => "#{System.user_home!()}/Pictures/Photos\ Library.photoslibrary",

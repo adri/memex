@@ -33,6 +33,21 @@ defmodule Memex.Importers.Github do
 
   def provider, do: @provider
 
+  def field_metadata do
+    %{
+      repo_name: %{name: "Repository", description: "GitHub repository", dynamic: true},
+      issue_title: %{name: "Issue title", description: "GitHub issue title"},
+      issue_body: %{name: "Issue body", description: "GitHub issue body"},
+      issue_url: %{name: "Issue URL", description: "GitHub issue URL"},
+      review_body: %{name: "Review body", description: "GitHub review body"},
+      review_state: %{name: "Review state", description: "GitHub review state"},
+      review_url: %{name: "Review URL", description: "GitHub review URL"},
+      comment_body: %{name: "Comment body", description: "GitHub comment body"},
+      comment_url: %{name: "Comment URL", description: "GitHub comment URL"},
+      github_user_name: %{name: "GitHub user", description: "GitHub username", dynamic: true}
+    }
+  end
+
   def default_config do
     %{
       "user_name" => "",

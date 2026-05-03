@@ -30,6 +30,17 @@ defmodule Memex.Importers.ApplePodcasts do
 
   def provider, do: "Podcasts"
 
+  def field_metadata do
+    %{
+      episode_title: %{name: "Episode", description: "Episode title"},
+      episode_description: %{name: "Episode description", description: "Episode description"},
+      episode_author: %{name: "Episode author", description: "Episode author", dynamic: true},
+      podcast_title: %{name: "Podcast", description: "Podcast title", dynamic: true},
+      podcast_author: %{name: "Podcast author", description: "Podcast author", dynamic: true},
+      podcast_category: %{name: "Category", description: "Podcast category", dynamic: true}
+    }
+  end
+
   def default_config do
     %{
       "location" =>

@@ -25,7 +25,16 @@ defmodule Memex.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Memex.Supervisor]
-    Supervisor.start_link(children, opts)
+    result = Supervisor.start_link(children, opts)
+
+    # Warm the search-bar autocomplete catalog so the first page load
+    # doesn't pay the ~10s cost of distinct-value queries. Skipped in
+    # test, where Repo runs in a sandbox each test owns separately.
+    if Mix.env() != :test do
+      Task.start(fn -> Memex.Search.Catalog.snapshot() end)
+    end
+
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration

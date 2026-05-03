@@ -34,6 +34,17 @@ defmodule Memex.Importers.Arc do
 
   def provider, do: "Arc"
 
+  def field_metadata do
+    %{
+      place_name: %{name: "Place", description: "Place name", dynamic: true},
+      place_address: %{name: "Address", description: "Place address"},
+      activity_type: %{name: "Activity", description: "Activity type (walking, running, ...)", dynamic: true},
+      activity_step_count: %{name: "Steps", description: "Step count"},
+      activity_heart_rate_average: %{name: "Heart rate", description: "Average heart rate"},
+      activity_active_energy_burned: %{name: "Energy", description: "Active energy burned"}
+    }
+  end
+
   def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Mobile\ Documents/iCloud~com~bigpaua~LearnerCoacher/",

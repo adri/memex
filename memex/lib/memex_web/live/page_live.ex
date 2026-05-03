@@ -2,6 +2,8 @@ defmodule MemexWeb.PageLive do
   @moduledoc false
   use MemexWeb, :surface_live_view
 
+  alias Memex.Importer
+  alias Memex.Search.Catalog
   alias Memex.Search.Chart, as: ChartQuery
   alias Memex.Search.Query
   alias Memex.Search.Sidebars
@@ -27,6 +29,14 @@ defmodule MemexWeb.PageLive do
 
   def mount(params, _session, socket) do
     Sidebars.subscribe()
+
+    socket =
+      if connected?(socket) do
+        Importer.subscribe()
+        push_event(socket, "search:catalog", Catalog.snapshot())
+      else
+        socket
+      end
 
     {:ok, assign(socket, debug: Map.has_key?(params, "debug"))}
   end
@@ -90,20 +100,6 @@ defmodule MemexWeb.PageLive do
      socket
      |> assign(query: query, filters: filters, selected_index: 0, page: 1)
      |> search()}
-  end
-
-  def handle_event("completion", %{"sources" => sources, "key" => key, "value" => value}, socket) do
-    options =
-      key
-      |> Memex.Schema.Catalog.search(value, sources)
-      |> Enum.map(fn %{"type" => type, "value" => value} ->
-        %{
-          "type" => type,
-          "label" => value
-        }
-      end)
-
-    {:reply, %{"options" => options}, socket}
   end
 
   def handle_event("load-more", _, %{assigns: assigns} = socket) do
@@ -176,4 +172,12 @@ defmodule MemexWeb.PageLive do
   def handle_info(%{event: event, payload: payload}, socket) do
     handle_event(event, payload, socket)
   end
+
+  def handle_info({Importer, %Memex.Schema.ImporterLog{state: state}}, socket)
+      when state in ["success", "error"] do
+    Catalog.invalidate()
+    {:noreply, push_event(socket, "search:catalog", Catalog.snapshot())}
+  end
+
+  def handle_info({Importer, _}, socket), do: {:noreply, socket}
 end

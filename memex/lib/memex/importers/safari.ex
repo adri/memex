@@ -19,6 +19,14 @@ defmodule Memex.Importers.Safari do
 
   def provider, do: "Safari"
 
+  def field_metadata do
+    %{
+      website_title: %{name: "Page title", description: "Page title"},
+      website_url: %{name: "URL", description: "Visited URL"},
+      device_name: %{name: "Device", description: "Device the visit happened on", dynamic: true}
+    }
+  end
+
   def default_config do
     %{
       "location" => "#{System.user_home!()}/Library/Safari/History.db",
